@@ -3,11 +3,15 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"scribble/socket"
+	socket "scribble/socket"
+	utils "scribble/utils"
+
+	"github.com/labstack/echo/v4"
 )
 
-func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) {
+func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) error {
 	fmt.Println("WebSocket Endpoint Hit by javascript")
+
 	conn, err := socket.Upgrade(w, r)
 	if err != nil {
 		fmt.Fprintf(w, "%+v\n", err)
@@ -20,19 +24,29 @@ func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) {
 
 	pool.Register <- client
 	client.Read()
+
+	return nil
 }
 
-func setupRoutes() {
+func setupRoutes(e *echo.Echo) {
 	pool := socket.NewPool()
 	go pool.Start()
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(pool, w, r)
+	e.GET("/app", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "index", nil)
+	})
+
+	e.GET("/ws", func(c echo.Context) error {
+		return serveWs(pool, c.Response().Writer, c.Request())
 	})
 }
 
 func main() {
-	fmt.Println("Distributed Chat App v0.01")
-	setupRoutes()
-	http.ListenAndServe(":8080", nil)
+	e := echo.New()
+	e.Static("/public", "public")
+	e.Renderer = utils.T
+
+	setupRoutes(e)
+
+	e.Logger.Fatal(e.Start(":1323"))
 }

@@ -2,7 +2,7 @@ const msgInp = document.querySelector('#msg');
 const sendMsgBtn = document.querySelector('#sendMsg');
 const messagesDiv = document.querySelector('.messages');
 
-const socket = new WebSocket('ws://localhost:8080/ws');
+const socket = new WebSocket('ws://localhost:1323/ws');
 
 const addMsgToDOM = function (msg) {
 	if (msg.length === 0) return;
