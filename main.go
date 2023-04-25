@@ -10,7 +10,9 @@ import (
 )
 
 func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) error {
-	fmt.Println("WebSocket Endpoint Hit by javascript")
+	// fmt.Println("WebSocket Endpoint Hit by javascript")
+
+	clientId := r.URL.Query().Get("id")
 
 	conn, err := socket.Upgrade(w, r)
 	if err != nil {
@@ -18,6 +20,7 @@ func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	client := &socket.Client{
+		ID:   clientId,
 		Conn: conn,
 		Pool: pool,
 	}
@@ -33,7 +36,9 @@ func setupRoutes(e *echo.Echo) {
 	go pool.Start()
 
 	e.GET("/app", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "index", nil)
+		return c.Render(http.StatusOK, "index", map[string]interface{}{
+			"Word": "basketball",
+		})
 	})
 
 	e.GET("/ws", func(c echo.Context) error {

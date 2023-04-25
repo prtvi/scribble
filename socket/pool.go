@@ -20,6 +20,9 @@ type Client struct {
 	Pool *Pool
 }
 
+// 0 ack (joined/exited) => "CONNECTED" / "DISCONNECTED"
+// 1 string
+// 2 interface{} / json
 type Message struct {
 	Type int    `json:"type"`
 	Body string `json:"body"`
@@ -40,22 +43,35 @@ func (pool *Pool) Start() {
 		select {
 		case client := <-pool.Register:
 			pool.Clients[client] = true
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+			// fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+
+			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client connected", client.ID)
 
 			for client := range pool.Clients {
-				client.Conn.WriteJSON(Message{Type: 1, Body: "New User Joined..."})
+				client.Conn.WriteJSON(Message{
+					Type: 0,
+					Body: "CONNECTED__" + client.ID,
+				})
 			}
 			break
+
 		case client := <-pool.Unregister:
 			delete(pool.Clients, client)
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+			// fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+
+			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client disconnected", client.ID)
 
 			for client := range pool.Clients {
-				client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected..."})
+				client.Conn.WriteJSON(Message{
+					Type: 0,
+					Body: "DISCONNECTED__" + client.ID,
+				})
 			}
 			break
+
 		case message := <-pool.Broadcast:
-			fmt.Println("Sending message to all clients in Pool")
+			fmt.Println("Sending message to all clients in Pool:", message)
+
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
 					fmt.Println(err)
@@ -84,6 +100,8 @@ func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 
 // Client
 func (c *Client) Read() {
+	fmt.Println("Client.Read called, id:", c.ID)
+
 	defer func() {
 		c.Pool.Unregister <- c
 		c.Conn.Close()
@@ -95,8 +113,13 @@ func (c *Client) Read() {
 			fmt.Println(err)
 			return
 		}
-		message := Message{Type: messageType, Body: string(p)}
+
+		message := Message{
+			Type: messageType,
+			Body: string(p),
+		}
+
+		fmt.Println("Message Received:", message)
 		c.Pool.Broadcast <- message
-		fmt.Printf("Message Received: %+v\n", message)
 	}
 }
