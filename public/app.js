@@ -13,14 +13,20 @@ const addMsgToDOM = function (msg) {
 	msgInp.value = '';
 };
 
-const socket = new WebSocket('ws://localhost:1323/ws?id=45');
+const poolId = new URLSearchParams(window.location.search).get('join');
+const clientId = String(Date.now());
+
+const socket = new WebSocket(
+	`ws://localhost:1323/ws/${poolId}?clientId=${clientId}`
+);
 
 const connect = () => {
 	socket.onopen = event => console.log('Successfully Connected', event);
 
 	socket.onmessage = msg => {
 		const data = JSON.parse(msg.data);
-		if (data.type !== 0) addMsgToDOM(msg.data);
+		// if (data.type !== 0)
+		addMsgToDOM(msg.data);
 	};
 
 	socket.onclose = event => console.log('Socket Closed Connection: ', event);

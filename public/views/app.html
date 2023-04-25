@@ -1,0 +1,23 @@
+{{ define "app" }}
+
+<!DOCTYPE html>
+<html lang="en">
+	{{ template "header" .}}
+
+	<body>
+		<p>{{ .Word }}</p>
+
+		<div class="messages"></div>
+
+		<form>
+			<label for="msg">Enter msg:</label>
+			<input type="text" id="msg" />
+
+			<button id="sendMsg">Send</button>
+		</form>
+
+		<script src="public/app.js"></script>
+	</body>
+</html>
+
+{{ end }}

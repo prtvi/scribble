@@ -8,13 +8,29 @@ import (
 )
 
 type Template struct {
-	templates *template.Template
+	templates map[string]*template.Template
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	return t.templates[name].ExecuteTemplate(w, name, data)
 }
 
-var T = &Template{
-	templates: template.Must(template.ParseGlob("public/*.html")),
+var T *Template
+
+func InitTemplates() *Template {
+	tmpls := make(map[string]*template.Template)
+
+	tmpls["app"] = template.Must(template.ParseFiles(
+		"public/views/app.html",
+		"public/views/templates/header.html",
+	))
+
+	tmpls["createPool"] = template.Must(template.ParseFiles(
+		"public/views/createPool.html",
+		"public/views/templates/header.html",
+	))
+
+	return &Template{
+		templates: tmpls,
+	}
 }

@@ -9,10 +9,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) error {
-	// fmt.Println("WebSocket Endpoint Hit by javascript")
+var Pools = map[string]*socket.Pool{}
 
-	clientId := r.URL.Query().Get("id")
+func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) error {
+	clientId := r.URL.Query().Get("clientId")
 
 	conn, err := socket.Upgrade(w, r)
 	if err != nil {
@@ -25,33 +25,64 @@ func serveWs(pool *socket.Pool, w http.ResponseWriter, r *http.Request) error {
 		Pool: pool,
 	}
 
+	fmt.Println("New client:", client.ID)
+
 	pool.Register <- client
 	client.Read()
 
 	return nil
 }
 
-func setupRoutes(e *echo.Echo) {
-	pool := socket.NewPool()
-	go pool.Start()
-
-	e.GET("/app", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "index", map[string]interface{}{
-			"Word": "basketball",
-		})
-	})
-
-	e.GET("/ws", func(c echo.Context) error {
-		return serveWs(pool, c.Response().Writer, c.Request())
-	})
-}
-
 func main() {
 	e := echo.New()
 	e.Static("/public", "public")
-	e.Renderer = utils.T
+	e.Renderer = utils.InitTemplates()
 
-	setupRoutes(e)
+	e.GET("/create-pool", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "createPool", map[string]any{
+			"Link": "",
+		})
+	})
+
+	e.POST("/create-pool", func(c echo.Context) error {
+		// create a new pool with an id
+		poolId := utils.GenerateUUID()
+
+		pool := socket.NewPool(poolId)
+		Pools[poolId] = pool
+		go pool.Start()
+
+		// generate link to join the pool
+		link := "/app?join=" + poolId
+
+		fmt.Println("Pool link:", link)
+
+		// send the link for the same
+		return c.Render(http.StatusOK, "createPool", map[string]any{
+			"Link": link,
+		})
+	})
+
+	e.GET("/ws/:poolId", func(c echo.Context) error {
+		poolId := c.Param("poolId")
+		clientId := c.QueryParam("clientId")
+		fmt.Println(poolId, clientId)
+
+		if pool, ok := Pools[poolId]; ok {
+			return serveWs(pool, c.Response().Writer, c.Request())
+		}
+
+		return c.JSON(http.StatusInternalServerError, `"msg":"some error"`)
+	})
+
+	e.GET("/app", func(c echo.Context) error {
+		poolId := c.QueryParam("join")
+		fmt.Println(poolId)
+
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"Word": poolId,
+		})
+	})
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
