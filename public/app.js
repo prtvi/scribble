@@ -13,30 +13,38 @@ const addMsgToDOM = function (msg) {
 	msgInp.value = '';
 };
 
-const poolId = new URLSearchParams(window.location.search).get('join');
-const clientId = String(Date.now());
+const connect = async () => {
+	const res = await fetch(`/check-pool?poolId=${poolId}&clientId=${clientId}`);
+	const data = await res.json();
+	console.log(data);
 
-const socket = new WebSocket(
-	`ws://localhost:1323/ws?poolId=${poolId}&clientId=${clientId}`
-);
+	if (data.code !== 200) {
+		messagesDiv.innerHTML = `<p>${data.msg}</p>`;
+		sendMsgBtn.disabled = true;
+		return;
+	}
 
-const connect = () => {
-	socket.onopen = event => console.log('Successfully Connected', event);
+	const socket = new WebSocket(
+		`ws://localhost:1323/ws?poolId=${poolId}&clientId=${clientId}`
+	);
 
+	socket.onopen = () => console.log('Successfully Connected');
 	socket.onmessage = msg => {
-		const data = JSON.parse(msg.data);
+		// const data = JSON.parse(msg.data);
 		// if (data.type !== 0)
 		addMsgToDOM(msg.data);
 	};
 
-	socket.onclose = event => console.log('Socket Closed Connection: ', event);
+	socket.onclose = () => console.log('Socket Closed Connection');
+	socket.onerror = error => console.log('Socket Error', error);
 
-	socket.onerror = error => console.log('Socket Error: ', error);
+	sendMsgBtn.addEventListener('click', e => {
+		e.preventDefault();
+		socket.send(msgInp.value);
+	});
 };
 
-connect();
+const poolId = new URLSearchParams(window.location.search).get('join');
+const clientId = String(Date.now());
 
-sendMsgBtn.addEventListener('click', e => {
-	e.preventDefault();
-	socket.send(msgInp.value);
-});
+connect();

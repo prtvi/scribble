@@ -19,6 +19,7 @@ func main() {
 	ee.GET("/create-pool", routes.CreatePool)
 	ee.POST("/create-pool", routes.CreatePoolLink)
 
+	ee.GET("/check-pool", routes.CheckPool)
 	ee.GET("/ws", routes.HandlerWsConnection)
 
 	e.Logger.Fatal(e.Start(":1323"))

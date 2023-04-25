@@ -9,6 +9,7 @@ import (
 
 type Pool struct {
 	ID         string
+	Capacity   int
 	Register   chan *Client
 	Unregister chan *Client
 	Clients    map[*Client]bool
@@ -30,9 +31,10 @@ type Message struct {
 }
 
 // Pool
-func NewPool(uuid string) *Pool {
+func NewPool(uuid string, capacity int) *Pool {
 	return &Pool{
 		ID:         uuid,
+		Capacity:   capacity,
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
