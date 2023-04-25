@@ -22,19 +22,67 @@ func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+// GET /welcome
+// render welcome page
+func Welcome(c echo.Context) error {
+	return c.Render(http.StatusOK, "welcome", nil)
+}
+
 // GET /app
 // if /app?join=sfds, then render the playing area
-// if /app          , then render welcome page to display "begin game"
+// if /app          , then render Message
 func App(c echo.Context) error {
 	poolId := c.QueryParam("join")
 
-	ForPlaying := false
-	if poolId != "" {
-		ForPlaying = true
+	// if poolId is empty then do not render any forms, just display Message
+	if poolId == "" {
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Hi there, are you lost?",
+		})
+	}
+
+	// else render "RegisterToPool" form wo js
+	return c.Render(http.StatusOK, "app", map[string]any{
+		"RegisterToPool": true,
+		"PoolId":         poolId, // hidden in form
+		"ConnectSocket":  false,
+	})
+}
+
+// POST /app
+// on post request made to this route to capture clientName from "RegisterToPool" form
+func RegisterToPool(c echo.Context) error {
+	poolId := c.FormValue("poolId")
+	clientName := c.FormValue("clientName")
+
+	pool, ok := Pools[poolId]
+	if !ok {
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Pool expired or non-existent",
+		})
+	}
+
+	poolCap := pool.Capacity
+	poolCurrSizePlus1 := len(pool.Clients) + 1
+
+	if poolCurrSizePlus1 > poolCap {
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Too many client connection requests",
+		})
 	}
 
 	return c.Render(http.StatusOK, "app", map[string]any{
-		"ForPlaying": ForPlaying,
+		"RegisterToPool": false,
+		"ConnectSocket":  true,
+		"Message":        "",
+		"PoolId":         poolId,
+		"ClientName":     clientName,
 	})
 }
 
@@ -50,6 +98,7 @@ func CreatePool(c echo.Context) error {
 // on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
 func CreatePoolLink(c echo.Context) error {
 	nMembers, _ := strconv.Atoi(c.FormValue("nMembers"))
+	fmt.Println("Pool cap:", nMembers)
 
 	// create a new pool with an id
 	poolId := utils.GenerateUUID()
@@ -68,44 +117,13 @@ func CreatePoolLink(c echo.Context) error {
 	})
 }
 
-type ResponseMessage struct {
-	Code    int    `json:"code"`
-	Message string `json:"msg"`
-}
-
-func CheckPool(c echo.Context) error {
-	poolId := c.QueryParam("poolId")
-
-	pool, ok := Pools[poolId]
-	if !ok {
-		return c.JSON(http.StatusOK, ResponseMessage{
-			Code:    http.StatusBadRequest,
-			Message: "Pool expired or non-existent",
-		})
-	}
-
-	poolCap := pool.Capacity
-	poolCurrSizePlus1 := len(pool.Clients) + 1
-
-	if poolCurrSizePlus1 > poolCap {
-		return c.JSON(http.StatusOK, ResponseMessage{
-			Code:    http.StatusExpectationFailed,
-			Message: "Too many client connection requests",
-		})
-	}
-
-	return c.JSON(http.StatusOK, ResponseMessage{
-		Code:    http.StatusOK,
-		Message: "Ready to make socket connection",
-	})
-}
-
-// GET /ws?poolId=234bkj&clientId=123123
+// GET /ws?poolId=234bkj&clientId=123123&clientName=joy
 // handle socket connections for the pools
 func HandlerWsConnection(c echo.Context) error {
 	poolId := c.QueryParam("poolId")
 	clientId := c.QueryParam("clientId")
-	fmt.Println(poolId, clientId)
+	clientName := c.QueryParam("clientName")
+	fmt.Println(poolId, clientId, clientName)
 
 	return socket.ServeWs(Pools[poolId], c.Response().Writer, c.Request())
 }

@@ -30,6 +30,11 @@ func InitTemplates() *Template {
 		"public/views/templates/header.html",
 	))
 
+	tmpls["welcome"] = template.Must(template.ParseFiles(
+		"public/views/welcome.html",
+		"public/views/templates/header.html",
+	))
+
 	return &Template{
 		templates: tmpls,
 	}

@@ -14,12 +14,14 @@ func main() {
 
 	ee := e.Group("", routes.Middleware)
 
+	ee.GET("/welcome", routes.Welcome)
+
 	ee.GET("/app", routes.App)
+	ee.POST("/app", routes.RegisterToPool)
 
 	ee.GET("/create-pool", routes.CreatePool)
 	ee.POST("/create-pool", routes.CreatePoolLink)
 
-	ee.GET("/check-pool", routes.CheckPool)
 	ee.GET("/ws", routes.HandlerWsConnection)
 
 	e.Logger.Fatal(e.Start(":1323"))

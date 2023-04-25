@@ -5,24 +5,45 @@
 	{{ template "header" .}}
 
 	<body>
-		{{ if .ForPlaying }}
+		<div class="main">
+			{{ if .RegisterToPool }}
 
-		<div class="messages"></div>
+			<form action="/app" method="post">
+				<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-		<form>
-			<label for="msg">Enter msg:</label>
-			<input type="text" id="msg" />
+				<label for="name">Enter your name to join:</label>
+				<input type="text" name="clientName" />
+				<button type="submit">Join</button>
+			</form>
 
-			<button id="sendMsg">Send</button>
-		</form>
+			{{ end }}
 
-		<script src="public/app.js"></script>
+			<!--  -->
 
-		{{ else }}
+			{{ if .ConnectSocket }}
 
-		<a href="/create-pool"><button>Start playing</button></a>
+			<div class="messages"></div>
+			<form>
+				<input type="hidden" name="poolId" value="{{ .PoolId }}" />
+				<input type="hidden" name="clientName" value="{{ .ClientName }}" />
 
-		{{ end }}
+				<label for="msg">Enter msg:</label>
+				<input type="text" id="msg" />
+				<button id="sendMsg">Send</button>
+			</form>
+
+			<script src="public/app.js"></script>
+
+			{{ end }}
+
+			<!--  -->
+
+			{{ if ne .Message "" }}
+
+			<p>{{ .Message }}</p>
+
+			{{ end }}
+		</div>
 	</body>
 </html>
 

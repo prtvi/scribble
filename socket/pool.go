@@ -17,9 +17,9 @@ type Pool struct {
 }
 
 type Client struct {
-	ID   string
-	Conn *websocket.Conn
-	Pool *Pool
+	ID, Name string
+	Conn     *websocket.Conn
+	Pool     *Pool
 }
 
 // 0 ack (joined/exited) => "CONNECTED" / "DISCONNECTED"
@@ -54,7 +54,7 @@ func (pool *Pool) Start() {
 			for client := range pool.Clients {
 				client.Conn.WriteJSON(Message{
 					Type: 0,
-					Body: "CONNECTED__" + client.ID,
+					Body: fmt.Sprintf("CONNECTED_%s_%s", client.ID, client.Name),
 				})
 			}
 			break
@@ -68,7 +68,7 @@ func (pool *Pool) Start() {
 			for client := range pool.Clients {
 				client.Conn.WriteJSON(Message{
 					Type: 0,
-					Body: "DISCONNECTED__" + client.ID,
+					Body: fmt.Sprintf("DISCONNECTED_%s_%s", client.ID, client.Name),
 				})
 			}
 			break
@@ -128,6 +128,7 @@ func (c *Client) Read() {
 // serves the websocket and registers the client to the pool
 func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
 	clientId := r.URL.Query().Get("clientId")
+	clientName := r.URL.Query().Get("clientName")
 
 	conn, err := Upgrade(w, r)
 	if err != nil {
@@ -136,11 +137,12 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
 
 	client := &Client{
 		ID:   clientId,
+		Name: clientName,
 		Conn: conn,
 		Pool: pool,
 	}
 
-	fmt.Println("New client:", client.ID)
+	fmt.Println("New client:", client.ID, client.Name)
 
 	pool.Register <- client
 	client.Read()
