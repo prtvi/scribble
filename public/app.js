@@ -17,7 +17,7 @@ const poolId = new URLSearchParams(window.location.search).get('join');
 const clientId = String(Date.now());
 
 const socket = new WebSocket(
-	`ws://localhost:1323/ws/${poolId}?clientId=${clientId}`
+	`ws://localhost:1323/ws?poolId=${poolId}&clientId=${clientId}`
 );
 
 const connect = () => {

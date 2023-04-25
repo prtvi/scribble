@@ -5,7 +5,7 @@
 	{{ template "header" .}}
 
 	<body>
-		<p>{{ .Word }}</p>
+		{{ if .ForPlaying }}
 
 		<div class="messages"></div>
 
@@ -17,6 +17,12 @@
 		</form>
 
 		<script src="public/app.js"></script>
+
+		{{ else }}
+
+		<a href="/create-pool"><button>Start playing</button></a>
+
+		{{ end }}
 	</body>
 </html>
 

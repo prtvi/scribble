@@ -72,8 +72,7 @@ func (pool *Pool) Start() {
 			break
 
 		case message := <-pool.Broadcast:
-			fmt.Println("Sending message to all clients in Pool:", message)
-
+			// fmt.Println("Sending message to all clients in Pool:", message)
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
 					fmt.Println(err)
@@ -102,8 +101,6 @@ func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 
 // Client
 func (c *Client) Read() {
-	fmt.Println("Client.Read called, id:", c.ID)
-
 	defer func() {
 		c.Pool.Unregister <- c
 		c.Conn.Close()
@@ -124,4 +121,27 @@ func (c *Client) Read() {
 		fmt.Println("Message Received:", message)
 		c.Pool.Broadcast <- message
 	}
+}
+
+// serves the websocket and registers the client to the pool
+func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
+	clientId := r.URL.Query().Get("clientId")
+
+	conn, err := Upgrade(w, r)
+	if err != nil {
+		fmt.Fprintf(w, "%+v\n", err)
+	}
+
+	client := &Client{
+		ID:   clientId,
+		Conn: conn,
+		Pool: pool,
+	}
+
+	fmt.Println("New client:", client.ID)
+
+	pool.Register <- client
+	client.Read()
+
+	return nil
 }
