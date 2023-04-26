@@ -2,8 +2,6 @@ const msgInp = document.querySelector('#msg');
 const sendMsgBtn = document.querySelector('#sendMsg');
 const messagesDiv = document.querySelector('.messages');
 
-const main = document.querySelector('.main');
-
 const addMsgToDOM = function (msg) {
 	if (msg.length === 0) return;
 

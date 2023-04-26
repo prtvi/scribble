@@ -14,7 +14,7 @@ func main() {
 
 	ee := e.Group("", routes.Middleware)
 
-	ee.GET("/welcome", routes.Welcome)
+	ee.GET("/", routes.Welcome)
 
 	ee.GET("/app", routes.App)
 	ee.POST("/app", routes.RegisterToPool)

@@ -39,32 +39,18 @@ func App(c echo.Context) error {
 		return c.Render(http.StatusOK, "app", map[string]any{
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
-			"Message":        "Hi there, are you lost?",
+			"Message":        "Hi there, are you lost?!",
 		})
 	}
 
-	// else render "RegisterToPool" form wo js
-	return c.Render(http.StatusOK, "app", map[string]any{
-		"RegisterToPool": true,
-		"PoolId":         poolId, // hidden in form
-		"ConnectSocket":  false,
-	})
-}
-
-// POST /app
-// on post request made to this route to capture clientName from "RegisterToPool" form
-func RegisterToPool(c echo.Context) error {
-	poolId := c.FormValue("poolId")
-	clientName := c.FormValue("clientName")
-
-	// check if pool exists
+	// check if pool exists, verify if it exists then render the forms/message accordingly
 	pool, ok := Pools[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
 		return c.Render(http.StatusOK, "app", map[string]any{
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
-			"Message":        "Pool expired or non-existent",
+			"Message":        "Pool expired or non-existent!",
 		})
 	}
 
@@ -77,11 +63,25 @@ func RegisterToPool(c echo.Context) error {
 		return c.Render(http.StatusOK, "app", map[string]any{
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
-			"Message":        "Too many client connection requests",
+			"Message":        "Your party is full!",
 		})
 	}
 
-	// else render connect to socket form
+	// else render "RegisterToPool" form
+	return c.Render(http.StatusOK, "app", map[string]any{
+		"RegisterToPool": true,
+		"PoolId":         poolId, // hidden in form
+		"ConnectSocket":  false,
+	})
+}
+
+// POST /app
+// on post request made to this route to capture clientName from "RegisterToPool" post form
+func RegisterToPool(c echo.Context) error {
+	poolId := c.FormValue("poolId")
+	clientName := c.FormValue("clientName")
+
+	// render ConnectSocket form to establish socket connection
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": false,
 		"ConnectSocket":  true,
