@@ -18,7 +18,7 @@ var Hub = map[string]*socket.Pool{}
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		dt := time.Now().String()[0:19]
-		fmt.Println(fmt.Sprintf("\033[32m%s: %s   at %s \033[0m\n", c.Request().Method, c.Request().URL, dt))
+		utils.Cp("green", fmt.Sprintf("%s: %s  %s", c.Request().Method, utils.Cs("white", fmt.Sprintf("%s", c.Request().URL)), utils.Cs("green", dt)))
 		return next(c)
 	}
 }
@@ -105,7 +105,7 @@ func CreatePool(c echo.Context) error {
 func CreatePoolLink(c echo.Context) error {
 	// get the pool capacity from form input
 	capacity, _ := strconv.Atoi(c.FormValue("capacity"))
-	fmt.Println("Pool capacity:", capacity)
+	utils.Cp("yellow", "Pool capacity:", utils.Cs("white", c.FormValue("capacity")))
 
 	// create a new pool with an uuid
 	poolId := utils.GenerateUUID()
@@ -117,7 +117,7 @@ func CreatePoolLink(c echo.Context) error {
 
 	// generate link to join the pool
 	link := "/app?join=" + poolId
-	fmt.Println("Pool link:", "http://localhost:1323"+link)
+	utils.Cp("yellow", "Pool link:", utils.Cs("whiteU", "http://localhost:1323"+link))
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "createPool", map[string]any{
@@ -128,9 +128,9 @@ func CreatePoolLink(c echo.Context) error {
 // GET /ws?poolId=234bkj&clientId=123123&clientName=joy
 // handle socket connections for the pools
 func HandlerWsConnection(c echo.Context) error {
-	// get the poolId, clientId and clientName from query params
+	// get the poolId from query params
 	poolId := c.QueryParam("poolId")
 
-	// register connections
+	// register connection
 	return socket.ServeWs(Hub[poolId], c.Response().Writer, c.Request())
 }

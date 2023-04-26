@@ -1,6 +1,9 @@
 package socket
 
-import "fmt"
+import (
+	"fmt"
+	utils "scribble/utils"
+)
 
 // connected    type 1
 // disconnected type 2
@@ -41,7 +44,7 @@ func (pool *Pool) Start() {
 		case client := <-pool.Register:
 			// on client register, append the client to Pool.Client map
 			pool.Clients[client] = true
-			fmt.Println("Size of connection pool: ", len(pool.Clients), "client connected", client.Name)
+			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
 
 			// all clients (c from loop) to one (registered client): all-1
 			for c := range pool.Clients {
@@ -57,7 +60,7 @@ func (pool *Pool) Start() {
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client map
 			delete(pool.Clients, client)
-			fmt.Println("Size of connection pool: ", len(pool.Clients), "client disconnected", client.Name)
+			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
 			// all clients (c from loop) to one (disconnected client): all-1
 			for c := range pool.Clients {
@@ -72,7 +75,7 @@ func (pool *Pool) Start() {
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message to all clients
-			fmt.Println("Sending message to all clients in pool:", message)
+			utils.Cp("yellow", "Sending received message to all clients in pool")
 
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {

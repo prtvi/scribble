@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	utils "scribble/utils"
 
 	"github.com/gorilla/websocket"
 )
@@ -31,7 +32,7 @@ func (c *Client) Read() {
 		// parse message received from client
 		var clientMsg Message
 		err = json.Unmarshal(msgByte, &clientMsg)
-		fmt.Println("Message received:", clientMsg)
+		utils.Cp("blue", "Message received:", utils.Cs("white", fmt.Sprintf("%+v", clientMsg)))
 
 		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- clientMsg
@@ -56,8 +57,6 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
 		Conn: conn,
 		Pool: pool,
 	}
-
-	fmt.Println("New client:", client.ID, client.Name)
 
 	// register and notify other clients
 	pool.Register <- client
