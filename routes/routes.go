@@ -70,8 +70,8 @@ func App(c echo.Context) error {
 	// else render "RegisterToPool" form
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": true,
-		"PoolId":         poolId, // hidden in form
 		"ConnectSocket":  false,
+		"PoolId":         poolId, // hidden in form
 	})
 }
 
@@ -86,8 +86,8 @@ func RegisterToPool(c echo.Context) error {
 		"RegisterToPool": false,
 		"ConnectSocket":  true,
 		"Message":        "",
-		"PoolId":         poolId,
-		"ClientName":     clientName,
+		"PoolId":         poolId,     // hidden in form
+		"ClientName":     clientName, // hidden in form
 	})
 }
 

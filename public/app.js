@@ -25,7 +25,7 @@ const connect = async () => {
 		const msgJson = JSON.parse(msg.data);
 		console.log('received:', msgJson);
 
-		addMsgToDOM(`message: ${msgJson.content} ___ from: ${msgJson.clientName}`);
+		addMsgToDOM(`${msgJson.clientName}: ${msgJson.content}`);
 	};
 
 	socket.onclose = () => console.log('Socket Closed Connection');
@@ -37,8 +37,8 @@ const connect = async () => {
 		const responseMsg = {
 			type: 0,
 			content: msgInp.value,
-			clientName: clientName,
-			clientId: clientId,
+			clientName,
+			clientId,
 		};
 		console.log('sending:', responseMsg);
 
