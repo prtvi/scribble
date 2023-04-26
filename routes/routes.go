@@ -31,11 +31,11 @@ func Welcome(c echo.Context) error {
 
 // GET /app
 // if /app?join=sfds, then render the playing area
-// if /app          , then render Message
+// if /app          , then render message
 func App(c echo.Context) error {
 	poolId := c.QueryParam("join")
 
-	// if poolId is empty then do not render any forms, just display Message
+	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" {
 		return c.Render(http.StatusOK, "app", map[string]any{
 			"RegisterToPool": false,

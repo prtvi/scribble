@@ -31,7 +31,7 @@ func (c *Client) Read() {
 		// parse message received from client
 		var clientMsg Message
 		err = json.Unmarshal(msgByte, &clientMsg)
-		fmt.Println("Message Received:", clientMsg)
+		fmt.Println("Message received:", clientMsg)
 
 		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- clientMsg
