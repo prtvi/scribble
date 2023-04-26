@@ -11,7 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var Pools = map[string]*socket.Pool{}
+// map of {poolId: pool}
+var Hub = map[string]*socket.Pool{}
 
 // middleware
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -44,7 +45,7 @@ func App(c echo.Context) error {
 	}
 
 	// check if pool exists, verify if it exists then render the forms/message accordingly
-	pool, ok := Pools[poolId]
+	pool, ok := Hub[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
 		return c.Render(http.StatusOK, "app", map[string]any{
@@ -110,13 +111,13 @@ func CreatePoolLink(c echo.Context) error {
 	poolId := utils.GenerateUUID()
 	pool := socket.NewPool(poolId, capacity)
 
-	// append to global Pools map, and start listening to pool connections
-	Pools[poolId] = pool
+	// append to global Hub map, and start listening to pool connections
+	Hub[poolId] = pool
 	go pool.Start()
 
 	// generate link to join the pool
 	link := "/app?join=" + poolId
-	fmt.Println("Pool link:", link)
+	fmt.Println("Pool link:", "http://localhost:1323"+link)
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "createPool", map[string]any{
@@ -129,10 +130,7 @@ func CreatePoolLink(c echo.Context) error {
 func HandlerWsConnection(c echo.Context) error {
 	// get the poolId, clientId and clientName from query params
 	poolId := c.QueryParam("poolId")
-	clientId := c.QueryParam("clientId")
-	clientName := c.QueryParam("clientName")
-	fmt.Println(poolId, clientId, clientName)
 
 	// register connections
-	return socket.ServeWs(Pools[poolId], c.Response().Writer, c.Request())
+	return socket.ServeWs(Hub[poolId], c.Response().Writer, c.Request())
 }

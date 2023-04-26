@@ -37,13 +37,15 @@ func (pool *Pool) Start() {
 		case client := <-pool.Register:
 			// on client register, append the client to Pool.Client map
 			pool.Clients[client] = true
-
 			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client connected", client.Name)
 
-			for client := range pool.Clients {
-				client.Conn.WriteJSON(Message{
-					Type:    0,
-					Content: fmt.Sprintf("CONNECTED_%s_%s", client.ID, client.Name),
+			// all clients (c from loop) to one (registered client): all-1
+			for c := range pool.Clients {
+				c.Conn.WriteJSON(Message{
+					Type:       0,
+					Content:    fmt.Sprintf("CONNECTED_%s_%s", client.ID, client.Name),
+					ClientId:   client.ID,
+					ClientName: client.Name,
 				})
 			}
 			break
@@ -51,13 +53,15 @@ func (pool *Pool) Start() {
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client map
 			delete(pool.Clients, client)
-
 			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client disconnected", client.Name)
 
-			for client := range pool.Clients {
-				client.Conn.WriteJSON(Message{
-					Type:    0,
-					Content: fmt.Sprintf("DISCONNECTED_%s_%s", client.ID, client.Name),
+			// all clients (c from loop) to one (disconnected client): all-1
+			for c := range pool.Clients {
+				c.Conn.WriteJSON(Message{
+					Type:       0,
+					Content:    fmt.Sprintf("DISCONNECTED_%s_%s", client.ID, client.Name),
+					ClientId:   client.ID,
+					ClientName: client.Name,
 				})
 			}
 			break
