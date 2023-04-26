@@ -16,7 +16,7 @@ const addMsgToDOM = function (msg) {
 };
 
 const connect = async () => {
-	const wsUrl = `ws://localhost:1323/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
+	const wsUrl = `ws://${domain}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
 
 	console.log('connecting socket', wsUrl);
 
@@ -32,6 +32,11 @@ const connect = async () => {
 		socket.send(msgInp.value);
 	});
 };
+
+const url = window.location.href;
+const li = url.lastIndexOf('/');
+const fi = url.indexOf('/');
+const domain = url.slice(fi + 2, li);
 
 const poolId = document.getElementsByName('poolId')[0].value;
 const clientName = document.getElementsByName('clientName')[0].value;

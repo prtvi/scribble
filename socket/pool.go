@@ -31,6 +31,8 @@ type Message struct {
 }
 
 // Pool
+
+// returns a new Pool
 func NewPool(uuid string, capacity int) *Pool {
 	return &Pool{
 		ID:         uuid,
@@ -42,14 +44,15 @@ func NewPool(uuid string, capacity int) *Pool {
 	}
 }
 
+// start listening to pool connections and messages
 func (pool *Pool) Start() {
 	for {
 		select {
 		case client := <-pool.Register:
+			// on client register, append the client to Pool.Client map
 			pool.Clients[client] = true
-			// fmt.Println("Size of Connection Pool: ", len(pool.Clients))
 
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client connected", client.ID)
+			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client connected", client.Name)
 
 			for client := range pool.Clients {
 				client.Conn.WriteJSON(Message{
@@ -60,10 +63,10 @@ func (pool *Pool) Start() {
 			break
 
 		case client := <-pool.Unregister:
+			// on client disconnect, delete the client from Pool.Client map
 			delete(pool.Clients, client)
-			// fmt.Println("Size of Connection Pool: ", len(pool.Clients))
 
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client disconnected", client.ID)
+			fmt.Println("Size of Connection Pool: ", len(pool.Clients), "client disconnected", client.Name)
 
 			for client := range pool.Clients {
 				client.Conn.WriteJSON(Message{
@@ -74,7 +77,9 @@ func (pool *Pool) Start() {
 			break
 
 		case message := <-pool.Broadcast:
-			// fmt.Println("Sending message to all clients in Pool:", message)
+			// on message received from any of the clients in the pool, broadcast the message to all clients
+			fmt.Println("Sending message to all clients in Pool:", message)
+
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
 					fmt.Println(err)
@@ -92,6 +97,7 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+// register the socket connection from client
 func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -102,6 +108,8 @@ func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 }
 
 // Client
+
+// read messages received from client
 func (c *Client) Read() {
 	defer func() {
 		c.Pool.Unregister <- c
@@ -121,6 +129,8 @@ func (c *Client) Read() {
 		}
 
 		fmt.Println("Message Received:", message)
+
+		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- message
 	}
 }
@@ -130,11 +140,13 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
 	clientId := r.URL.Query().Get("clientId")
 	clientName := r.URL.Query().Get("clientName")
 
+	// register to socket connection
 	conn, err := Upgrade(w, r)
 	if err != nil {
 		fmt.Fprintf(w, "%+v\n", err)
 	}
 
+	// create a new client to append to Pool.Clients map
 	client := &Client{
 		ID:   clientId,
 		Name: clientName,
@@ -144,6 +156,7 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
 
 	fmt.Println("New client:", client.ID, client.Name)
 
+	// register and notify other clients
 	pool.Register <- client
 	client.Read()
 
