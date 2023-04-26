@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -26,8 +27,10 @@ type Client struct {
 // 1 string
 // 2 interface{} / json
 type Message struct {
-	Type int    `json:"type"`
-	Body string `json:"body"`
+	Type       int    `json:"type"`
+	Content    string `json:"content"`
+	ClientName string `json:"clientName,omitempty"`
+	ClientId   string `json:"clientId,omitempty"`
 }
 
 // Pool
@@ -56,8 +59,8 @@ func (pool *Pool) Start() {
 
 			for client := range pool.Clients {
 				client.Conn.WriteJSON(Message{
-					Type: 0,
-					Body: fmt.Sprintf("CONNECTED_%s_%s", client.ID, client.Name),
+					Type:    0,
+					Content: fmt.Sprintf("CONNECTED_%s_%s", client.ID, client.Name),
 				})
 			}
 			break
@@ -70,8 +73,8 @@ func (pool *Pool) Start() {
 
 			for client := range pool.Clients {
 				client.Conn.WriteJSON(Message{
-					Type: 0,
-					Body: fmt.Sprintf("DISCONNECTED_%s_%s", client.ID, client.Name),
+					Type:    0,
+					Content: fmt.Sprintf("DISCONNECTED_%s_%s", client.ID, client.Name),
 				})
 			}
 			break
@@ -117,21 +120,19 @@ func (c *Client) Read() {
 	}()
 
 	for {
-		messageType, p, err := c.Conn.ReadMessage()
+		_, msgByte, err := c.Conn.ReadMessage()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		message := Message{
-			Type: messageType,
-			Body: string(p),
-		}
-
-		fmt.Println("Message Received:", message)
+		// parse message received from client
+		var clientMsg Message
+		err = json.Unmarshal(msgByte, &clientMsg)
+		fmt.Println("Message Received:", clientMsg)
 
 		// broadcast the message to all clients in the pool
-		c.Pool.Broadcast <- message
+		c.Pool.Broadcast <- clientMsg
 	}
 }
 

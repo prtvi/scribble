@@ -17,17 +17,32 @@ const connect = async () => {
 	const wsUrl = `ws://${domain}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
 
 	console.log('connecting socket', wsUrl);
-
 	const socket = new WebSocket(wsUrl);
 
 	socket.onopen = () => console.log('Successfully Connected');
-	socket.onmessage = msg => addMsgToDOM(msg.data);
+
+	socket.onmessage = msg => {
+		const msgJson = JSON.parse(msg.data);
+		console.log('received:', msgJson);
+
+		addMsgToDOM(`message: ${msgJson.content} ___ from: ${msgJson.clientName}`);
+	};
+
 	socket.onclose = () => console.log('Socket Closed Connection');
 	socket.onerror = error => console.log('Socket Error', error);
 
 	sendMsgBtn.addEventListener('click', e => {
 		e.preventDefault();
-		socket.send(msgInp.value);
+
+		const responseMsg = {
+			type: 0,
+			content: msgInp.value,
+			clientName: clientName,
+			clientId: clientId,
+		};
+		console.log('sending:', responseMsg);
+
+		socket.send(JSON.stringify(responseMsg));
 	});
 };
 
