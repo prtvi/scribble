@@ -5,9 +5,10 @@ import (
 	utils "scribble/utils"
 )
 
-// connected      type 1
-// disconnected   type 2
-// string data    type 3
+// connected        type 1 - Content field, but mainly Type determines the message
+// disconnected     type 2 - Content field, but mainly Type determines the message
+// string data      type 3 - Content field will be populated with a string
+// string data      type 4 - Content field will be populated with canvas data as string
 
 type Message struct {
 	Type       int    `json:"type"`
@@ -75,7 +76,7 @@ func (pool *Pool) Start() {
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message to all clients
-			utils.Cp("yellow", "Broadcasting received message")
+			utils.Cp("yellow", "Message received. Type:", utils.Cs("reset", fmt.Sprintf("%d,", message.Type)), utils.Cs("yellow", "broadcasting ..."))
 
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
