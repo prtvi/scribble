@@ -6,6 +6,7 @@
 	color: #d4d4c9;
 }
 
-#canv {
+canvas {
 	border: 1px solid black;
+	background-color: white;
 }

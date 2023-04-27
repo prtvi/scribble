@@ -5,9 +5,9 @@ import (
 	utils "scribble/utils"
 )
 
-// connected    type 1
-// disconnected type 2
-// json data    type 3
+// connected      type 1
+// disconnected   type 2
+// string data    type 3
 
 type Message struct {
 	Type       int    `json:"type"`
@@ -75,7 +75,7 @@ func (pool *Pool) Start() {
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message to all clients
-			utils.Cp("yellow", "Sending received message to all clients in pool")
+			utils.Cp("yellow", "Broadcasting received message")
 
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {

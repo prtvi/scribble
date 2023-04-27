@@ -82,7 +82,17 @@ func RegisterToPool(c echo.Context) error {
 	poolId := c.FormValue("poolId")
 	clientName := c.FormValue("clientName")
 
+	// extra check to prevent user from joining any random pool which does not exist
+	if _, ok := Hub[poolId]; !ok {
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Pool expired or non-existent!",
+		})
+	}
+
 	// render ConnectSocket form to establish socket connection
+	// socket connection will start only if "ConnectSocket" form is rendered
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": false,
 		"ConnectSocket":  true,

@@ -72,8 +72,8 @@ const connect = async () => {
 
 // extract domain from url
 const url = window.location.href;
-const li = url.lastIndexOf('/');
 const fi = url.indexOf('/');
+const li = url.lastIndexOf('/');
 const domain = url.slice(fi + 2, li);
 
 // get the poolId and clientName from the form
@@ -83,3 +83,48 @@ const clientName = document.getElementsByName('clientName')[0].value;
 const clientId = String(Date.now());
 
 connect();
+
+// draw on canvas code
+
+const canvas = document.querySelector('#canv');
+const ctx = canvas.getContext('2d');
+
+const coord = { x: 0, y: 0 };
+let paint = false;
+
+const getPosition = function (event) {
+	coord.x = event.clientX - canvas.offsetLeft;
+	coord.y = event.clientY - canvas.offsetTop;
+};
+
+const startPainting = function (event) {
+	paint = true;
+	getPosition(event);
+};
+
+const stopPainting = function () {
+	paint = false;
+};
+
+const sketch = function (event) {
+	if (!paint) return;
+
+	ctx.beginPath();
+
+	ctx.lineWidth = 5;
+	ctx.lineCap = 'round';
+	ctx.strokeStyle = 'green';
+
+	ctx.moveTo(coord.x, coord.y);
+
+	getPosition(event);
+
+	ctx.lineTo(coord.x, coord.y);
+	ctx.stroke();
+};
+
+window.addEventListener('load', () => {
+	document.addEventListener('mousedown', startPainting);
+	document.addEventListener('mouseup', stopPainting);
+	document.addEventListener('mousemove', sketch);
+});
