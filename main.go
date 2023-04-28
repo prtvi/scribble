@@ -24,7 +24,7 @@ func main() {
 
 	ee.GET("/ws", routes.HandlerWsConnection)
 
-	e.GET("/api/get-all-clients-in-pool", routes.GetAllClientsInPool)
+	e.GET("/api/get-clients-in-pool", routes.GetAllClientsInPool)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

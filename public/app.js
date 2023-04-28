@@ -58,7 +58,7 @@ async function initColor() {
 }
 
 async function getAllClients() {
-	const res = await fetch(`api/get-all-clients-in-pool?poolId=${poolId}`);
+	const res = await fetch(`api/get-clients-in-pool?poolId=${poolId}`);
 	const data = await res.json();
 	return data;
 }
