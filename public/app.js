@@ -10,6 +10,7 @@ const ctx = canvas.getContext('2d');
 
 const coord = { x: 0, y: 0 };
 let paint = false;
+let color = '';
 
 const [poolId, clientName, clientId] = initCredentials();
 const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
@@ -24,27 +25,7 @@ socket.onerror = error => console.log('Socket error', error);
 sendMsgBtn.addEventListener('click', sendMsgBtnEL);
 window.addEventListener('load', windowEL);
 
-const getClientNamesTimer = setInterval(async () => {
-	try {
-		const res = await fetch(`api/get-all-clients-in-pool?poolId=${poolId}`);
-		const names = await res.json();
-
-		membersDiv.innerHTML = '';
-		names.forEach(n => {
-			const clientNameHolder = document.createElement('div');
-			const clientName = document.createElement('p');
-
-			clientName.innerHTML = n.name;
-			clientName.style.color = n.color;
-			clientNameHolder.appendChild(clientName);
-
-			membersDiv.appendChild(clientNameHolder);
-		});
-	} catch (error) {
-		console.log('inside catch, stopping timer!', error);
-		clearInterval(getClientNamesTimer);
-	}
-}, 5000);
+const renderAllClientsTimer = setInterval(renderAllClients, 5000);
 
 // -------- main
 
@@ -68,6 +49,39 @@ function getDomain() {
 
 function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function initColor() {
+	const allClients = await getAllClients();
+	matchedClient = allClients.find(c => c.id === clientId);
+	color = matchedClient.color;
+}
+
+async function getAllClients() {
+	const res = await fetch(`api/get-all-clients-in-pool?poolId=${poolId}`);
+	const data = await res.json();
+	return data;
+}
+
+async function renderAllClients() {
+	try {
+		const allClients = await getAllClients();
+
+		membersDiv.innerHTML = '';
+		allClients.forEach(n => {
+			const clientNameHolder = document.createElement('div');
+			const clientName = document.createElement('p');
+
+			clientName.innerHTML = n.name;
+			clientName.style.color = n.color;
+			clientNameHolder.appendChild(clientName);
+
+			membersDiv.appendChild(clientNameHolder);
+		});
+	} catch (error) {
+		console.log('error, closing render all clients timer');
+		clearInterval(renderAllClientsTimer);
+	}
 }
 
 function addMsgToDOM(msg) {
@@ -152,8 +166,8 @@ function socketOnMessage(message) {
 }
 
 function socketOnClose() {
-	console.log('Socket connection closed, stopping getClientNamestimer');
-	clearInterval(getClientNamesTimer);
+	console.log('Socket connection closed, stopping render all clients timer');
+	clearInterval(renderAllClientsTimer);
 }
 
 function getPosition(event) {
@@ -177,7 +191,7 @@ function sketch(event) {
 
 	ctx.lineWidth = 5;
 	ctx.lineCap = 'round';
-	ctx.strokeStyle = 'green';
+	ctx.strokeStyle = color;
 
 	ctx.moveTo(coord.x, coord.y);
 
@@ -194,7 +208,9 @@ function sendMsgBtnEL(e) {
 	sendMessage(msgInp.value);
 }
 
-function windowEL() {
+async function windowEL() {
+	await initColor();
+
 	document.addEventListener('mousedown', startPainting);
 	document.addEventListener('mouseup', stopPainting);
 	document.addEventListener('mousemove', sketch);

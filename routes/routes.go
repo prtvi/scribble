@@ -46,7 +46,7 @@ var errorMapForAppRoute = map[string]any{
 
 // GET /app
 func App(c echo.Context) error {
-	// if /app?join=sfds, then render the playing areax
+	// if /app?join=poolId, then render the playing areax
 	// if /app          , then render message
 
 	poolId := c.QueryParam("join")
@@ -156,25 +156,27 @@ func HandlerWsConnection(c echo.Context) error {
 // GET /api/get-all-clients-in-pool?poolId=123jisd
 func GetAllClientsInPool(c echo.Context) error {
 	// returns all the clients (name and color properties) in the pool
-	type clientNameAndColor struct {
+	type clientInfo struct {
+		ID    string `json:"id"`
 		Name  string `json:"name"`
 		Color string `json:"color"`
 	}
 
 	poolId := c.QueryParam("poolId")
-	clientNamesList := make([]clientNameAndColor, 0)
+	clientInfoList := make([]clientInfo, 0)
 
 	pool, ok := Hub[poolId]
 	if !ok {
-		return c.JSON(http.StatusOK, clientNamesList)
+		return c.JSON(http.StatusOK, clientInfoList)
 	}
 
 	for client := range pool.Clients {
-		clientNamesList = append(clientNamesList, clientNameAndColor{
+		clientInfoList = append(clientInfoList, clientInfo{
+			ID:    client.ID,
 			Name:  client.Name,
 			Color: client.Color,
 		})
 	}
 
-	return c.JSON(http.StatusOK, clientNamesList)
+	return c.JSON(http.StatusOK, clientInfoList)
 }
