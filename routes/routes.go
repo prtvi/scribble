@@ -14,45 +14,55 @@ import (
 // map of {poolId: pool}
 var Hub = map[string]*socket.Pool{}
 
-// middleware
+// / middleware
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		dt := time.Now().String()[0:19]
-		utils.Cp("green", fmt.Sprintf("%s: %s  %s", c.Request().Method, utils.Cs("white", fmt.Sprintf("%s", c.Request().URL)), utils.Cs("green", dt)))
+		reqMethod := c.Request().Method
+
+		var color string
+		if reqMethod == "GET" {
+			color = "green"
+		} else if reqMethod == "POST" {
+			color = "cyan"
+		}
+
+		utils.Cp(color, fmt.Sprintf("%s: %s  %s", reqMethod, utils.Cs("white", fmt.Sprintf("%s", c.Request().URL)), utils.Cs(color, dt)))
+
 		return next(c)
 	}
 }
 
 // GET /welcome
-// render welcome page
 func Welcome(c echo.Context) error {
 	return c.Render(http.StatusOK, "welcome", nil)
 }
 
+var errorMapForAppRoute = map[string]any{
+	"RegisterToPool": false,
+	"ConnectSocket":  false,
+	"Message":        "",
+}
+
 // GET /app
-// if /app?join=sfds, then render the playing area
-// if /app          , then render message
 func App(c echo.Context) error {
+	// if /app?join=sfds, then render the playing areax
+	// if /app          , then render message
+
 	poolId := c.QueryParam("join")
 
 	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" {
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Hi there, are you lost?!",
-		})
+		errorMapForAppRoute["Message"] = "Hi there, are you lost?!"
+		return c.Render(http.StatusOK, "app", errorMapForAppRoute)
 	}
 
-	// check if pool exists, verify if it exists then render the forms/message accordingly
+	// check if pool exists, if is does not exist then render no form
 	pool, ok := Hub[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Pool expired or non-existent!",
-		})
+		errorMapForAppRoute["Message"] = "Pool expired or non-existent!"
+		return c.Render(http.StatusOK, "app", errorMapForAppRoute)
 	}
 
 	// if pool exists, get its capacity and curr size
@@ -61,14 +71,11 @@ func App(c echo.Context) error {
 
 	if poolCurrSizePlus1 > poolCap {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Your party is full!",
-		})
+		errorMapForAppRoute["Message"] = "Your party is full!"
+		return c.Render(http.StatusOK, "app", errorMapForAppRoute)
 	}
 
-	// else render "RegisterToPool" form
+	// else if every check, checks out then render "RegisterToPool" form
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": true,
 		"ConnectSocket":  false,
@@ -77,18 +84,16 @@ func App(c echo.Context) error {
 }
 
 // POST /app
-// on post request made to this route to capture clientName from "RegisterToPool" post form
 func RegisterToPool(c echo.Context) error {
+	// on post request made to this route to capture clientName from "RegisterToPool" post form
+
 	poolId := c.FormValue("poolId")
 	clientName := c.FormValue("clientName")
 
 	// extra check to prevent user from joining any random pool which does not exist
 	if _, ok := Hub[poolId]; !ok {
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Pool expired or non-existent!",
-		})
+		errorMapForAppRoute["Message"] = "Pool expired or non-existent!"
+		return c.Render(http.StatusOK, "app", errorMapForAppRoute)
 	}
 
 	// render ConnectSocket form to establish socket connection
@@ -96,23 +101,23 @@ func RegisterToPool(c echo.Context) error {
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": false,
 		"ConnectSocket":  true,
-		"Message":        "",
 		"PoolId":         poolId,     // hidden in form
 		"ClientName":     clientName, // hidden in form
 	})
 }
 
 // GET /create-pool
-// render a form to create a new pool
 func CreatePool(c echo.Context) error {
+	// render a form to create a new pool
 	return c.Render(http.StatusOK, "createPool", map[string]any{
 		"Link": "",
 	})
 }
 
 // POST /create-pool
-// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
 func CreatePoolLink(c echo.Context) error {
+	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
+
 	// get the pool capacity from form input
 	capacity, _ := strconv.Atoi(c.FormValue("capacity"))
 	utils.Cp("yellow", "Pool capacity:", utils.Cs("white", c.FormValue("capacity")))
@@ -125,6 +130,8 @@ func CreatePoolLink(c echo.Context) error {
 	Hub[poolId] = pool
 	go pool.Start()
 
+	utils.Cp("blue", "Hub size (number of pools):", utils.Cs("white", fmt.Sprintf("%d", len(Hub))))
+
 	// generate link to join the pool
 	link := "/app?join=" + poolId
 	utils.Cp("yellow", "Pool link:", utils.Cs("whiteU", "http://localhost:1323"+link))
@@ -136,8 +143,9 @@ func CreatePoolLink(c echo.Context) error {
 }
 
 // GET /ws?poolId=234bkj&clientId=123123&clientName=joy
-// handle socket connections for the pools
 func HandlerWsConnection(c echo.Context) error {
+	// handle socket connections for the pools
+
 	// get the poolId from query params
 	poolId := c.QueryParam("poolId")
 

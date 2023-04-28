@@ -3,7 +3,6 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/gorilla/websocket"
 )
@@ -35,30 +34,4 @@ func (c *Client) Read() {
 		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- clientMsg
 	}
-}
-
-// serves the websocket and registers the client to the pool
-func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
-	clientId := r.URL.Query().Get("clientId")
-	clientName := r.URL.Query().Get("clientName")
-
-	// register to socket connection
-	conn, err := Upgrade(w, r)
-	if err != nil {
-		fmt.Fprintf(w, "%+v\n", err)
-	}
-
-	// create a new client to append to Pool.Clients map
-	client := &Client{
-		ID:   clientId,
-		Name: clientName,
-		Conn: conn,
-		Pool: pool,
-	}
-
-	// register and notify other clients
-	pool.Register <- client
-	client.Read()
-
-	return nil
 }

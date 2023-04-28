@@ -22,3 +22,29 @@ func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 	}
 	return ws, nil
 }
+
+// serves the websocket and registers the client to the pool
+func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
+	clientId := r.URL.Query().Get("clientId")
+	clientName := r.URL.Query().Get("clientName")
+
+	// register to socket connection
+	conn, err := Upgrade(w, r)
+	if err != nil {
+		fmt.Fprintf(w, "%+v\n", err)
+	}
+
+	// create a new client to append to Pool.Clients map
+	client := &Client{
+		ID:   clientId,
+		Name: clientName,
+		Conn: conn,
+		Pool: pool,
+	}
+
+	// register and notify other clients
+	pool.Register <- client
+	client.Read()
+
+	return nil
+}

@@ -4,16 +4,16 @@ const messagesDiv = document.querySelector('.messages');
 
 const canvas = document.querySelector('#canv');
 const ctx = canvas.getContext('2d');
+
+// -------- main
+
 const coord = { x: 0, y: 0 };
 let paint = false;
 
 const [poolId, clientName, clientId] = initCredentials();
 const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
 
-// -------- main
-
 // establish socket connection
-
 const socket = new WebSocket(wsUrl);
 socket.onopen = () => console.log('Socket successfully connected');
 socket.onmessage = socketOnMessage;
