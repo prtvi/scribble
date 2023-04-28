@@ -8,9 +8,9 @@ import (
 )
 
 type Client struct {
-	ID, Name string
-	Conn     *websocket.Conn
-	Pool     *Pool
+	ID, Name, Color string
+	Conn            *websocket.Conn
+	Pool            *Pool
 }
 
 // read messages received from client
@@ -28,7 +28,7 @@ func (c *Client) Read() {
 		}
 
 		// parse message received from client
-		var clientMsg Message
+		var clientMsg SocketMessage
 		err = json.Unmarshal(msgByte, &clientMsg)
 
 		// broadcast the message to all clients in the pool

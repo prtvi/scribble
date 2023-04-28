@@ -15,7 +15,7 @@ import (
 var Hub = map[string]*socket.Pool{}
 
 // / middleware
-func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
+func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		dt := time.Now().String()[0:19]
 		reqMethod := c.Request().Method
@@ -151,4 +151,30 @@ func HandlerWsConnection(c echo.Context) error {
 
 	// register connection
 	return socket.ServeWs(Hub[poolId], c.Response().Writer, c.Request())
+}
+
+// GET /api/get-all-clients-in-pool?poolId=123jisd
+func GetAllClientsInPool(c echo.Context) error {
+	// returns all the clients (name and color properties) in the pool
+	type clientNameAndColor struct {
+		Name  string `json:"name"`
+		Color string `json:"color"`
+	}
+
+	poolId := c.QueryParam("poolId")
+	clientNamesList := make([]clientNameAndColor, 0)
+
+	pool, ok := Hub[poolId]
+	if !ok {
+		return c.JSON(http.StatusOK, clientNamesList)
+	}
+
+	for client := range pool.Clients {
+		clientNamesList = append(clientNamesList, clientNameAndColor{
+			Name:  client.Name,
+			Color: client.Color,
+		})
+	}
+
+	return c.JSON(http.StatusOK, clientNamesList)
 }

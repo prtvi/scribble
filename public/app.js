@@ -1,6 +1,7 @@
 const msgInp = document.querySelector('#msg');
 const sendMsgBtn = document.querySelector('#sendMsg');
 const messagesDiv = document.querySelector('.messages');
+const membersDiv = document.querySelector('.members');
 
 const canvas = document.querySelector('#canv');
 const ctx = canvas.getContext('2d');
@@ -17,11 +18,33 @@ const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clie
 const socket = new WebSocket(wsUrl);
 socket.onopen = () => console.log('Socket successfully connected');
 socket.onmessage = socketOnMessage;
-socket.onclose = () => console.log('Socket connection closed');
+socket.onclose = socketOnClose;
 socket.onerror = error => console.log('Socket error', error);
 
 sendMsgBtn.addEventListener('click', sendMsgBtnEL);
 window.addEventListener('load', windowEL);
+
+const getClientNamesTimer = setInterval(async () => {
+	try {
+		const res = await fetch(`api/get-all-clients-in-pool?poolId=${poolId}`);
+		const names = await res.json();
+
+		membersDiv.innerHTML = '';
+		names.forEach(n => {
+			const clientNameHolder = document.createElement('div');
+			const clientName = document.createElement('p');
+
+			clientName.innerHTML = n.name;
+			clientName.style.color = n.color;
+			clientNameHolder.appendChild(clientName);
+
+			membersDiv.appendChild(clientNameHolder);
+		});
+	} catch (error) {
+		console.log('inside catch, stopping timer!', error);
+		clearInterval(getClientNamesTimer);
+	}
+}, 5000);
 
 // -------- main
 
@@ -54,7 +77,7 @@ function addMsgToDOM(msg) {
 	const msgDiv = document.createElement('div');
 	const text = document.createTextNode(msg);
 	msgDiv.appendChild(text);
-	messagesDiv && messagesDiv.appendChild(msgDiv);
+	messagesDiv.appendChild(msgDiv);
 
 	msgInp.value = '';
 }
@@ -126,6 +149,11 @@ function socketOnMessage(message) {
 		default:
 			break;
 	}
+}
+
+function socketOnClose() {
+	console.log('Socket connection closed, stopping getClientNamestimer');
+	clearInterval(getClientNamesTimer);
 }
 
 function getPosition(event) {

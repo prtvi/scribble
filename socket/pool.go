@@ -10,31 +10,33 @@ import (
 // string data      type 3 - Content field will be populated with a string
 // string data      type 4 - Content field will be populated with canvas data as string
 
-type Message struct {
+type SocketMessage struct {
 	Type       int    `json:"type"`
 	Content    string `json:"content"`
-	ClientName string `json:"clientName,omitempty"`
 	ClientId   string `json:"clientId,omitempty"`
+	ClientName string `json:"clientName,omitempty"`
 }
 
 type Pool struct {
-	ID         string
-	Capacity   int
-	Register   chan *Client
-	Unregister chan *Client
-	Clients    map[*Client]bool
-	Broadcast  chan Message
+	ID                   string
+	Capacity             int
+	Register             chan *Client
+	Unregister           chan *Client
+	Clients              map[*Client]bool
+	Broadcast            chan SocketMessage
+	ColorAssignmentIndex int
 }
 
 // returns a new Pool
 func NewPool(uuid string, capacity int) *Pool {
 	return &Pool{
-		ID:         uuid,
-		Capacity:   capacity,
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
-		Clients:    make(map[*Client]bool),
-		Broadcast:  make(chan Message),
+		ID:                   uuid,
+		Capacity:             capacity,
+		Register:             make(chan *Client),
+		Unregister:           make(chan *Client),
+		Clients:              make(map[*Client]bool),
+		Broadcast:            make(chan SocketMessage),
+		ColorAssignmentIndex: 0,
 	}
 }
 
@@ -49,7 +51,7 @@ func (pool *Pool) Start() {
 
 			// all clients (c from loop) to one (registered client): all-1
 			for c := range pool.Clients {
-				c.Conn.WriteJSON(Message{
+				c.Conn.WriteJSON(SocketMessage{
 					Type:       1,
 					Content:    fmt.Sprintf("CONNECTED_%s", client.Name),
 					ClientId:   client.ID,
@@ -65,7 +67,7 @@ func (pool *Pool) Start() {
 
 			// all clients (c from loop) to one (disconnected client): all-1
 			for c := range pool.Clients {
-				c.Conn.WriteJSON(Message{
+				c.Conn.WriteJSON(SocketMessage{
 					Type:       2,
 					Content:    fmt.Sprintf("DISCONNECTED_%s", client.Name),
 					ClientId:   client.ID,
@@ -76,7 +78,9 @@ func (pool *Pool) Start() {
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message to all clients
-			utils.Cp("yellow", "Message received. Type:", utils.Cs("reset", fmt.Sprintf("%d,", message.Type)), utils.Cs("yellow", "broadcasting ..."))
+			utils.Cp("blue", "SocketMessage received, type:", utils.Cs("reset", fmt.Sprintf("%d,", message.Type)), utils.Cs("blue", "broadcasting ..."))
+
+			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {

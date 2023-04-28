@@ -12,7 +12,7 @@ func main() {
 	e.Static("/public", "public")
 	e.Renderer = utils.InitTemplates()
 
-	ee := e.Group("", routes.Middleware)
+	ee := e.Group("", routes.Logger)
 
 	ee.GET("/", routes.Welcome)
 
@@ -23,6 +23,8 @@ func main() {
 	ee.POST("/create-pool", routes.CreatePoolLink)
 
 	ee.GET("/ws", routes.HandlerWsConnection)
+
+	e.GET("/api/get-all-clients-in-pool", routes.GetAllClientsInPool)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
