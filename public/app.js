@@ -20,8 +20,6 @@ sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
 window.addEventListener('load', initColor);
 window.addEventListener('load', addCanvasEventListeners);
 
-// ---------------- main ----------------
-
 // ---------------- chat ----------------
 
 const msgInp = document.querySelector('#msg');
@@ -58,8 +56,6 @@ function sendChatMsgBtnEL(e) {
 	// convert object to string to transmit
 	socket.send(JSON.stringify(responseMsg));
 }
-
-// ---------------- chat ----------------
 
 // ---------------- canvas ----------------
 
@@ -123,8 +119,6 @@ function addCanvasEventListeners() {
 	document.addEventListener('mousemove', paint);
 }
 
-// ---------------- canvas ----------------
-
 // ---------------- get all clients list ----------------
 
 async function getAllClients() {
@@ -155,8 +149,6 @@ async function displayAllClientsInPool() {
 		clearInterval(displayAllClientsInPoolTimer);
 	}
 }
-
-// ---------------- get all clients list ----------------
 
 // ---------------- utils ----------------
 
@@ -230,5 +222,3 @@ async function initColor() {
 	const matchedClient = allClients.find(c => c.id === clientId);
 	paintUtils.color = matchedClient.color;
 }
-
-// ---------------- utils ----------------

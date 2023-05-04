@@ -5,10 +5,11 @@ import (
 	utils "scribble/utils"
 )
 
-// connected        type 1 - Content field, but mainly Type determines the message
-// disconnected     type 2 - Content field, but mainly Type determines the message
-// string data      type 3 - Content field will be populated with a string
-// string data      type 4 - Content field will be populated with canvas data as string
+// SocketMessage.Content field
+// Type 1 - Connected
+// Type 2 - Disconnected
+// Type 3 - Text message
+// Type 4 - Canvas data as string
 
 type SocketMessage struct {
 	Type       int    `json:"type"`
