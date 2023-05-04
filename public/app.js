@@ -1,7 +1,9 @@
+'use strict';
+
+// clientId, clientName and poolId initialised from inline js
+
 const msgInp = document.querySelector('#msg');
-const sendMsgBtn = document.querySelector('#sendMsg');
-const messagesDiv = document.querySelector('.messages');
-const membersDiv = document.querySelector('.members');
+const sendChatMsgBtn = document.querySelector('#sendMsg');
 
 const canvas = document.querySelector('#canv');
 const ctx = canvas.getContext('2d');
@@ -12,7 +14,6 @@ const coord = { x: 0, y: 0 };
 let paint = false;
 let color = '';
 
-const [poolId, clientName, clientId] = initCredentials();
 const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
 
 // establish socket connection
@@ -22,20 +23,14 @@ socket.onmessage = socketOnMessage;
 socket.onclose = socketOnClose;
 socket.onerror = error => console.log('Socket error', error);
 
-sendMsgBtn.addEventListener('click', sendMsgBtnEL);
+sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
 window.addEventListener('load', windowEL);
 
-const renderAllClientsTimer = setInterval(renderAllClients, 5000);
+const displayAllClientsInPoolTimer = setInterval(displayAllClientsInPool, 5000);
 
 // -------- main
 
-function initCredentials() {
-	return [
-		document.getElementsByName('poolId')[0].value,
-		document.getElementsByName('clientName')[0].value,
-		String(Date.now()),
-	];
-}
+// utils
 
 function getDomain() {
 	// extract domain from url
@@ -51,9 +46,11 @@ function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// utils
+
 async function initColor() {
 	const allClients = await getAllClients();
-	matchedClient = allClients.find(c => c.id === clientId);
+	const matchedClient = allClients.find(c => c.id === clientId);
 	color = matchedClient.color;
 }
 
@@ -63,9 +60,12 @@ async function getAllClients() {
 	return data;
 }
 
-async function renderAllClients() {
+// dom utils
+
+async function displayAllClientsInPool() {
 	try {
 		const allClients = await getAllClients();
+		const membersDiv = document.querySelector('.members');
 
 		membersDiv.innerHTML = '';
 		allClients.forEach(n => {
@@ -79,14 +79,16 @@ async function renderAllClients() {
 			membersDiv.appendChild(clientNameHolder);
 		});
 	} catch (error) {
-		console.log('error, closing render all clients timer');
-		clearInterval(renderAllClientsTimer);
+		console.log('error, closing display all clients timer');
+		clearInterval(displayAllClientsInPoolTimer);
 	}
 }
 
-function addMsgToDOM(msg) {
+function appendChatMsgToDOM(msg) {
 	// adds the content into the DOM
 	if (msg.length === 0 || msg === '') return;
+
+	const messagesDiv = document.querySelector('.messages');
 
 	const msgDiv = document.createElement('div');
 	const text = document.createTextNode(msg);
@@ -103,7 +105,11 @@ function displayImgOnCanvas(imgData) {
 	img.setAttribute('src', imgData);
 }
 
-function sendMessage(msg) {
+// dom utils
+
+// send data
+
+function sendChatMessage(msg) {
 	if (msg.length === 0 || msg === '') return;
 
 	// create string response object
@@ -127,9 +133,12 @@ async function sendImgData() {
 	};
 
 	// sending canvas data
-	await wait(500);
 	socket.send(JSON.stringify(respBody));
 }
+
+// send data
+
+// socket
 
 function socketOnMessage(message) {
 	// parse json string into json object
@@ -144,16 +153,16 @@ function socketOnMessage(message) {
 		case 1:
 			// if the current clientName and the clientName from response match then
 			if (msg.clientName === clientName)
-				addMsgToDOM(`You joined the pool as ${clientName}!`);
-			else addMsgToDOM(`${msg.clientName} has joined the pool!`);
+				appendChatMsgToDOM(`You joined the pool as ${clientName}!`);
+			else appendChatMsgToDOM(`${msg.clientName} has joined the pool!`);
 			break;
 
 		case 2:
-			addMsgToDOM(`${msg.clientName} has left the pool!`);
+			appendChatMsgToDOM(`${msg.clientName} has left the pool!`);
 			break;
 
 		case 3:
-			addMsgToDOM(`${msg.clientName}: ${msg.content}`);
+			appendChatMsgToDOM(`${msg.clientName}: ${msg.content}`);
 			break;
 
 		case 4:
@@ -167,8 +176,12 @@ function socketOnMessage(message) {
 
 function socketOnClose() {
 	console.log('Socket connection closed, stopping render all clients timer');
-	clearInterval(renderAllClientsTimer);
+	clearInterval(displayAllClientsInPoolTimer);
 }
+
+// socket
+
+// canvas utils
 
 function getPosition(event) {
 	coord.x = event.clientX - canvas.offsetLeft;
@@ -184,7 +197,7 @@ function stopPainting() {
 	paint = false;
 }
 
-function sketch(event) {
+async function sketch(event) {
 	if (!paint) return;
 
 	ctx.beginPath();
@@ -200,12 +213,17 @@ function sketch(event) {
 	ctx.lineTo(coord.x, coord.y);
 	ctx.stroke();
 
+	await wait(500);
 	sendImgData();
 }
 
-function sendMsgBtnEL(e) {
+// canvas utils
+
+// event listeners
+
+function sendChatMsgBtnEL(e) {
 	e.preventDefault();
-	sendMessage(msgInp.value);
+	sendChatMessage(msgInp.value);
 }
 
 async function windowEL() {
@@ -215,3 +233,5 @@ async function windowEL() {
 	document.addEventListener('mouseup', stopPainting);
 	document.addEventListener('mousemove', sketch);
 }
+
+// event listeners

@@ -11,8 +11,15 @@
 			<form action="/app" method="post">
 				<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-				<label for="name">Enter your name to join:</label>
-				<input type="text" name="clientName" required autofocus />
+				<label for="clientName">Enter your name to join:</label>
+				<input
+					type="text"
+					name="clientName"
+					id="clientName"
+					required
+					autofocus
+				/>
+
 				<button type="submit">Join</button>
 			</form>
 
@@ -25,16 +32,19 @@
 			<div class="members"></div>
 			<div class="messages"></div>
 			<form>
-				<input type="hidden" name="poolId" value="{{ .PoolId }}" />
-				<input type="hidden" name="clientName" value="{{ .ClientName }}" />
-				<input type="hidden" name="clientId" value="" />
-
-				<label for="msg">Enter msg:</label>
+				<label for="msg">Chat:</label>
 				<input type="text" id="msg" required />
+
 				<button id="sendMsg">Send</button>
 			</form>
 
 			<canvas id="canv"></canvas>
+
+			<script>
+				const poolId = '{{ .PoolId }}';
+				const clientId = '{{ .ClientId }}';
+				const clientName = '{{ .ClientName }}';
+			</script>
 
 			<script src="public/app.js"></script>
 
