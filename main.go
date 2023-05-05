@@ -24,7 +24,5 @@ func main() {
 
 	ee.GET("/ws", routes.HandlerWsConnection)
 
-	e.GET("/api/start-game", routes.StartGame)
-
 	e.Logger.Fatal(e.Start(":1323"))
 }

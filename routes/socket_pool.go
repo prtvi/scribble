@@ -88,45 +88,69 @@ func (pool *Pool) Start() {
 
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
-			if message.Type == 5 {
-				type clientInfo struct {
-					ID    string `json:"id"`
-					Name  string `json:"name"`
-					Color string `json:"color"`
-				}
+			switch message.Type {
+			case 5:
+				message = ResponseMessageType_5(message.PoolId)
 
-				clientInfoList := make([]clientInfo, 0)
+			case 6:
+				message = ResponseMessageType_6(message.PoolId)
 
-				pool, ok := HUB[message.PoolId]
-				if !ok {
-					fmt.Println("no ok")
-				}
-
-				for client := range pool.Clients {
-					clientInfoList = append(clientInfoList, clientInfo{
-						ID:    client.ID,
-						Name:  client.Name,
-						Color: client.Color,
-					})
-				}
-
-				byteInfo, _ := json.Marshal(clientInfoList)
-				for c := range pool.Clients {
-					c.Conn.WriteJSON(model.SocketMessage{
-						Type:    5,
-						Content: string(byteInfo),
-					})
-				}
-
+			default:
 				break
 			}
 
 			for client := range pool.Clients {
-				if err := client.Conn.WriteJSON(message); err != nil {
-					fmt.Println(err)
-					return
-				}
+				client.Conn.WriteJSON(message)
 			}
 		}
+	}
+}
+
+func ResponseMessageType_5(poolId string) model.SocketMessage {
+	type clientInfo struct {
+		ID    string `json:"id"`
+		Name  string `json:"name"`
+		Color string `json:"color"`
+	}
+
+	clientInfoList := make([]clientInfo, 0)
+	pool, ok := HUB[poolId]
+
+	if !ok {
+		return model.SocketMessage{
+			Type:    5,
+			Content: "[]",
+		}
+	}
+
+	for client := range pool.Clients {
+		clientInfoList = append(clientInfoList, clientInfo{
+			ID:    client.ID,
+			Name:  client.Name,
+			Color: client.Color,
+		})
+	}
+
+	byteInfo, _ := json.Marshal(clientInfoList)
+	return model.SocketMessage{
+		Type:    5,
+		Content: string(byteInfo),
+	}
+}
+
+func ResponseMessageType_6(poolId string) model.SocketMessage {
+	pool, ok := HUB[poolId]
+
+	if !ok {
+		return model.SocketMessage{
+			Type:    6,
+			Content: "false",
+		}
+	}
+
+	pool.HasGameStarted = true
+	return model.SocketMessage{
+		Type:    6,
+		Content: "true",
 	}
 }

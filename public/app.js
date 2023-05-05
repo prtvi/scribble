@@ -1,16 +1,10 @@
 'use strict';
-// clientId, clientName and poolId initialised from inline js
 
-const canvas = document.querySelector('#canv');
+const canvas = document.querySelector('.canv');
 const ctx = canvas.getContext('2d');
 
-const msgInp = document.querySelector('#msg');
-const sendChatMsgBtn = document.querySelector('#send-msg');
-
-const loading = document.querySelector('.loading');
-const startGameDiv = document.querySelector('.start-game');
-const startGameBtn = document.querySelector('.start-game-btn');
-const now = new Date();
+const msgInp = document.querySelector('.msg');
+const sendChatMsgBtn = document.querySelector('.send-msg');
 
 // ---------------- main ----------------
 
@@ -22,18 +16,194 @@ const paintUtils = {
 	isAllowedToPaint: false, // not used yet
 };
 
+let startGameTimer,
+	startGameAfterInterval,
+	secondsLeft = gameStartsInSeconds;
+
 const socket = initSocket();
+checkGameBeginStat();
 
 const renderClientsTimer = setInterval(getAllClientsEL, 5 * 1000);
-const startGameCountdownTimer = setInterval(startGameCountdownEL, 1000);
-const startGameAfterTimeout = setTimeout(
-	startGameAfterTimeoutEL,
-	Math.ceil(gameStartTime - now)
-);
-
 sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
 window.addEventListener('load', addCanvasEventListeners);
-startGameBtn.addEventListener('click', startGameAfterTimeoutEL);
+
+// ---------------- utils ----------------
+
+function initSocket() {
+	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
+
+	const socket = new WebSocket(wsUrl);
+
+	socket.onopen = () => {
+		console.log('Socket successfully connected!');
+		getAllClientsEL();
+	};
+
+	socket.onmessage = socketOnMessage;
+	socket.onclose = socketOnClose;
+	socket.onerror = error => console.log('Socket error', error);
+
+	function getDomain() {
+		// extract domain from url
+		const url = window.location.href;
+		const fi = url.indexOf('/');
+		const li = url.lastIndexOf('/');
+		const domain = url.slice(fi + 2, li);
+
+		return domain;
+	}
+
+	function socketOnMessage(message) {
+		// parse json string into json object
+		const msg = JSON.parse(message.data);
+
+		// msg.type
+		// 1 === CONNECTED
+		// 2 === DISCONNECTED
+		// 3 === string data
+		// 4 === canvas data
+		// 5 === all client info
+		// 6 === start game ack
+
+		switch (msg.type) {
+			case 1:
+				// if the current clientName and the clientName from response match then
+				if (msg.clientId === clientId)
+					appendChatMsgToDOM(`You joined the pool as ${clientName}!`);
+				else appendChatMsgToDOM(`${msg.clientName} has joined the pool!`);
+				break;
+
+			case 2:
+				appendChatMsgToDOM(`${msg.clientName} has left the pool!`);
+				break;
+
+			case 3:
+				appendChatMsgToDOM(`${msg.clientName}: ${msg.content}`);
+				break;
+
+			case 4:
+				displayImgOnCanvas(msg.content);
+				break;
+
+			case 5:
+				renderClients(msg.content);
+				break;
+
+			case 6:
+				startGame(msg.content);
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	function socketOnClose() {
+		console.log('Socket connection closed, stopping timers and timeouts!');
+		clearInterval(renderClientsTimer);
+		clearInterval(startGameTimer);
+		clearTimeout(startGameAfterInterval);
+	}
+
+	return socket;
+}
+
+function checkGameBeginStat() {
+	if (!hasGameStarted) {
+		console.log('game not started');
+
+		// start game countdown to show user how much time is left
+		startGameTimer = setInterval(renderCountdownEL, 1000);
+
+		// start game after timeout
+		startGameAfterInterval = setTimeout(
+			requestStartGameEL,
+			(gameStartsInSeconds + 2) * 1000
+		);
+
+		// add event listener to start game button to start game
+		document
+			.querySelector('.start-game-btn')
+			.addEventListener('click', requestStartGameEL);
+	} else {
+		console.log('started game');
+		paintUtils.hasGameStarted = true;
+	}
+}
+
+function wait(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ---------------- start game countdown ----------------
+
+function renderCountdownEL() {
+	// renders the countdown to display to the user remaining time for game to start
+	document.querySelector('.loading').textContent = secondsLeft;
+	secondsLeft -= 1;
+}
+
+function requestStartGameEL() {
+	// runs when the game starts, makes socket conn call to server to start the game
+
+	// clear the countdown timer to show time left to start game
+	clearInterval(startGameTimer);
+
+	// generate response and send
+	const responseMsg = {
+		type: 6,
+		content: '',
+		poolId,
+	};
+
+	socket.send(JSON.stringify(responseMsg));
+}
+
+function startGame(msg) {
+	// called when socket receives message from server with type as 6
+	if (msg !== 'true') return;
+
+	console.log('started game ...');
+
+	// clear interval after response from server
+	clearTimeout(startGameAfterInterval);
+
+	// hide the div and toggle hasGameStarted
+	document.querySelector('.start-game').style.display = 'none';
+	paintUtils.hasGameStarted = true;
+}
+
+// ---------------- get all clients and render ----------------
+
+function renderClients(allClients) {
+	// called when the socket conn receives a message from server
+	const membersDiv = document.querySelector('.members');
+	membersDiv.innerHTML = '';
+
+	allClients = JSON.parse(allClients);
+
+	allClients.forEach(n => {
+		const clientNameHolder = document.createElement('div');
+		const clientName = document.createElement('p');
+
+		clientName.innerHTML = n.name;
+		clientName.style.color = `#${n.color}`;
+		clientNameHolder.appendChild(clientName);
+
+		membersDiv.appendChild(clientNameHolder);
+	});
+}
+
+function getAllClientsEL() {
+	// makes a socket connection call to request client info list
+	const responseMsg = {
+		type: 5,
+		content: '',
+		poolId,
+	};
+
+	socket.send(JSON.stringify(responseMsg));
+}
 
 // ---------------- chat ----------------
 
@@ -130,138 +300,4 @@ function addCanvasEventListeners() {
 	document.addEventListener('mousedown', startPainting);
 	document.addEventListener('mouseup', stopPainting);
 	document.addEventListener('mousemove', paint);
-}
-
-// ---------------- get all clients list and render ----------------
-
-function renderClients(allClients) {
-	const membersDiv = document.querySelector('.members');
-	membersDiv.innerHTML = '';
-
-	allClients = JSON.parse(allClients);
-
-	allClients.forEach(n => {
-		const clientNameHolder = document.createElement('div');
-		const clientName = document.createElement('p');
-
-		clientName.innerHTML = n.name;
-		clientName.style.color = `#${n.color}`;
-		clientNameHolder.appendChild(clientName);
-
-		membersDiv.appendChild(clientNameHolder);
-	});
-}
-
-function getAllClientsEL() {
-	const responseMsg = {
-		type: 5,
-		content: '',
-		poolId,
-	};
-
-	socket.send(JSON.stringify(responseMsg));
-}
-
-// ---------------- start game countdown ----------------
-
-function startGameCountdownEL() {
-	// does the countdown to display to the user remaining time for game to start
-
-	const now = new Date();
-	loading.textContent = Math.ceil((gameStartTime - now) / 1000);
-}
-
-async function startGameAfterTimeoutEL() {
-	// runs when the game starts
-
-	const res = await fetch(`/api/start-game?poolId=${poolId}`);
-	const data = await res.json();
-
-	if (!data.success) return;
-
-	console.log('starting game ...');
-	clearInterval(startGameCountdownTimer);
-	clearTimeout(startGameAfterTimeout);
-
-	startGameDiv.style.display = 'none';
-	paintUtils.hasGameStarted = true;
-}
-
-// ---------------- utils ----------------
-
-function initSocket() {
-	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
-
-	const socket = new WebSocket(wsUrl);
-
-	socket.onopen = () => {
-		console.log('Socket successfully connected!');
-		getAllClientsEL();
-	};
-
-	socket.onmessage = socketOnMessage;
-	socket.onclose = socketOnClose;
-	socket.onerror = error => console.log('Socket error', error);
-
-	function getDomain() {
-		// extract domain from url
-		const url = window.location.href;
-		const fi = url.indexOf('/');
-		const li = url.lastIndexOf('/');
-		const domain = url.slice(fi + 2, li);
-
-		return domain;
-	}
-
-	function socketOnMessage(message) {
-		// parse json string into json object
-		const msg = JSON.parse(message.data);
-
-		// if message type is 1 === CONNECTED
-		// if message type is 2 === DISCONNECTED
-		// if message type is 3 === string data
-		// if message type is 4 === canvas data
-		// if message type is 5 === all client info
-
-		switch (msg.type) {
-			case 1:
-				// if the current clientName and the clientName from response match then
-				if (msg.clientName === clientName)
-					appendChatMsgToDOM(`You joined the pool as ${clientName}!`);
-				else appendChatMsgToDOM(`${msg.clientName} has joined the pool!`);
-				break;
-
-			case 2:
-				appendChatMsgToDOM(`${msg.clientName} has left the pool!`);
-				break;
-
-			case 3:
-				appendChatMsgToDOM(`${msg.clientName}: ${msg.content}`);
-				break;
-
-			case 4:
-				displayImgOnCanvas(msg.content);
-				break;
-
-			case 5:
-				renderClients(msg.content);
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	function socketOnClose() {
-		console.log('Socket connection closed, stopping timers and timeouts!');
-		clearInterval(renderClientsTimer);
-		clearInterval(startGameCountdownTimer);
-		clearTimeout(startGameAfterTimeout);
-	}
-
-	return socket;
-}
-
-function wait(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
 }

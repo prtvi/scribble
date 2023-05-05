@@ -34,13 +34,14 @@
 			<div class="messages"></div>
 			<form>
 				<label for="msg">Chat:</label>
-				<input type="text" id="msg" required />
+				<input type="text" class="msg" required />
 
-				<button id="send-msg">Send</button>
+				<button class="send-msg">Send</button>
 			</form>
 
-			<canvas id="canv"></canvas>
+			<canvas class="canv"></canvas>
 
+			{{ if eq .HasGameStarted "" }}
 			<div class="start-game">
 				<div>
 					Waiting for others to join, starting game in
@@ -48,13 +49,17 @@
 				</div>
 				<button class="start-game-btn">Start now</button>
 			</div>
+			{{ end }}
 
 			<script>
 				const poolId = '{{ .PoolId }}';
 				const clientId = '{{ .ClientId }}';
 				const clientName = '{{ .ClientName }}';
 				const clientColor = '{{ .ClientColor }}';
-				const gameStartTime = new Date('{{ .GameStartTime }}');
+				const gameStartsInSeconds = Math.ceil(
+					Number('{{ .GameStartsInSeconds }}')
+				);
+				const hasGameStarted = Boolean('{{ .HasGameStarted }}');
 			</script>
 
 			<script src="public/app.js"></script>
