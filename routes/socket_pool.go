@@ -1,6 +1,7 @@
-package socket
+package routes
 
 import (
+	"encoding/json"
 	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
@@ -86,6 +87,39 @@ func (pool *Pool) Start() {
 			utils.Cp("blue", "SocketMessage received, type:", utils.Cs("reset", fmt.Sprintf("%d,", message.Type)), utils.Cs("blue", "broadcasting ..."))
 
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
+
+			if message.Type == 5 {
+				type clientInfo struct {
+					ID    string `json:"id"`
+					Name  string `json:"name"`
+					Color string `json:"color"`
+				}
+
+				clientInfoList := make([]clientInfo, 0)
+
+				pool, ok := HUB[message.PoolId]
+				if !ok {
+					fmt.Println("no ok")
+				}
+
+				for client := range pool.Clients {
+					clientInfoList = append(clientInfoList, clientInfo{
+						ID:    client.ID,
+						Name:  client.Name,
+						Color: client.Color,
+					})
+				}
+
+				byteInfo, _ := json.Marshal(clientInfoList)
+				for c := range pool.Clients {
+					c.Conn.WriteJSON(model.SocketMessage{
+						Type:    5,
+						Content: string(byteInfo),
+					})
+				}
+
+				break
+			}
 
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {

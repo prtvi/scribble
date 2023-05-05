@@ -1,9 +1,8 @@
-package socket
+package routes
 
 import (
 	"encoding/json"
 	"fmt"
-
 	model "scribble/model"
 
 	"github.com/gorilla/websocket"

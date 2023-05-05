@@ -24,7 +24,7 @@ const paintUtils = {
 
 const socket = initSocket();
 
-const renderClientsTimer = setInterval(getAllClientsAndRenderEL, 5 * 1000);
+const renderClientsTimer = setInterval(getAllClientsEL, 5 * 1000);
 const startGameCountdownTimer = setInterval(startGameCountdownEL, 1000);
 const startGameAfterTimeout = setTimeout(
 	startGameAfterTimeoutEL,
@@ -32,7 +32,6 @@ const startGameAfterTimeout = setTimeout(
 );
 
 sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
-window.addEventListener('load', getAllClientsAndRenderEL);
 window.addEventListener('load', addCanvasEventListeners);
 startGameBtn.addEventListener('click', startGameAfterTimeoutEL);
 
@@ -133,34 +132,34 @@ function addCanvasEventListeners() {
 	document.addEventListener('mousemove', paint);
 }
 
-// ---------------- get all clients list ----------------
+// ---------------- get all clients list and render ----------------
 
-async function getAllClients() {
-	const res = await fetch(`api/get-clients-in-pool?poolId=${poolId}`);
-	const data = await res.json();
-	return data;
+function renderClients(allClients) {
+	const membersDiv = document.querySelector('.members');
+	membersDiv.innerHTML = '';
+
+	allClients = JSON.parse(allClients);
+
+	allClients.forEach(n => {
+		const clientNameHolder = document.createElement('div');
+		const clientName = document.createElement('p');
+
+		clientName.innerHTML = n.name;
+		clientName.style.color = `#${n.color}`;
+		clientNameHolder.appendChild(clientName);
+
+		membersDiv.appendChild(clientNameHolder);
+	});
 }
 
-async function getAllClientsAndRenderEL() {
-	try {
-		const allClients = await getAllClients();
-		const membersDiv = document.querySelector('.members');
-		membersDiv.innerHTML = '';
+function getAllClientsEL() {
+	const responseMsg = {
+		type: 5,
+		content: '',
+		poolId,
+	};
 
-		allClients.forEach(n => {
-			const clientNameHolder = document.createElement('div');
-			const clientName = document.createElement('p');
-
-			clientName.innerHTML = n.name;
-			clientName.style.color = `#${n.color}`;
-			clientNameHolder.appendChild(clientName);
-
-			membersDiv.appendChild(clientNameHolder);
-		});
-	} catch (error) {
-		console.log('error, closing render all clients timer');
-		clearInterval(renderClientsTimer);
-	}
+	socket.send(JSON.stringify(responseMsg));
 }
 
 // ---------------- start game countdown ----------------
@@ -194,7 +193,12 @@ function initSocket() {
 	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
 
 	const socket = new WebSocket(wsUrl);
-	socket.onopen = () => console.log('Socket successfully connected');
+
+	socket.onopen = () => {
+		console.log('Socket successfully connected!');
+		getAllClientsEL();
+	};
+
 	socket.onmessage = socketOnMessage;
 	socket.onclose = socketOnClose;
 	socket.onerror = error => console.log('Socket error', error);
@@ -217,6 +221,7 @@ function initSocket() {
 		// if message type is 2 === DISCONNECTED
 		// if message type is 3 === string data
 		// if message type is 4 === canvas data
+		// if message type is 5 === all client info
 
 		switch (msg.type) {
 			case 1:
@@ -239,7 +244,7 @@ function initSocket() {
 				break;
 
 			case 5:
-				console.log(msg);
+				renderClients(msg.content);
 				break;
 
 			default:

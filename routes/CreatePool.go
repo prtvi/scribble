@@ -3,7 +3,6 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	socket "scribble/socket"
 	utils "scribble/utils"
 	"strconv"
 
@@ -30,13 +29,13 @@ func CreatePoolLink(c echo.Context) error {
 
 	// create a new pool with an uuid
 	poolId := utils.GenerateUUID()
-	pool := socket.NewPool(poolId, capacity)
+	pool := NewPool(poolId, capacity)
 
 	// append to global Hub map, and start listening to pool connections
-	Hub[poolId] = pool
+	HUB[poolId] = pool
 	go pool.Start()
 
-	utils.Cp("blue", "Hub size (number of pools):", utils.Cs("white", fmt.Sprintf("%d", len(Hub))))
+	utils.Cp("blue", "Hub size (number of pools):", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
 
 	// generate link to join the pool
 	link := "/app?join=" + poolId

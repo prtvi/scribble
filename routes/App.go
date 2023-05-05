@@ -7,8 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var COLORS = []string{"36fdc3", "180dab", "90c335", "d17161", "a16014", "2f38a0", "11ea10", "9e5df3", "87425b", "ece8f8"}
-
 var dataForAppRoute = map[string]any{
 	"RegisterToPool": false,
 	"ConnectSocket":  false,
@@ -29,7 +27,7 @@ func App(c echo.Context) error {
 	}
 
 	// check if pool exists, if is does not exist then render no form
-	pool, ok := Hub[poolId]
+	pool, ok := HUB[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
 		dataForAppRoute["Message"] = "Pool expired or non-existent!"
@@ -64,7 +62,7 @@ func RegisterToPool(c echo.Context) error {
 	clientName := c.FormValue("clientName")
 
 	// extra check to prevent user from joining any random pool which does not exist
-	pool, ok := Hub[poolId]
+	pool, ok := HUB[poolId]
 	if !ok {
 		dataForAppRoute["Message"] = "Pool expired or non-existent!"
 		return c.Render(http.StatusOK, "app", dataForAppRoute)
@@ -72,7 +70,7 @@ func RegisterToPool(c echo.Context) error {
 
 	// generate client id and color
 	clientId := utils.GenerateUUID()[0:8]
-	clientColor := COLORS[pool.ColorAssignmentIndex]
+	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered

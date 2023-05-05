@@ -8,6 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var COLORS = []string{"36fdc3", "180dab", "90c335", "d17161", "a16014", "2f38a0", "11ea10", "9e5df3", "87425b", "ece8f8"}
+
 func GenerateUUID() string {
 	return uuid.New().String()
 }

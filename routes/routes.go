@@ -3,7 +3,6 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	socket "scribble/socket"
 	utils "scribble/utils"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 )
 
 // map of {poolId: pool}
-var Hub = map[string]*socket.Pool{}
+var HUB = map[string]*Pool{}
 
 // / middleware
 func Logger(next echo.HandlerFunc) echo.HandlerFunc {
@@ -45,5 +44,5 @@ func HandlerWsConnection(c echo.Context) error {
 	poolId := c.QueryParam("poolId")
 
 	// register connection
-	return socket.ServeWs(Hub[poolId], c.Response().Writer, c.Request())
+	return ServeWs(HUB[poolId], c.Response().Writer, c.Request())
 }
