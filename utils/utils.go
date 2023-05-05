@@ -3,12 +3,18 @@ package utils
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 func GenerateUUID() string {
 	return uuid.New().String()
+}
+
+func FormatTimeLong(t time.Time) string {
+	// 2023-09-19 23:34:09
+	return t.String()[0:19]
 }
 
 var reset string = "\033[0m"

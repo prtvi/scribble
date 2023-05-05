@@ -4,26 +4,39 @@
 const canvas = document.querySelector('#canv');
 const ctx = canvas.getContext('2d');
 
+const msgInp = document.querySelector('#msg');
+const sendChatMsgBtn = document.querySelector('#send-msg');
+
+const loading = document.querySelector('.loading');
+const startGameDiv = document.querySelector('.start-game');
+const startGameBtn = document.querySelector('.start-game-btn');
+const now = new Date();
+
 // ---------------- main ----------------
 
 const paintUtils = {
 	coords: { x: 0, y: 0 },
-	color: '',
+	color: `#${clientColor}`,
 	isPainting: false,
+	hasGameStarted: false,
+	isAllowedToPaint: false, // not used yet
 };
 
 const socket = initSocket();
 
-const displayAllClientsInPoolTimer = setInterval(displayAllClientsInPool, 5000);
+const renderClientsTimer = setInterval(getAllClientsAndRenderEL, 5 * 1000);
+const startGameCountdownTimer = setInterval(startGameCountdownEL, 1000);
+const startGameAfterTimeout = setTimeout(
+	startGameAfterTimeoutEL,
+	Math.ceil(gameStartTime - now)
+);
 
 sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
-window.addEventListener('load', initColor);
+window.addEventListener('load', getAllClientsAndRenderEL);
 window.addEventListener('load', addCanvasEventListeners);
+startGameBtn.addEventListener('click', startGameAfterTimeoutEL);
 
 // ---------------- chat ----------------
-
-const msgInp = document.querySelector('#msg');
-const sendChatMsgBtn = document.querySelector('#sendMsg');
 
 function appendChatMsgToDOM(msg) {
 	// adds the content into the DOM
@@ -75,6 +88,7 @@ function stopPainting() {
 
 async function paint(event) {
 	if (!paintUtils.isPainting) return;
+	if (!paintUtils.hasGameStarted) return;
 
 	ctx.beginPath();
 
@@ -127,10 +141,9 @@ async function getAllClients() {
 	return data;
 }
 
-async function displayAllClientsInPool() {
+async function getAllClientsAndRenderEL() {
 	try {
 		const allClients = await getAllClients();
-
 		const membersDiv = document.querySelector('.members');
 		membersDiv.innerHTML = '';
 
@@ -139,21 +152,46 @@ async function displayAllClientsInPool() {
 			const clientName = document.createElement('p');
 
 			clientName.innerHTML = n.name;
-			clientName.style.color = n.color;
+			clientName.style.color = `#${n.color}`;
 			clientNameHolder.appendChild(clientName);
 
 			membersDiv.appendChild(clientNameHolder);
 		});
 	} catch (error) {
-		console.log('error, closing display all clients timer');
-		clearInterval(displayAllClientsInPoolTimer);
+		console.log('error, closing render all clients timer');
+		clearInterval(renderClientsTimer);
 	}
+}
+
+// ---------------- start game countdown ----------------
+
+function startGameCountdownEL() {
+	// does the countdown to display to the user remaining time for game to start
+
+	const now = new Date();
+	loading.textContent = Math.ceil((gameStartTime - now) / 1000);
+}
+
+async function startGameAfterTimeoutEL() {
+	// runs when the game starts
+
+	const res = await fetch(`/api/start-game?poolId=${poolId}`);
+	const data = await res.json();
+
+	if (!data.success) return;
+
+	console.log('starting game ...');
+	clearInterval(startGameCountdownTimer);
+	clearTimeout(startGameAfterTimeout);
+
+	startGameDiv.style.display = 'none';
+	paintUtils.hasGameStarted = true;
 }
 
 // ---------------- utils ----------------
 
 function initSocket() {
-	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}`;
+	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
 
 	const socket = new WebSocket(wsUrl);
 	socket.onopen = () => console.log('Socket successfully connected');
@@ -200,14 +238,20 @@ function initSocket() {
 				displayImgOnCanvas(msg.content);
 				break;
 
+			case 5:
+				console.log(msg);
+				break;
+
 			default:
 				break;
 		}
 	}
 
 	function socketOnClose() {
-		console.log('Socket connection closed, stopping render all clients timer');
-		clearInterval(displayAllClientsInPoolTimer);
+		console.log('Socket connection closed, stopping timers and timeouts!');
+		clearInterval(renderClientsTimer);
+		clearInterval(startGameCountdownTimer);
+		clearTimeout(startGameAfterTimeout);
 	}
 
 	return socket;
@@ -215,10 +259,4 @@ function initSocket() {
 
 function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function initColor() {
-	const allClients = await getAllClients();
-	const matchedClient = allClients.find(c => c.id === clientId);
-	paintUtils.color = matchedClient.color;
 }

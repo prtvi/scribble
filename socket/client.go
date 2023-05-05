@@ -4,11 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 
+	model "scribble/model"
+
 	"github.com/gorilla/websocket"
 )
 
+// Client.Role: int
+// 0: painter
+// 1: common player
+
+// Client.Color: string
+// color string hash value without the #
+
 type Client struct {
 	ID, Name, Color string
+	Role            int // not used yet
 	Conn            *websocket.Conn
 	Pool            *Pool
 }
@@ -28,7 +38,7 @@ func (c *Client) Read() {
 		}
 
 		// parse message received from client
-		var clientMsg SocketMessage
+		var clientMsg model.SocketMessage
 		err = json.Unmarshal(msgByte, &clientMsg)
 
 		// broadcast the message to all clients in the pool

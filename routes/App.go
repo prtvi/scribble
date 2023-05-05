@@ -7,6 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var COLORS = []string{"36fdc3", "180dab", "90c335", "d17161", "a16014", "2f38a0", "11ea10", "9e5df3", "87425b", "ece8f8"}
+
 var dataForAppRoute = map[string]any{
 	"RegisterToPool": false,
 	"ConnectSocket":  false,
@@ -61,14 +63,16 @@ func RegisterToPool(c echo.Context) error {
 	poolId := c.FormValue("poolId")
 	clientName := c.FormValue("clientName")
 
-	// generate client id
-	clientId := utils.GenerateUUID()[0:8]
-
 	// extra check to prevent user from joining any random pool which does not exist
-	if _, ok := Hub[poolId]; !ok {
+	pool, ok := Hub[poolId]
+	if !ok {
 		dataForAppRoute["Message"] = "Pool expired or non-existent!"
 		return c.Render(http.StatusOK, "app", dataForAppRoute)
 	}
+
+	// generate client id and color
+	clientId := utils.GenerateUUID()[0:8]
+	clientColor := COLORS[pool.ColorAssignmentIndex]
 
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered
@@ -77,8 +81,10 @@ func RegisterToPool(c echo.Context) error {
 		"ConnectSocket":  true,
 
 		// init as js vars
-		"PoolId":     poolId,
-		"ClientId":   clientId,
-		"ClientName": clientName,
+		"PoolId":        poolId,
+		"ClientId":      clientId,
+		"ClientName":    clientName,
+		"ClientColor":   clientColor,
+		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
 	})
 }

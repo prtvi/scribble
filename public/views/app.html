@@ -16,6 +16,7 @@
 					type="text"
 					name="clientName"
 					id="clientName"
+					value="p1"
 					required
 					autofocus
 				/>
@@ -35,15 +36,25 @@
 				<label for="msg">Chat:</label>
 				<input type="text" id="msg" required />
 
-				<button id="sendMsg">Send</button>
+				<button id="send-msg">Send</button>
 			</form>
 
 			<canvas id="canv"></canvas>
+
+			<div class="start-game">
+				<div>
+					Waiting for others to join, starting game in
+					<span class="loading">120</span> seconds
+				</div>
+				<button class="start-game-btn">Start now</button>
+			</div>
 
 			<script>
 				const poolId = '{{ .PoolId }}';
 				const clientId = '{{ .ClientId }}';
 				const clientName = '{{ .ClientName }}';
+				const clientColor = '{{ .ClientColor }}';
+				const gameStartTime = new Date('{{ .GameStartTime }}');
 			</script>
 
 			<script src="public/app.js"></script>
