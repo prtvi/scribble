@@ -17,6 +17,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 
 var T *Template
 
+// render nested templates
 func InitTemplates() *Template {
 	tmpls := make(map[string]*template.Template)
 

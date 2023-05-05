@@ -73,6 +73,7 @@ func RegisterToPool(c echo.Context) error {
 	clientId := utils.GenerateUUID()[0:8]
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
+	// check if game has started
 	currTime := time.Now()
 	diff := pool.GameStartTime.Sub(currTime)
 	var hasGameStarted string = ""

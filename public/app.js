@@ -1,13 +1,16 @@
 'use strict';
 
+// canvas
 const canvas = document.querySelector('.canv');
 const ctx = canvas.getContext('2d');
 
+// chat messages
 const msgInp = document.querySelector('.msg');
 const sendChatMsgBtn = document.querySelector('.send-msg');
 
 // ---------------- main ----------------
 
+// utils for paintting on canvas
 const paintUtils = {
 	coords: { x: 0, y: 0 },
 	color: `#${clientColor}`,
@@ -16,25 +19,31 @@ const paintUtils = {
 	isAllowedToPaint: false, // not used yet
 };
 
+// timers to start when game has not yet started
 let startGameTimer,
 	startGameAfterInterval,
 	secondsLeft = gameStartsInSeconds;
 
+// init socket connection and check game begin status
 const socket = initSocket();
 checkGameBeginStat();
 
+// render all clients in pool on UI every 5 seconds
 const renderClientsTimer = setInterval(getAllClientsEL, 5 * 1000);
+// event listeners to send chat messages event listeners for canvas painting
 sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
 window.addEventListener('load', addCanvasEventListeners);
 
 // ---------------- utils ----------------
 
 function initSocket() {
-	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
+	// initialises socket connection and adds corresponding function handlers to the socket
 
+	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
 	const socket = new WebSocket(wsUrl);
 
 	socket.onopen = () => {
+		// on socket open success, get all clients and render them on UI
 		console.log('Socket successfully connected!');
 		getAllClientsEL();
 	};
@@ -54,6 +63,8 @@ function initSocket() {
 	}
 
 	function socketOnMessage(message) {
+		// runs when a message is received on the socket conn, runs the corresponding functions depending on message type
+
 		// parse json string into json object
 		const msg = JSON.parse(message.data);
 
@@ -67,9 +78,9 @@ function initSocket() {
 
 		switch (msg.type) {
 			case 1:
-				// if the current clientName and the clientName from response match then
 				if (msg.clientId === clientId)
-					appendChatMsgToDOM(`You joined the pool as ${clientName}!`);
+					// if the current clientId and the clientId from response match then
+					appendChatMsgToDOM(`You joined the pool as ${msg.clientName}!`);
 				else appendChatMsgToDOM(`${msg.clientName} has joined the pool!`);
 				break;
 
@@ -99,6 +110,7 @@ function initSocket() {
 	}
 
 	function socketOnClose() {
+		// on socket conn close, stop all timer or intervals
 		console.log('Socket connection closed, stopping timers and timeouts!');
 		clearInterval(renderClientsTimer);
 		clearInterval(startGameTimer);
@@ -109,13 +121,18 @@ function initSocket() {
 }
 
 function checkGameBeginStat() {
+	// checks if game has already started based on "hasGameStarted" variable
+
+	// if game has not started then, begin the countdown and render time left
+	// and request start game on time-up
+	// also listen to start game btn press to start the game
 	if (!hasGameStarted) {
 		console.log('game not started');
 
 		// start game countdown to show user how much time is left
 		startGameTimer = setInterval(renderCountdownEL, 1000);
 
-		// start game after timeout
+		// start game after this timeout
 		startGameAfterInterval = setTimeout(
 			requestStartGameEL,
 			(gameStartsInSeconds + 2) * 1000
@@ -126,6 +143,7 @@ function checkGameBeginStat() {
 			.querySelector('.start-game-btn')
 			.addEventListener('click', requestStartGameEL);
 	} else {
+		// if game has already begun, then alter the hasGameStarted field in paintUtils
 		console.log('started game');
 		paintUtils.hasGameStarted = true;
 	}
@@ -175,13 +193,27 @@ function startGame(msg) {
 
 // ---------------- get all clients and render ----------------
 
+function getAllClientsEL() {
+	// makes a socket connection call to request client info list
+	const responseMsg = {
+		type: 5,
+		content: '',
+		poolId,
+	};
+
+	socket.send(JSON.stringify(responseMsg));
+}
+
 function renderClients(allClients) {
-	// called when the socket conn receives a message from server
+	// called when the socket conn receives a message from server as type 5
+
 	const membersDiv = document.querySelector('.members');
 	membersDiv.innerHTML = '';
 
+	// parse array of objects into json
 	allClients = JSON.parse(allClients);
 
+	// render
 	allClients.forEach(n => {
 		const clientNameHolder = document.createElement('div');
 		const clientName = document.createElement('p');
@@ -194,25 +226,14 @@ function renderClients(allClients) {
 	});
 }
 
-function getAllClientsEL() {
-	// makes a socket connection call to request client info list
-	const responseMsg = {
-		type: 5,
-		content: '',
-		poolId,
-	};
-
-	socket.send(JSON.stringify(responseMsg));
-}
-
 // ---------------- chat ----------------
 
 function appendChatMsgToDOM(msg) {
-	// adds the content into the DOM
+	// adds the msg into the DOM
+
 	if (msg.length === 0 || msg === '') return;
 
 	const messagesDiv = document.querySelector('.messages');
-
 	const msgDiv = document.createElement('div');
 	const text = document.createTextNode(msg);
 	msgDiv.appendChild(text);
@@ -222,6 +243,8 @@ function appendChatMsgToDOM(msg) {
 }
 
 function sendChatMsgBtnEL(e) {
+	// event listener to send chat message
+
 	e.preventDefault();
 	const msg = msgInp.value;
 

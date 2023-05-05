@@ -6,6 +6,7 @@
 
 	<body>
 		<div class="main">
+			<!-- render this form when get request to /app is made, then capture form response and register to pool -->
 			{{ if .RegisterToPool }}
 
 			<form action="/app" method="post">
@@ -26,8 +27,7 @@
 
 			{{ end }}
 
-			<!-- above code renders when a GET request is made -->
-
+			<!-- render this form when post request to /app is made, render this form for chat msgs and then estalblish socket connection -->
 			{{ if .ConnectSocket }}
 
 			<div class="members"></div>
@@ -41,14 +41,18 @@
 
 			<canvas class="canv"></canvas>
 
+			<!-- if game has not started then render this part -->
 			{{ if eq .HasGameStarted "" }}
+
 			<div class="start-game">
 				<div>
 					Waiting for others to join, starting game in
 					<span class="loading">120</span> seconds
+					<!-- to be added in config -->
 				</div>
 				<button class="start-game-btn">Start now</button>
 			</div>
+
 			{{ end }}
 
 			<script>
@@ -66,8 +70,7 @@
 
 			{{ end }}
 
-			<!--  -->
-
+			<!-- if pool does not exist or some error occurs then render message only, render this part when .Message is not "empty" -->
 			{{ if ne .Message "" }}
 
 			<p>{{ .Message }}</p>

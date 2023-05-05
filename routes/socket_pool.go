@@ -26,7 +26,7 @@ func NewPool(uuid string, capacity int) *Pool {
 	now := time.Now()
 	// later := now.Add(time.Minute * 2)
 
-	later := now.Add(time.Second * 15)
+	later := now.Add(time.Second * 15) // later diff to be added on config
 
 	return &Pool{
 		ID:                   uuid,
@@ -107,6 +107,8 @@ func (pool *Pool) Start() {
 }
 
 func ResponseMessageType_5(poolId string) model.SocketMessage {
+	// returns client info list embedded in model.SocketMessage
+
 	type clientInfo struct {
 		ID    string `json:"id"`
 		Name  string `json:"name"`
@@ -116,6 +118,7 @@ func ResponseMessageType_5(poolId string) model.SocketMessage {
 	clientInfoList := make([]clientInfo, 0)
 	pool, ok := HUB[poolId]
 
+	// if pool does not exist then send empty list
 	if !ok {
 		return model.SocketMessage{
 			Type:    5,
@@ -123,6 +126,7 @@ func ResponseMessageType_5(poolId string) model.SocketMessage {
 		}
 	}
 
+	// append client info into an array
 	for client := range pool.Clients {
 		clientInfoList = append(clientInfoList, clientInfo{
 			ID:    client.ID,
@@ -131,6 +135,7 @@ func ResponseMessageType_5(poolId string) model.SocketMessage {
 		})
 	}
 
+	// marshall array in byte and send as string
 	byteInfo, _ := json.Marshal(clientInfoList)
 	return model.SocketMessage{
 		Type:    5,
@@ -139,8 +144,11 @@ func ResponseMessageType_5(poolId string) model.SocketMessage {
 }
 
 func ResponseMessageType_6(poolId string) model.SocketMessage {
+	// returns if game has started or not embedded in model.SocketMessage
+
 	pool, ok := HUB[poolId]
 
+	// if pool foes not exist then send false
 	if !ok {
 		return model.SocketMessage{
 			Type:    6,
@@ -148,6 +156,7 @@ func ResponseMessageType_6(poolId string) model.SocketMessage {
 		}
 	}
 
+	// flag game started variable for the pool as true
 	pool.HasGameStarted = true
 	return model.SocketMessage{
 		Type:    6,
