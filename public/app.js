@@ -16,13 +16,15 @@ const paintUtils = {
 	color: `#${clientColor}`,
 	isPainting: false,
 	hasGameStarted: false,
-	isAllowedToPaint: false, // not used yet
+	isAllowedToPaint: false,
 };
 
 // timers to start when game has not yet started
 let startGameTimer,
 	startGameAfterInterval,
-	secondsLeft = gameStartsInSeconds;
+	secondsLeftForGameStart = gameStartsInSeconds,
+	timeLeftForWord,
+	timerForWord;
 
 // init socket connection and check game begin status
 const socket = initSocket();
@@ -66,42 +68,49 @@ function initSocket() {
 		// runs when a message is received on the socket conn, runs the corresponding functions depending on message type
 
 		// parse json string into json object
-		const msg = JSON.parse(message.data);
+		const socketMessage = JSON.parse(message.data);
 
-		// msg.type
+		// socketMessage.type
 		// 1 === CONNECTED
 		// 2 === DISCONNECTED
 		// 3 === string data
 		// 4 === canvas data
 		// 5 === all client info
-		// 6 === start game ack
+		// 6 === start game
 
-		switch (msg.type) {
+		switch (socketMessage.type) {
 			case 1:
-				if (msg.clientId === clientId)
+				if (socketMessage.clientId === clientId)
 					// if the current clientId and the clientId from response match then
-					appendChatMsgToDOM(`You joined the pool as ${msg.clientName}!`);
-				else appendChatMsgToDOM(`${msg.clientName} has joined the pool!`);
+					appendChatMsgToDOM(
+						`You joined the pool as ${socketMessage.clientName}!`
+					);
+				else
+					appendChatMsgToDOM(
+						`${socketMessage.clientName} has joined the pool!`
+					);
 				break;
 
 			case 2:
-				appendChatMsgToDOM(`${msg.clientName} has left the pool!`);
+				appendChatMsgToDOM(`${socketMessage.clientName} has left the pool!`);
 				break;
 
 			case 3:
-				appendChatMsgToDOM(`${msg.clientName}: ${msg.content}`);
+				appendChatMsgToDOM(
+					`${socketMessage.clientName}: ${socketMessage.content}`
+				);
 				break;
 
 			case 4:
-				displayImgOnCanvas(msg.content);
+				displayImgOnCanvas(socketMessage.content);
 				break;
 
 			case 5:
-				renderClients(msg.content);
+				renderClients(socketMessage.content);
 				break;
 
 			case 6:
-				startGame(msg.content);
+				startGame(socketMessage);
 				break;
 
 			default:
@@ -157,8 +166,8 @@ function wait(ms) {
 
 function renderCountdownEL() {
 	// renders the countdown to display to the user remaining time for game to start
-	document.querySelector('.loading').textContent = secondsLeft;
-	secondsLeft -= 1;
+	document.querySelector('.loading').textContent = secondsLeftForGameStart;
+	secondsLeftForGameStart -= 1;
 }
 
 function requestStartGameEL() {
@@ -177,11 +186,12 @@ function requestStartGameEL() {
 	socket.send(JSON.stringify(responseMsg));
 }
 
-function startGame(msg) {
+function startGame(socketMessage) {
 	// called when socket receives message from server with type as 6
-	if (msg !== 'true') return;
+	if (socketMessage.content !== 'true') return;
 
-	console.log('started game ...');
+	console.log('game started');
+	timeLeftForWord = socketMessage.timeLeftForCurrWord;
 
 	// clear interval after response from server
 	clearTimeout(startGameAfterInterval);
@@ -189,6 +199,32 @@ function startGame(msg) {
 	// hide the div and toggle hasGameStarted
 	document.querySelector('.start-game').style.display = 'none';
 	paintUtils.hasGameStarted = true;
+
+	// for enabling drawing access if clientId matches and display word
+	if (clientId === socketMessage.currentPlayerId) {
+		paintUtils.isAllowedToPaint = true;
+		document.querySelector('.your-word').textContent =
+			socketMessage.currentWord;
+	}
+
+	// start remaining time for word timer
+	timerForWord = setInterval(renderTimeLeftForWordEL, 1000);
+}
+
+function renderTimeLeftForWordEL() {
+	const timeLeftDiv = document.querySelector('.time-left-for-word');
+	timeLeftDiv.classList.remove('hidden');
+	timeLeftDiv.querySelector('span').textContent = timeLeftForWord;
+
+	timeLeftForWord -= 1;
+
+	if (timeLeftForWord <= 0) {
+		clearInterval(timerForWord);
+
+		console.log('timerForWord cleared');
+
+		// trigger next word for next player: TODO
+	}
 }
 
 // ------------------------------------- get all clients and render -------------------------------------
@@ -281,6 +317,7 @@ function stopPainting() {
 async function paint(event) {
 	if (!paintUtils.isPainting) return;
 	if (!paintUtils.hasGameStarted) return;
+	if (!paintUtils.isAllowedToPaint) return;
 
 	ctx.beginPath();
 

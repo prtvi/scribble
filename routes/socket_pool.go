@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
 	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
@@ -19,14 +18,19 @@ type Pool struct {
 	CreatedTime          time.Time
 	GameStartTime        time.Time
 	HasGameStarted       bool
+
+	// not initialised when start
+	CurrentWord         string
+	TimeLeftForCurrWord float64
+	CurrentPlayerIndex  int
+	CurrentPlayer       *Client
+	AlreadyPlayed       []*Client
 }
 
-// returns a new Pool
 func NewPool(uuid string, capacity int) *Pool {
+	// returns a new Pool
 	now := time.Now()
-	// later := now.Add(time.Minute * 2)
-
-	later := now.Add(time.Second * 15) // later diff to be added on config
+	later := now.Add(time.Second * GameStartDurationInSeconds)
 
 	return &Pool{
 		ID:                   uuid,
@@ -39,25 +43,13 @@ func NewPool(uuid string, capacity int) *Pool {
 		CreatedTime:          now,
 		GameStartTime:        later,
 		HasGameStarted:       false,
+
+		AlreadyPlayed: make([]*Client, 0),
 	}
 }
 
-func removeClientFromList(list []*Client, client *Client) []*Client {
-	var idxToRemove int
-	for i, c := range list {
-		if c == client {
-			idxToRemove = i
-			break
-		}
-	}
-
-	list[idxToRemove] = list[len(list)-1]
-	list = list[:len(list)-1]
-	return list
-}
-
-// start listening to pool connections and messages
 func (pool *Pool) Start() {
+	// start listening to pool connections and messages
 	for {
 		select {
 		case client := <-pool.Register:
@@ -81,7 +73,7 @@ func (pool *Pool) Start() {
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client slice
 			pool.Clients = removeClientFromList(pool.Clients, client)
-			// pool.ColorAssignmentIndex -= 1
+			// pool.ColorAssignmentIndex -= 1 // TODO
 
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
@@ -104,10 +96,10 @@ func (pool *Pool) Start() {
 
 			switch message.Type {
 			case 5: // client info list
-				message = ResponseMessageType_5(message.PoolId)
+				message = responseMessageType5(message.PoolId)
 
-			case 6: // start game ack
-				message = ResponseMessageType_6(message.PoolId)
+			case 6: // start game
+				message = responseMessageType6(message.PoolId)
 
 			default:
 				break
@@ -117,63 +109,5 @@ func (pool *Pool) Start() {
 				c.Conn.WriteJSON(message)
 			}
 		}
-	}
-}
-
-func ResponseMessageType_5(poolId string) model.SocketMessage {
-	// returns client info list embedded in model.SocketMessage
-
-	type clientInfo struct {
-		ID    string `json:"id"`
-		Name  string `json:"name"`
-		Color string `json:"color"`
-	}
-
-	clientInfoList := make([]clientInfo, 0)
-	pool, ok := HUB[poolId]
-
-	// if pool does not exist then send empty list
-	if !ok {
-		return model.SocketMessage{
-			Type:    5,
-			Content: "[]",
-		}
-	}
-
-	// append client info into an array
-	for _, client := range pool.Clients {
-		clientInfoList = append(clientInfoList, clientInfo{
-			ID:    client.ID,
-			Name:  client.Name,
-			Color: client.Color,
-		})
-	}
-
-	// marshall array in byte and send as string
-	byteInfo, _ := json.Marshal(clientInfoList)
-	return model.SocketMessage{
-		Type:    5,
-		Content: string(byteInfo),
-	}
-}
-
-func ResponseMessageType_6(poolId string) model.SocketMessage {
-	// returns if game has started or not embedded in model.SocketMessage
-
-	pool, ok := HUB[poolId]
-
-	// if pool does not exist then send false
-	if !ok {
-		return model.SocketMessage{
-			Type:    6,
-			Content: "false",
-		}
-	}
-
-	// flag game started variable for the pool as true
-	pool.HasGameStarted = true
-	return model.SocketMessage{
-		Type:    6,
-		Content: "true",
 	}
 }

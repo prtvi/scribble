@@ -10,3 +10,7 @@ canvas {
 	border: 1px solid lightcyan;
 	background-color: gray;
 }
+
+.hidden {
+	display: none;
+}
