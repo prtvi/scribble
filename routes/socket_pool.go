@@ -13,7 +13,7 @@ type Pool struct {
 	Capacity             int
 	Register             chan *Client
 	Unregister           chan *Client
-	Clients              map[*Client]bool
+	Clients              []*Client
 	Broadcast            chan model.SocketMessage
 	ColorAssignmentIndex int
 	CreatedTime          time.Time
@@ -33,7 +33,7 @@ func NewPool(uuid string, capacity int) *Pool {
 		Capacity:             capacity,
 		Register:             make(chan *Client),
 		Unregister:           make(chan *Client),
-		Clients:              make(map[*Client]bool),
+		Clients:              make([]*Client, 0),
 		Broadcast:            make(chan model.SocketMessage),
 		ColorAssignmentIndex: 0,
 		CreatedTime:          now,
@@ -42,19 +42,33 @@ func NewPool(uuid string, capacity int) *Pool {
 	}
 }
 
+func removeClientFromList(list []*Client, client *Client) []*Client {
+	var idxToRemove int
+	for i, c := range list {
+		if c == client {
+			idxToRemove = i
+			break
+		}
+	}
+
+	list[idxToRemove] = list[len(list)-1]
+	list = list[:len(list)-1]
+	return list
+}
+
 // start listening to pool connections and messages
 func (pool *Pool) Start() {
 	for {
 		select {
 		case client := <-pool.Register:
-			// on client register, append the client to Pool.Client map
-			pool.Clients[client] = true
+			// on client register, append the client to Pool.Client slice
+			pool.Clients = append(pool.Clients, client)
 			pool.ColorAssignmentIndex += 1
 
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
 
 			// all clients (c from loop) to one (registered client): all-1
-			for c := range pool.Clients {
+			for _, c := range pool.Clients {
 				c.Conn.WriteJSON(model.SocketMessage{
 					Type:       1,
 					Content:    fmt.Sprintf("CONNECTED_%s", client.Name),
@@ -65,14 +79,14 @@ func (pool *Pool) Start() {
 			break
 
 		case client := <-pool.Unregister:
-			// on client disconnect, delete the client from Pool.Client map
-			delete(pool.Clients, client)
-			pool.ColorAssignmentIndex -= 1
+			// on client disconnect, delete the client from Pool.Client slice
+			pool.Clients = removeClientFromList(pool.Clients, client)
+			// pool.ColorAssignmentIndex -= 1
 
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
 			// all clients (c from loop) to one (disconnected client): all-1
-			for c := range pool.Clients {
+			for _, c := range pool.Clients {
 				c.Conn.WriteJSON(model.SocketMessage{
 					Type:       2,
 					Content:    fmt.Sprintf("DISCONNECTED_%s", client.Name),
@@ -89,18 +103,18 @@ func (pool *Pool) Start() {
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
 			switch message.Type {
-			case 5:
+			case 5: // client info list
 				message = ResponseMessageType_5(message.PoolId)
 
-			case 6:
+			case 6: // start game ack
 				message = ResponseMessageType_6(message.PoolId)
 
 			default:
 				break
 			}
 
-			for client := range pool.Clients {
-				client.Conn.WriteJSON(message)
+			for _, c := range pool.Clients {
+				c.Conn.WriteJSON(message)
 			}
 		}
 	}
@@ -127,7 +141,7 @@ func ResponseMessageType_5(poolId string) model.SocketMessage {
 	}
 
 	// append client info into an array
-	for client := range pool.Clients {
+	for _, client := range pool.Clients {
 		clientInfoList = append(clientInfoList, clientInfo{
 			ID:    client.ID,
 			Name:  client.Name,
@@ -148,7 +162,7 @@ func ResponseMessageType_6(poolId string) model.SocketMessage {
 
 	pool, ok := HUB[poolId]
 
-	// if pool foes not exist then send false
+	// if pool does not exist then send false
 	if !ok {
 		return model.SocketMessage{
 			Type:    6,

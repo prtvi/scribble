@@ -34,7 +34,7 @@ const renderClientsTimer = setInterval(getAllClientsEL, 5 * 1000);
 sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
 window.addEventListener('load', addCanvasEventListeners);
 
-// ---------------- utils ----------------
+// ------------------------------------- utils -------------------------------------
 
 function initSocket() {
 	// initialises socket connection and adds corresponding function handlers to the socket
@@ -153,7 +153,7 @@ function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ---------------- start game countdown ----------------
+// ------------------------------------- start game countdown -------------------------------------
 
 function renderCountdownEL() {
 	// renders the countdown to display to the user remaining time for game to start
@@ -170,7 +170,7 @@ function requestStartGameEL() {
 	// generate response and send
 	const responseMsg = {
 		type: 6,
-		content: '',
+		content: 'start the game bro!',
 		poolId,
 	};
 
@@ -191,7 +191,7 @@ function startGame(msg) {
 	paintUtils.hasGameStarted = true;
 }
 
-// ---------------- get all clients and render ----------------
+// ------------------------------------- get all clients and render -------------------------------------
 
 function getAllClientsEL() {
 	// makes a socket connection call to request client info list
@@ -226,7 +226,7 @@ function renderClients(allClients) {
 	});
 }
 
-// ---------------- chat ----------------
+// ------------------------------------- chat -------------------------------------
 
 function appendChatMsgToDOM(msg) {
 	// adds the msg into the DOM
@@ -262,7 +262,7 @@ function sendChatMsgBtnEL(e) {
 	socket.send(JSON.stringify(responseMsg));
 }
 
-// ---------------- canvas ----------------
+// ------------------------------------- canvas -------------------------------------
 
 function updatePositionCanvas(event) {
 	paintUtils.coords.x = event.clientX - canvas.offsetLeft;
