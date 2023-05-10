@@ -21,7 +21,18 @@
 
 		{{ else }}
 
-		<a href="{{ .Link }}">Click here to join</a>
+		<a href="{{ .Link }}" class="copy-link">Click here to join</a>
+
+		<button class="copy-link-btn">Copy link</button>
+
+		<script>
+			const aTag = document.querySelector('.copy-link');
+			document
+				.querySelector('.copy-link-btn')
+				.addEventListener('click', () =>
+					navigator.clipboard.writeText(aTag.href)
+				);
+		</script>
 
 		{{ end }}
 	</body>

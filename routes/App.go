@@ -3,7 +3,6 @@ package routes
 import (
 	"net/http"
 	utils "scribble/utils"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -74,11 +73,9 @@ func RegisterToPool(c echo.Context) error {
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
 	// check if game has started
-	currTime := time.Now()
-	diff := pool.GameStartTime.Sub(currTime)
 	var hasGameStarted string = ""
-	if diff <= 0 {
-		hasGameStarted = "started"
+	if pool.HasGameStarted {
+		hasGameStarted = "true"
 	}
 
 	// render ConnectSocket form to establish socket connection
@@ -87,12 +84,16 @@ func RegisterToPool(c echo.Context) error {
 		"RegisterToPool": false,
 		"ConnectSocket":  true,
 
+		// variables in DOM
+		"GameStartDurationInSeconds": GameStartDurationInSeconds,
+		"TimeForEachWordInSeconds":   TimeForEachWordInSeconds,
+
 		// init as js vars
-		"PoolId":              poolId,
-		"ClientId":            clientId,
-		"ClientName":          clientName,
-		"ClientColor":         clientColor,
-		"GameStartsInSeconds": diff.Seconds(),
-		"HasGameStarted":      hasGameStarted,
+		"PoolId":         poolId,
+		"ClientId":       clientId,
+		"ClientName":     clientName,
+		"ClientColor":    clientColor,
+		"GameStartTime":  utils.FormatTimeLong(pool.GameStartTime),
+		"HasGameStarted": hasGameStarted,
 	})
 }

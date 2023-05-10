@@ -20,11 +20,11 @@ type Pool struct {
 	HasGameStarted       bool
 
 	// not initialised when start
-	CurrentWord         string
-	TimeLeftForCurrWord float64
-	CurrentPlayerIndex  int
-	CurrentPlayer       *Client
-	AlreadyPlayed       []*Client
+	CurrentWord          string
+	CurrentWordExpiresAt time.Time
+	CurrentPlayerIndex   int
+	CurrentPlayer        *Client
+	AlreadyPlayed        []*Client
 }
 
 func NewPool(uuid string, capacity int) *Pool {

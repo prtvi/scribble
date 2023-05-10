@@ -41,10 +41,13 @@
 
 			<canvas class="canv"></canvas>
 
-			<div class="your-word"></div>
+			<div class="hidden painter-utils">
+				<div class="your-word"></div>
+				<!-- <button class="clear-canvas">Clear</button> -->
+			</div>
 
 			<div class="hidden time-left-for-word">
-				Time left: <span></span> seconds
+				Time left: <span>{{ .TimeForEachWordInSeconds }}</span> seconds
 			</div>
 
 			<!-- if game has not started then render this part -->
@@ -53,7 +56,7 @@
 			<div class="start-game">
 				<div>
 					Waiting for others to join, starting game in
-					<span class="loading">120</span> seconds
+					<span class="loading">{{ .GameStartDurationInSeconds }}</span> seconds
 					<!-- to be added in config -->
 				</div>
 				<button class="start-game-btn">Start now</button>
@@ -66,9 +69,7 @@
 				const clientId = '{{ .ClientId }}';
 				const clientName = '{{ .ClientName }}';
 				const clientColor = '{{ .ClientColor }}';
-				const gameStartsInSeconds = Math.ceil(
-					Number('{{ .GameStartsInSeconds }}')
-				);
+				const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
 				const hasGameStarted = Boolean('{{ .HasGameStarted }}');
 			</script>
 

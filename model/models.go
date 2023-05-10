@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 // SocketMessage.Type: int
 // Determines the content type in SocketMessage.Content field
 // 1 - Connected             - send to all
@@ -16,14 +18,14 @@ package model
 // Used by client to request all client info list and start game
 
 type SocketMessage struct {
-	Type                   int     `json:"type"`
-	Content                string  `json:"content"`
-	ClientId               string  `json:"clientId,omitempty"`
-	ClientName             string  `json:"clientName,omitempty"`
-	PoolId                 string  `json:"poolId,omitempty"`
-	CurrentPlayerId        string  `json:"currentPlayerId,omitempty"`
-	CurrentWord            string  `json:"currentWord,omitempty"`
-	SecondsLeftForCurrWord float64 `json:"timeLeftForCurrWord,omitempty"`
+	Type                 int       `json:"type"`
+	Content              string    `json:"content"`
+	ClientId             string    `json:"clientId,omitempty"`
+	ClientName           string    `json:"clientName,omitempty"`
+	PoolId               string    `json:"poolId,omitempty"`
+	CurrentPlayerId      string    `json:"currentPlayerId,omitempty"`
+	CurrentWord          string    `json:"currentWord,omitempty"`
+	CurrentWordExpiresAt time.Time `json:"currentWordExpiresAt,omitempty"`
 }
 
 type ClientInfo struct {

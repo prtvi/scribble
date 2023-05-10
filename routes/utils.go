@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	model "scribble/model"
 	utils "scribble/utils"
+	"time"
 )
 
-const GameStartDurationInSeconds = 20
+const GameStartDurationInSeconds = 60
 const TimeForEachWordInSeconds = 30
 
 func removeClientFromList(list []*Client, client *Client) []*Client {
@@ -66,11 +67,21 @@ func responseMessageType6(poolId string) model.SocketMessage {
 		}
 	}
 
+	if pool.HasGameStarted {
+		return model.SocketMessage{
+			Type:                 6,
+			Content:              "true",
+			CurrentPlayerId:      pool.CurrentPlayer.ID,
+			CurrentWord:          pool.CurrentWord,
+			CurrentWordExpiresAt: pool.CurrentWordExpiresAt,
+		}
+	}
+
 	// flag game started variable for the pool as true
 	pool.HasGameStarted = true
 
 	pool.CurrentWord = utils.GetRandomWord()
-	pool.TimeLeftForCurrWord = TimeForEachWordInSeconds
+	pool.CurrentWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
 	pool.CurrentPlayerIndex = 0
 	pool.CurrentPlayer = pool.Clients[pool.CurrentPlayerIndex]
 	pool.AlreadyPlayed = append(pool.AlreadyPlayed, pool.CurrentPlayer) // TODO
@@ -78,10 +89,10 @@ func responseMessageType6(poolId string) model.SocketMessage {
 	pool.CurrentPlayerIndex += 1
 
 	return model.SocketMessage{
-		Type:                   6,
-		Content:                "true",
-		CurrentPlayerId:        pool.CurrentPlayer.ID,
-		CurrentWord:            pool.CurrentWord,
-		SecondsLeftForCurrWord: pool.TimeLeftForCurrWord,
+		Type:                 6,
+		Content:              "true",
+		CurrentPlayerId:      pool.CurrentPlayer.ID,
+		CurrentWord:          pool.CurrentWord,
+		CurrentWordExpiresAt: pool.CurrentWordExpiresAt,
 	}
 }

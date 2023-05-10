@@ -10,7 +10,7 @@ const sendChatMsgBtn = document.querySelector('.send-msg');
 
 // ---------------- main ----------------
 
-// utils for paintting on canvas
+// utils for painting on canvas
 const paintUtils = {
 	coords: { x: 0, y: 0 },
 	color: `#${clientColor}`,
@@ -19,22 +19,16 @@ const paintUtils = {
 	isAllowedToPaint: false,
 };
 
-// timers to start when game has not yet started
-let startGameTimer,
-	startGameAfterInterval,
-	secondsLeftForGameStart = gameStartsInSeconds,
-	timeLeftForWord,
-	timerForWord;
+// timers
+let startGameTimerId,
+	startGameAfterIntervalId,
+	wordExpiryTimerId,
+	renderClientsTimerId;
+let currentWordExpiresAt;
 
 // init socket connection and check game begin status
 const socket = initSocket();
 checkGameBeginStat();
-
-// render all clients in pool on UI every 5 seconds
-const renderClientsTimer = setInterval(getAllClientsEL, 5 * 1000);
-// event listeners to send chat messages event listeners for canvas painting
-sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
-window.addEventListener('load', addCanvasEventListeners);
 
 // ------------------------------------- utils -------------------------------------
 
@@ -121,9 +115,10 @@ function initSocket() {
 	function socketOnClose() {
 		// on socket conn close, stop all timer or intervals
 		console.log('Socket connection closed, stopping timers and timeouts!');
-		clearInterval(renderClientsTimer);
-		clearInterval(startGameTimer);
-		clearTimeout(startGameAfterInterval);
+		clearInterval(renderClientsTimerId);
+		clearInterval(startGameTimerId);
+		clearTimeout(startGameAfterIntervalId);
+		clearInterval(wordExpiryTimerId);
 	}
 
 	return socket;
@@ -139,12 +134,12 @@ function checkGameBeginStat() {
 		console.log('game not started');
 
 		// start game countdown to show user how much time is left
-		startGameTimer = setInterval(renderCountdownEL, 1000);
+		startGameTimerId = setInterval(renderCountdownEL, 1000);
 
 		// start game after this timeout
-		startGameAfterInterval = setTimeout(
+		startGameAfterIntervalId = setTimeout(
 			requestStartGameEL,
-			(gameStartsInSeconds + 2) * 1000
+			getSecondsLeftFrom(gameStartTime) * 1000
 		);
 
 		// add event listener to start game button to start game
@@ -162,19 +157,26 @@ function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getSecondsLeftFrom(futureTime) {
+	const now = new Date().getTime();
+	const diff = futureTime - now;
+	return Math.round(diff / 1000);
+}
+
 // ------------------------------------- start game countdown -------------------------------------
 
 function renderCountdownEL() {
 	// renders the countdown to display to the user remaining time for game to start
-	document.querySelector('.loading').textContent = secondsLeftForGameStart;
-	secondsLeftForGameStart -= 1;
+	document.querySelector('.loading').textContent =
+		getSecondsLeftFrom(gameStartTime);
 }
 
 function requestStartGameEL() {
 	// runs when the game starts, makes socket conn call to server to start the game
 
-	// clear the countdown timer to show time left to start game
-	clearInterval(startGameTimer);
+	// clear the countdown timers
+	clearInterval(startGameTimerId);
+	clearTimeout(startGameAfterIntervalId);
 
 	// generate response and send
 	const responseMsg = {
@@ -191,43 +193,57 @@ function startGame(socketMessage) {
 	if (socketMessage.content !== 'true') return;
 
 	console.log('game started');
-	timeLeftForWord = socketMessage.timeLeftForCurrWord;
 
-	// clear interval after response from server
-	clearTimeout(startGameAfterInterval);
+	// initialise the time at which this word expires
+	currentWordExpiresAt = new Date(socketMessage.currentWordExpiresAt).getTime();
 
 	// hide the div and toggle hasGameStarted
-	document.querySelector('.start-game').style.display = 'none';
+	const startGameDiv = document.querySelector('.start-game');
+	if (startGameDiv) startGameDiv.style.display = 'none';
+
 	paintUtils.hasGameStarted = true;
 
-	// for enabling drawing access if clientId matches and display word
+	// for enabling drawing access if clientId matches
 	if (clientId === socketMessage.currentPlayerId) {
 		paintUtils.isAllowedToPaint = true;
+
+		// display the word by unhiding the painter-utils div
+		document.querySelector('.painter-utils').classList.remove('hidden');
 		document.querySelector('.your-word').textContent =
 			socketMessage.currentWord;
 	}
 
-	// start remaining time for word timer
-	timerForWord = setInterval(renderTimeLeftForWordEL, 1000);
+	// start timer for the word expiry
+	wordExpiryTimerId = setInterval(renderTimeLeftForWordEL, 1000);
+
+	// add EL for clearing the canvas
+	// document.querySelector('.clear-canvas').addEventListener('click', () => {
+	// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	// 	console.log('send canvas data after clearing not working');
+	// 	sendImgData();
+	// });
 }
 
 function renderTimeLeftForWordEL() {
 	const timeLeftDiv = document.querySelector('.time-left-for-word');
 	timeLeftDiv.classList.remove('hidden');
-	timeLeftDiv.querySelector('span').textContent = timeLeftForWord;
 
-	timeLeftForWord -= 1;
-
-	if (timeLeftForWord <= 0) {
-		clearInterval(timerForWord);
-
-		console.log('timerForWord cleared');
+	const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
+	if (secondsLeft <= 0) {
+		clearInterval(wordExpiryTimerId);
+		console.log('timer for word cleared');
 
 		// trigger next word for next player: TODO
 	}
+
+	timeLeftDiv.querySelector('span').textContent = secondsLeft;
 }
 
 // ------------------------------------- get all clients and render -------------------------------------
+
+// render all clients in pool on UI every 5 seconds
+renderClientsTimerId = setInterval(getAllClientsEL, 10 * 1000);
 
 function getAllClientsEL() {
 	// makes a socket connection call to request client info list
@@ -264,6 +280,9 @@ function renderClients(allClients) {
 
 // ------------------------------------- chat -------------------------------------
 
+// event listeners to send chat messages
+sendChatMsgBtn.addEventListener('click', sendChatMsgBtnEL);
+
 function appendChatMsgToDOM(msg) {
 	// adds the msg into the DOM
 
@@ -299,6 +318,9 @@ function sendChatMsgBtnEL(e) {
 }
 
 // ------------------------------------- canvas -------------------------------------
+
+// event listeners for canvas painting
+window.addEventListener('load', addCanvasEventListeners);
 
 function updatePositionCanvas(event) {
 	paintUtils.coords.x = event.clientX - canvas.offsetLeft;
@@ -343,7 +365,7 @@ function displayImgOnCanvas(imgData) {
 	img.setAttribute('src', imgData);
 }
 
-async function sendImgData() {
+function sendImgData() {
 	// called by paint function
 	const respBody = {
 		type: 4,
