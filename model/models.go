@@ -18,14 +18,14 @@ import "time"
 // Used by client to request all client info list and start game
 
 type SocketMessage struct {
-	Type                 int       `json:"type"`
-	Content              string    `json:"content"`
-	ClientId             string    `json:"clientId,omitempty"`
-	ClientName           string    `json:"clientName,omitempty"`
-	PoolId               string    `json:"poolId,omitempty"`
-	CurrentPlayerId      string    `json:"currentPlayerId,omitempty"`
-	CurrentWord          string    `json:"currentWord,omitempty"`
-	CurrentWordExpiresAt time.Time `json:"currentWordExpiresAt,omitempty"`
+	Type              int       `json:"type"`
+	Content           string    `json:"content"`
+	ClientId          string    `json:"clientId,omitempty"`
+	ClientName        string    `json:"clientName,omitempty"`
+	PoolId            string    `json:"poolId,omitempty"`
+	CurrSketcherId    string    `json:"currSketcherId,omitempty"`
+	CurrWord          string    `json:"currWord,omitempty"`
+	CurrWordExpiresAt time.Time `json:"currWordExpiresAt,omitempty"`
 }
 
 type ClientInfo struct {

@@ -8,16 +8,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Client.Role: int
-// 0: painter
-// 1: common player
-
 // Client.Color: string
 // color string hash value without the #
 
 type Client struct {
 	ID, Name, Color string
-	Role            int // not used yet
+	HasSketched     bool
 	Conn            *websocket.Conn
 	Pool            *Pool
 }

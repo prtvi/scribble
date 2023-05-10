@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-const GameStartDurationInSeconds = 60
-const TimeForEachWordInSeconds = 30
+const GameStartDurationInSeconds = 120
+const TimeForEachWordInSeconds = 90
 
 func removeClientFromList(list []*Client, client *Client) []*Client {
 	var idxToRemove int
@@ -21,6 +21,20 @@ func removeClientFromList(list []*Client, client *Client) []*Client {
 
 	list[idxToRemove] = list[len(list)-1]
 	return list[:len(list)-1]
+}
+
+func pickClient(pool *Pool) *Client {
+	var client *Client = pool.Clients[0]
+
+	for _, c := range pool.Clients {
+		if !c.HasSketched {
+			client = c
+			break
+		}
+	}
+
+	client.HasSketched = true
+	return client
 }
 
 func responseMessageType5(poolId string) model.SocketMessage {
@@ -69,30 +83,28 @@ func responseMessageType6(poolId string) model.SocketMessage {
 
 	if pool.HasGameStarted {
 		return model.SocketMessage{
-			Type:                 6,
-			Content:              "true",
-			CurrentPlayerId:      pool.CurrentPlayer.ID,
-			CurrentWord:          pool.CurrentWord,
-			CurrentWordExpiresAt: pool.CurrentWordExpiresAt,
+			Type:              6,
+			Content:           "true",
+			CurrSketcherId:    pool.CurrSketcher.ID,
+			CurrWord:          pool.CurrWord,
+			CurrWordExpiresAt: pool.CurrWordExpiresAt,
 		}
 	}
 
 	// flag game started variable for the pool as true
 	pool.HasGameStarted = true
 
-	pool.CurrentWord = utils.GetRandomWord()
-	pool.CurrentWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
-	pool.CurrentPlayerIndex = 0
-	pool.CurrentPlayer = pool.Clients[pool.CurrentPlayerIndex]
-	pool.AlreadyPlayed = append(pool.AlreadyPlayed, pool.CurrentPlayer) // TODO
+	pool.CurrWord = utils.GetRandomWord()
+	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
+	pool.CurrSketcher = pickClient(pool)
 
-	pool.CurrentPlayerIndex += 1
+	utils.Cp("yellow", "Game started!")
 
 	return model.SocketMessage{
-		Type:                 6,
-		Content:              "true",
-		CurrentPlayerId:      pool.CurrentPlayer.ID,
-		CurrentWord:          pool.CurrentWord,
-		CurrentWordExpiresAt: pool.CurrentWordExpiresAt,
+		Type:              6,
+		Content:           "true",
+		CurrSketcherId:    pool.CurrSketcher.ID,
+		CurrWord:          pool.CurrWord,
+		CurrWordExpiresAt: pool.CurrWordExpiresAt,
 	}
 }

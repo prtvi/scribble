@@ -148,7 +148,9 @@ function checkGameBeginStat() {
 			.addEventListener('click', requestStartGameEL);
 	} else {
 		// if game has already begun, then alter the hasGameStarted field in paintUtils
-		console.log('started game');
+		console.log(
+			'game has started already, but I have no idea about the status of the game!'
+		);
 		paintUtils.hasGameStarted = true;
 	}
 }
@@ -192,10 +194,13 @@ function startGame(socketMessage) {
 	// called when socket receives message from server with type as 6
 	if (socketMessage.content !== 'true') return;
 
-	console.log('game started');
+	console.log('game started by server');
 
 	// initialise the time at which this word expires
-	currentWordExpiresAt = new Date(socketMessage.currentWordExpiresAt).getTime();
+	currentWordExpiresAt = new Date(socketMessage.currWordExpiresAt).getTime();
+
+	// start timer for the word expiry
+	wordExpiryTimerId = setInterval(renderTimeLeftForWordEL, 1000);
 
 	// hide the div and toggle hasGameStarted
 	const startGameDiv = document.querySelector('.start-game');
@@ -204,18 +209,13 @@ function startGame(socketMessage) {
 	paintUtils.hasGameStarted = true;
 
 	// for enabling drawing access if clientId matches
-	if (clientId === socketMessage.currentPlayerId) {
+	if (clientId === socketMessage.currSketcherId) {
 		paintUtils.isAllowedToPaint = true;
 
 		// display the word by unhiding the painter-utils div
 		document.querySelector('.painter-utils').classList.remove('hidden');
-		document.querySelector('.your-word').textContent =
-			socketMessage.currentWord;
+		document.querySelector('.your-word').textContent = socketMessage.currWord;
 	}
-
-	// start timer for the word expiry
-	wordExpiryTimerId = setInterval(renderTimeLeftForWordEL, 1000);
-
 	// add EL for clearing the canvas
 	// document.querySelector('.clear-canvas').addEventListener('click', () => {
 	// 	ctx.clearRect(0, 0, canvas.width, canvas.height);

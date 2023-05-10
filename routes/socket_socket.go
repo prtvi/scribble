@@ -37,11 +37,12 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) error {
 
 	// create a new client to append to Pool.Clients map
 	client := &Client{
-		ID:    clientId,
-		Name:  clientName,
-		Color: clientColor,
-		Conn:  conn,
-		Pool:  pool,
+		ID:          clientId,
+		Name:        clientName,
+		Color:       clientColor,
+		HasSketched: false,
+		Conn:        conn,
+		Pool:        pool,
 	}
 
 	// register and notify other clients

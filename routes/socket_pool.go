@@ -20,11 +20,9 @@ type Pool struct {
 	HasGameStarted       bool
 
 	// not initialised when start
-	CurrentWord          string
-	CurrentWordExpiresAt time.Time
-	CurrentPlayerIndex   int
-	CurrentPlayer        *Client
-	AlreadyPlayed        []*Client
+	CurrWord          string
+	CurrWordExpiresAt time.Time
+	CurrSketcher      *Client
 }
 
 func NewPool(uuid string, capacity int) *Pool {
@@ -43,8 +41,6 @@ func NewPool(uuid string, capacity int) *Pool {
 		CreatedTime:          now,
 		GameStartTime:        later,
 		HasGameStarted:       false,
-
-		AlreadyPlayed: make([]*Client, 0),
 	}
 }
 
