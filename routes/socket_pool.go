@@ -91,11 +91,14 @@ func (pool *Pool) Start() {
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
 			switch message.Type {
+			case 3: // update client score on correct guess of word
+				updateScore(pool, message)
+
 			case 5: // client info list
-				message = responseMessageType5(message.PoolId)
+				message = responseMessageType5(pool)
 
 			case 6: // start game
-				message = responseMessageType6(message.PoolId)
+				message = responseMessageType6(pool)
 
 			default:
 				break

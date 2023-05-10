@@ -14,6 +14,7 @@ import (
 type Client struct {
 	ID, Name, Color string
 	HasSketched     bool
+	Score           int
 	Conn            *websocket.Conn
 	Pool            *Pool
 }

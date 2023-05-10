@@ -270,7 +270,7 @@ function renderClients(allClients) {
 		const clientNameHolder = document.createElement('div');
 		const clientName = document.createElement('p');
 
-		clientName.innerHTML = n.name;
+		clientName.innerHTML = `${n.name} with ${n.score} points`;
 		clientName.style.color = `#${n.color}`;
 		clientNameHolder.appendChild(clientName);
 
