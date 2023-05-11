@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"strings"
 	"time"
@@ -27,6 +28,10 @@ func GetRandomWord() string {
 	n := rand.Int() % len(WORDS)
 
 	return WORDS[n]
+}
+
+func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) float64 {
+	return math.Abs(t1.Sub(t2).Seconds())
 }
 
 var reset string = "\033[0m"

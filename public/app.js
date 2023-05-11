@@ -9,7 +9,6 @@ const msgInp = document.querySelector('.msg');
 const sendChatMsgBtn = document.querySelector('.send-msg');
 
 // ---------------- main ----------------
-
 // utils for painting on canvas
 const paintUtils = {
 	coords: { x: 0, y: 0 },
@@ -24,7 +23,6 @@ let startGameTimerId,
 	startGameAfterIntervalId,
 	wordExpiryTimerId,
 	renderClientsTimerId;
-let currentWordExpiresAt;
 
 // init socket connection and check game begin status
 const socket = initSocket();
@@ -133,19 +131,39 @@ function checkGameBeginStat() {
 	if (!hasGameStarted) {
 		console.log('game not started');
 
+		function requestStartGameEL() {
+			// runs when the game starts, makes socket conn call to server to start the game
+			// clear the countdown timers
+			clearInterval(startGameTimerId);
+			clearTimeout(startGameAfterIntervalId);
+
+			// generate response and send
+			const responseMsg = {
+				type: 6,
+				content: 'start the game bro!',
+				poolId,
+			};
+
+			socket.send(JSON.stringify(responseMsg));
+		}
+
+		// add event listener to start game button to start game
+		const startGameBtn = document.querySelector('.start-game-btn');
+		startGameBtn.addEventListener('click', requestStartGameEL);
+
 		// start game countdown to show user how much time is left
-		startGameTimerId = setInterval(renderCountdownEL, 1000);
+		startGameTimerId = setInterval(
+			() =>
+				(document.querySelector('.loading').textContent =
+					getSecondsLeftFrom(gameStartTime)),
+			1000
+		);
 
 		// start game after this timeout
 		startGameAfterIntervalId = setTimeout(
 			requestStartGameEL,
 			getSecondsLeftFrom(gameStartTime) * 1000
 		);
-
-		// add event listener to start game button to start game
-		document
-			.querySelector('.start-game-btn')
-			.addEventListener('click', requestStartGameEL);
 	} else {
 		// if game has already begun, then alter the hasGameStarted field in paintUtils
 		console.log(
@@ -165,48 +183,30 @@ function getSecondsLeftFrom(futureTime) {
 	return Math.round(diff / 1000);
 }
 
-// ------------------------------------- start game countdown -------------------------------------
+// ------------------------ start game ------------------------
 
-function renderCountdownEL() {
-	// renders the countdown to display to the user remaining time for game to start
-	document.querySelector('.loading').textContent =
-		getSecondsLeftFrom(gameStartTime);
-}
-
-function requestStartGameEL() {
-	// runs when the game starts, makes socket conn call to server to start the game
-
-	// clear the countdown timers
-	clearInterval(startGameTimerId);
-	clearTimeout(startGameAfterIntervalId);
-
-	// generate response and send
-	const responseMsg = {
-		type: 6,
-		content: 'start the game bro!',
-		poolId,
-	};
-
-	socket.send(JSON.stringify(responseMsg));
-}
-
-function startGame(socketMessage) {
-	// called when socket receives message from server with type as 6
-	if (socketMessage.content !== 'true') return;
-
-	console.log('game started by server');
-
+function beginClientSketchingFlow(socketMessage) {
 	// initialise the time at which this word expires
-	currentWordExpiresAt = new Date(socketMessage.currWordExpiresAt).getTime();
+	const currentWordExpiresAt = new Date(
+		socketMessage.currWordExpiresAt
+	).getTime();
+
+	const timeLeftDiv = document.querySelector('.time-left-for-word');
 
 	// start timer for the word expiry
-	wordExpiryTimerId = setInterval(renderTimeLeftForWordEL, 1000);
+	wordExpiryTimerId = setInterval(() => {
+		timeLeftDiv.classList.remove('hidden');
 
-	// hide the div and toggle hasGameStarted
-	const startGameDiv = document.querySelector('.start-game');
-	if (startGameDiv) startGameDiv.style.display = 'none';
+		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
+		if (secondsLeft <= 0) {
+			clearInterval(wordExpiryTimerId);
+			console.log('timer for word cleared');
 
-	paintUtils.hasGameStarted = true;
+			// trigger next word for next player: TODO
+		}
+
+		timeLeftDiv.querySelector('span').textContent = secondsLeft;
+	}, 1000);
 
 	// for enabling drawing access if clientId matches
 	if (clientId === socketMessage.currSketcherId) {
@@ -215,34 +215,34 @@ function startGame(socketMessage) {
 		// display the word by unhiding the painter-utils div
 		document.querySelector('.painter-utils').classList.remove('hidden');
 		document.querySelector('.your-word').textContent = socketMessage.currWord;
-	}
-	// add EL for clearing the canvas
-	// document.querySelector('.clear-canvas').addEventListener('click', () => {
-	// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	// 	console.log('send canvas data after clearing not working');
-	// 	sendImgData();
-	// });
+		// add EL for clearing the canvas
+		document.querySelector('.clear-canvas').addEventListener('click', () => {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			console.log('send canvas data after clearing not working');
+			sendImgData();
+		});
+	}
 }
 
-function renderTimeLeftForWordEL() {
-	const timeLeftDiv = document.querySelector('.time-left-for-word');
-	timeLeftDiv.classList.remove('hidden');
+function startGame(socketMessage) {
+	// called when socket receives message from server with type as 6
+	if (socketMessage.content !== 'true') return;
 
-	const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
-	if (secondsLeft <= 0) {
-		clearInterval(wordExpiryTimerId);
-		console.log('timer for word cleared');
+	console.log('game started by server');
+	paintUtils.hasGameStarted = true;
 
-		// trigger next word for next player: TODO
-	}
+	// hide the div and toggle hasGameStarted
+	const startGameDiv = document.querySelector('.start-game');
+	if (startGameDiv) startGameDiv.classList.add('hidden');
 
-	timeLeftDiv.querySelector('span').textContent = secondsLeft;
+	beginClientSketchingFlow(socketMessage);
 }
 
-// ------------------------------------- get all clients and render -------------------------------------
+// ------------------------ get all clients and render ------------------------
 
-// render all clients in pool on UI every 5 seconds
+// render all clients in pool on UI every n seconds
 renderClientsTimerId = setInterval(getAllClientsEL, 10 * 1000);
 
 function getAllClientsEL() {

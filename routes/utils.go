@@ -9,8 +9,8 @@ import (
 )
 
 const GameStartDurationInSeconds = 120
-const TimeForEachWordInSeconds = 90
-const ScoreForCorrectGuess = 50
+const TimeForEachWordInSeconds = 30
+const ScoreForCorrectGuess = 15
 
 func removeClientFromList(list []*Client, client *Client) []*Client {
 	var idxToRemove int
@@ -42,20 +42,20 @@ func pickClient(pool *Pool) *Client {
 func updateScore(pool *Pool, message model.SocketMessage) {
 	// update score for the client that guesses the word right
 
-	var client *Client
+	var guesserClient *Client
 	for _, c := range pool.Clients {
 		// increment score only if the guesser is not the sketcher
 		if c.ID == message.ClientId &&
 			pool.CurrSketcher.ID != message.ClientId {
-			client = c
+			guesserClient = c
 			break
 		}
 	}
 
-	// if the sketcher is the guesser, then the client will be nil, hence check if client is nil
+	// if the sketcher is the guesser, then the guesserClient will be nil, hence check if guesserClient is nil
 	// check if the word matches with the current word
-	if client != nil && strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) {
-		client.Score += ScoreForCorrectGuess
+	if guesserClient != nil && strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) {
+		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
 	}
 }
 
@@ -97,12 +97,9 @@ func responseMessageType6(pool *Pool) model.SocketMessage {
 
 	// flag game started variable for the pool as true
 	pool.HasGameStarted = true
-
-	pool.CurrWord = utils.GetRandomWord()
-	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
-	pool.CurrSketcher = pickClient(pool)
-
 	utils.Cp("yellow", "Game started!")
+
+	beginClientSketchingFlow(pool)
 
 	return model.SocketMessage{
 		Type:              6,
@@ -111,4 +108,10 @@ func responseMessageType6(pool *Pool) model.SocketMessage {
 		CurrWord:          pool.CurrWord,
 		CurrWordExpiresAt: pool.CurrWordExpiresAt,
 	}
+}
+
+func beginClientSketchingFlow(pool *Pool) {
+	pool.CurrWord = utils.GetRandomWord()
+	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
+	pool.CurrSketcher = pickClient(pool)
 }
