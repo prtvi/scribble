@@ -6,11 +6,11 @@ import "time"
 // Determines the content type in SocketMessage.Content field
 // 1 - Connected             - send to all
 // 2 - Disconnected          - send to all
-// 3 - Text message          - send to all
+// 3 - Text message          - send to all, also update score
 // 4 - Canvas data as string - send to all
-// 5 - Get all client info   - send to all but after processing
-// 6 - start game ack        - send to all but after processing
-// 7 - inter game comm       - send to all but after processing
+// 5 - clear canvas          - send to all
+// 6 - Get all client info   - send to all but after processing
+// 7 - start game ack        - send to all but after processing
 
 // SocketMessage.ClientId & SocketMessage.ClientName: string
 // The client that triggers conn/disconnection to server, Register/Unregister event at server

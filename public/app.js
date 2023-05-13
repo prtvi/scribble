@@ -67,8 +67,9 @@ function initSocket() {
 		// 2 === DISCONNECTED
 		// 3 === string data
 		// 4 === canvas data
-		// 5 === all client info
-		// 6 === start game
+		// 5 === clear canvas
+		// 6 === all client info
+		// 7 === start game
 
 		switch (socketMessage.type) {
 			case 1:
@@ -98,10 +99,14 @@ function initSocket() {
 				break;
 
 			case 5:
-				renderClients(socketMessage.content);
+				clearCanvas(socketMessage);
 				break;
 
 			case 6:
+				renderClients(socketMessage.content);
+				break;
+
+			case 7:
 				startGame(socketMessage);
 				break;
 
@@ -139,7 +144,7 @@ function checkGameBeginStat() {
 
 			// generate response and send
 			const responseMsg = {
-				type: 6,
+				type: 7,
 				content: 'start the game bro!',
 				poolId,
 			};
@@ -185,6 +190,11 @@ function getSecondsLeftFrom(futureTime) {
 
 // ------------------------ start game ------------------------
 
+function clearCanvas(socketMessage) {
+	if (clientId !== socketMessage.clientId)
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 function beginClientSketchingFlow(socketMessage) {
 	// initialise the time at which this word expires
 	const currentWordExpiresAt = new Date(
@@ -220,8 +230,15 @@ function beginClientSketchingFlow(socketMessage) {
 		document.querySelector('.clear-canvas').addEventListener('click', () => {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-			console.log('send canvas data after clearing not working');
-			sendImgData();
+			// broadcast clear canvas
+			const responseMsg = {
+				type: 5,
+				content: 'clear canvas',
+				clientId,
+				poolId,
+			};
+
+			socket.send(JSON.stringify(responseMsg));
 		});
 	}
 }
@@ -248,7 +265,7 @@ renderClientsTimerId = setInterval(getAllClientsEL, 10 * 1000);
 function getAllClientsEL() {
 	// makes a socket connection call to request client info list
 	const responseMsg = {
-		type: 5,
+		type: 6,
 		content: '',
 		poolId,
 	};

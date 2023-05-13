@@ -59,7 +59,7 @@ func updateScore(pool *Pool, message model.SocketMessage) {
 	}
 }
 
-func responseMessageType5(pool *Pool) model.SocketMessage {
+func getClientInfoList(pool *Pool, messageType int) model.SocketMessage {
 	// returns client info list embedded in model.SocketMessage
 
 	clientInfoList := make([]model.ClientInfo, 0)
@@ -77,17 +77,17 @@ func responseMessageType5(pool *Pool) model.SocketMessage {
 	// marshall array in byte and send as string
 	byteInfo, _ := json.Marshal(clientInfoList)
 	return model.SocketMessage{
-		Type:    5,
+		Type:    messageType,
 		Content: string(byteInfo),
 	}
 }
 
-func responseMessageType6(pool *Pool) model.SocketMessage {
+func startGameAck(pool *Pool, messageType int) model.SocketMessage {
 	// returns if game has started or not embedded in model.SocketMessage
 
 	if pool.HasGameStarted {
 		return model.SocketMessage{
-			Type:              6,
+			Type:              messageType,
 			Content:           "true",
 			CurrSketcherId:    pool.CurrSketcher.ID,
 			CurrWord:          pool.CurrWord,
@@ -102,7 +102,7 @@ func responseMessageType6(pool *Pool) model.SocketMessage {
 	beginClientSketchingFlow(pool)
 
 	return model.SocketMessage{
-		Type:              6,
+		Type:              messageType,
 		Content:           "true",
 		CurrSketcherId:    pool.CurrSketcher.ID,
 		CurrWord:          pool.CurrWord,

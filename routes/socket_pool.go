@@ -94,11 +94,11 @@ func (pool *Pool) Start() {
 			case 3: // update client score on correct guess of word
 				updateScore(pool, message)
 
-			case 5: // client info list
-				message = responseMessageType5(pool)
+			case 6: // client info list
+				message = getClientInfoList(pool, message.Type)
 
-			case 6: // start game
-				message = responseMessageType6(pool)
+			case 7: // start game
+				message = startGameAck(pool, message.Type)
 
 			default:
 				break
