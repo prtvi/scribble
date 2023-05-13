@@ -18,12 +18,6 @@ const paintUtils = {
 	isAllowedToPaint: false,
 };
 
-// timers
-let startGameTimerId,
-	startGameAfterIntervalId,
-	wordExpiryTimerId,
-	renderClientsTimerId;
-
 // init socket connection and check game begin status
 const socket = initSocket();
 checkGameBeginStat();
@@ -99,7 +93,7 @@ function initSocket() {
 				break;
 
 			case 5:
-				clearCanvas(socketMessage);
+				clearCanvas();
 				break;
 
 			case 6:
@@ -110,6 +104,10 @@ function initSocket() {
 				startGame(socketMessage);
 				break;
 
+			case 8:
+				beginClientSketchingFlow(socketMessage);
+				break;
+
 			default:
 				break;
 		}
@@ -118,10 +116,10 @@ function initSocket() {
 	function socketOnClose() {
 		// on socket conn close, stop all timer or intervals
 		console.log('Socket connection closed, stopping timers and timeouts!');
-		clearInterval(renderClientsTimerId);
-		clearInterval(startGameTimerId);
-		clearTimeout(startGameAfterIntervalId);
-		clearInterval(wordExpiryTimerId);
+		window.clearInterval(renderClientsTimerId);
+		window.clearInterval(startGameTimerId);
+		window.clearTimeout(startGameAfterTimeoutId);
+		window.clearInterval(wordExpiryTimerId);
 	}
 
 	return socket;
@@ -130,52 +128,49 @@ function initSocket() {
 function checkGameBeginStat() {
 	// checks if game has already started based on "hasGameStarted" variable
 
+	if (hasGameStarted) return;
+
 	// if game has not started then, begin the countdown and render time left
 	// and request start game on time-up
 	// also listen to start game btn press to start the game
-	if (!hasGameStarted) {
-		console.log('game not started');
 
-		function requestStartGameEL() {
-			// runs when the game starts, makes socket conn call to server to start the game
-			// clear the countdown timers
-			clearInterval(startGameTimerId);
-			clearTimeout(startGameAfterIntervalId);
+	console.log('game not started');
 
-			// generate response and send
-			const responseMsg = {
-				type: 7,
-				content: 'start the game bro!',
-				poolId,
-			};
+	function requestStartGameEL() {
+		// runs when the game starts, makes socket conn call to server to start the game
+		// clear the countdown timers
+		window.clearInterval(startGameTimerId);
+		window.clearTimeout(startGameAfterTimeoutId);
 
-			socket.send(JSON.stringify(responseMsg));
-		}
+		// generate response and send
+		const responseMsg = {
+			type: 7,
+			content: 'start the game bro!',
+			poolId,
+		};
 
-		// add event listener to start game button to start game
-		const startGameBtn = document.querySelector('.start-game-btn');
-		startGameBtn.addEventListener('click', requestStartGameEL);
-
-		// start game countdown to show user how much time is left
-		startGameTimerId = setInterval(
-			() =>
-				(document.querySelector('.loading').textContent =
-					getSecondsLeftFrom(gameStartTime)),
-			1000
-		);
-
-		// start game after this timeout
-		startGameAfterIntervalId = setTimeout(
-			requestStartGameEL,
-			getSecondsLeftFrom(gameStartTime) * 1000
-		);
-	} else {
-		// if game has already begun, then alter the hasGameStarted field in paintUtils
-		console.log(
-			'game has started already, but I have no idea about the status of the game!'
-		);
-		paintUtils.hasGameStarted = true;
+		socket.send(JSON.stringify(responseMsg));
 	}
+
+	// add event listener to start game button to start game
+	const startGameBtn = document.querySelector('.start-game-btn');
+	startGameBtn.addEventListener('click', requestStartGameEL);
+
+	// start game countdown to show user how much time is left for game to start
+	window.startGameTimerId = window.setInterval(
+		() =>
+			(document.querySelector('.loading').textContent =
+				getSecondsLeftFrom(gameStartTime)),
+		1000,
+		this
+	);
+
+	// start game after this timeout
+	window.startGameAfterTimeoutId = window.setTimeout(
+		requestStartGameEL,
+		getSecondsLeftFrom(gameStartTime) * 1000,
+		this
+	);
 }
 
 function wait(ms) {
@@ -190,33 +185,39 @@ function getSecondsLeftFrom(futureTime) {
 
 // ------------------------ start game ------------------------
 
-function clearCanvas(socketMessage) {
-	if (clientId !== socketMessage.clientId)
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+let currentWordExpiresAt;
 
 function beginClientSketchingFlow(socketMessage) {
 	// initialise the time at which this word expires
-	const currentWordExpiresAt = new Date(
-		socketMessage.currWordExpiresAt
-	).getTime();
-
-	const timeLeftDiv = document.querySelector('.time-left-for-word');
+	currentWordExpiresAt = new Date(socketMessage.currWordExpiresAt).getTime();
 
 	// start timer for the word expiry
-	wordExpiryTimerId = setInterval(() => {
-		timeLeftDiv.classList.remove('hidden');
+	window.wordExpiryTimerId = window.setInterval(
+		() => {
+			const timeLeftDiv = document.querySelector('.time-left-for-word');
+			timeLeftDiv.classList.remove('hidden');
 
-		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
-		if (secondsLeft <= 0) {
-			clearInterval(wordExpiryTimerId);
-			console.log('timer for word cleared');
+			const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
+			timeLeftDiv.querySelector('span').textContent = secondsLeft;
 
-			// trigger next word for next player: TODO
-		}
+			if (secondsLeft <= 0) {
+				window.clearInterval(wordExpiryTimerId);
+				console.log('timer for word cleared');
 
-		timeLeftDiv.querySelector('span').textContent = secondsLeft;
-	}, 1000);
+				requestCanvasClear();
+
+				// trigger next word for next player: TODO
+				const responseMsg = {
+					type: 8,
+					content: 'next word',
+				};
+
+				socket.send(JSON.stringify(responseMsg));
+			}
+		},
+		1000,
+		this
+	);
 
 	// for enabling drawing access if clientId matches
 	if (clientId === socketMessage.currSketcherId) {
@@ -227,19 +228,13 @@ function beginClientSketchingFlow(socketMessage) {
 		document.querySelector('.your-word').textContent = socketMessage.currWord;
 
 		// add EL for clearing the canvas
-		document.querySelector('.clear-canvas').addEventListener('click', () => {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-			// broadcast clear canvas
-			const responseMsg = {
-				type: 5,
-				content: 'clear canvas',
-				clientId,
-				poolId,
-			};
-
-			socket.send(JSON.stringify(responseMsg));
-		});
+		document
+			.querySelector('.clear-canvas')
+			.addEventListener('click', requestCanvasClear);
+	} else {
+		paintUtils.isAllowedToPaint = false;
+		document.querySelector('.painter-utils').classList.add('hidden');
+		document.querySelector('.your-word').textContent = '';
 	}
 }
 
@@ -252,7 +247,7 @@ function startGame(socketMessage) {
 
 	// hide the div and toggle hasGameStarted
 	const startGameDiv = document.querySelector('.start-game');
-	if (startGameDiv) startGameDiv.classList.add('hidden');
+	startGameDiv && startGameDiv.classList.add('hidden');
 
 	beginClientSketchingFlow(socketMessage);
 }
@@ -260,7 +255,11 @@ function startGame(socketMessage) {
 // ------------------------ get all clients and render ------------------------
 
 // render all clients in pool on UI every n seconds
-renderClientsTimerId = setInterval(getAllClientsEL, 10 * 1000);
+window.renderClientsTimerId = window.setInterval(
+	getAllClientsEL,
+	10 * 1000,
+	this
+);
 
 function getAllClientsEL() {
 	// makes a socket connection call to request client info list
@@ -283,11 +282,11 @@ function renderClients(allClients) {
 	allClients = JSON.parse(allClients);
 
 	// render
-	allClients.forEach(n => {
+	allClients.forEach((n, i) => {
 		const clientNameHolder = document.createElement('div');
 		const clientName = document.createElement('p');
 
-		clientName.innerHTML = `${n.name} with ${n.score} points`;
+		clientName.innerHTML = `#${i + 1} ${n.name}: ${n.score} points`;
 		clientName.style.color = `#${n.color}`;
 		clientNameHolder.appendChild(clientName);
 
@@ -380,6 +379,22 @@ function displayImgOnCanvas(imgData) {
 	var img = new Image();
 	img.onload = () => ctx.drawImage(img, 0, 0);
 	img.setAttribute('src', imgData);
+}
+
+function requestCanvasClear() {
+	// broadcast clear canvas
+	const responseMsg = {
+		type: 5,
+		content: 'clear canvas',
+		clientId,
+		poolId,
+	};
+
+	socket.send(JSON.stringify(responseMsg));
+}
+
+function clearCanvas() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function sendImgData() {

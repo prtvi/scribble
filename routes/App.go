@@ -34,6 +34,12 @@ func App(c echo.Context) error {
 		return c.Render(http.StatusOK, "app", dataForAppRoute)
 	}
 
+	// if game has already started then do not render both forms and display message
+	if pool.HasGameStarted {
+		dataForAppRoute["Message"] = "Sorry! The game has already started! 🥹"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
 	// if pool exists, get its capacity and curr size
 	poolCap := pool.Capacity
 	poolCurrSizePlus1 := len(pool.Clients) + 1

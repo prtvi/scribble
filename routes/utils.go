@@ -9,7 +9,7 @@ import (
 )
 
 const GameStartDurationInSeconds = 120
-const TimeForEachWordInSeconds = 30
+const TimeForEachWordInSeconds = 20
 const ScoreForCorrectGuess = 15
 
 func removeClientFromList(list []*Client, client *Client) []*Client {
@@ -42,7 +42,7 @@ func pickClient(pool *Pool) *Client {
 func updateScore(pool *Pool, message model.SocketMessage) {
 	// update score for the client that guesses the word right
 
-	var guesserClient *Client
+	var guesserClient *Client = nil
 	for _, c := range pool.Clients {
 		// increment score only if the guesser is not the sketcher
 		if c.ID == message.ClientId &&
@@ -99,6 +99,31 @@ func startGameAck(pool *Pool, messageType int) model.SocketMessage {
 	pool.HasGameStarted = true
 	utils.Cp("yellow", "Game started!")
 
+	beginClientSketchingFlow(pool)
+
+	return model.SocketMessage{
+		Type:              messageType,
+		Content:           "true",
+		CurrSketcherId:    pool.CurrSketcher.ID,
+		CurrWord:          pool.CurrWord,
+		CurrWordExpiresAt: pool.CurrWordExpiresAt,
+	}
+}
+
+func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
+	// if this request previously made, which means the expiry of the word is in future, then just return the curr stat
+
+	if pool.CurrWordExpiresAt.Sub(time.Now()) > 0 {
+		return model.SocketMessage{
+			Type:              messageType,
+			Content:           "true",
+			CurrSketcherId:    pool.CurrSketcher.ID,
+			CurrWord:          pool.CurrWord,
+			CurrWordExpiresAt: pool.CurrWordExpiresAt,
+		}
+	}
+
+	// else begin the client sketching flow
 	beginClientSketchingFlow(pool)
 
 	return model.SocketMessage{

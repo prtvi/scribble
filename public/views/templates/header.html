@@ -15,7 +15,11 @@
 
 	<link rel="stylesheet" href="public/style.css" />
 
-	<title>x</title>
+	{{ if ne .ClientName "" }}
+	<title>{{ .ClientName }} | Scribble</title>
+	{{ else }}
+	<title>Scribble</title>
+	{{ end }}
 </head>
 
 {{ end }}
