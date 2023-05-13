@@ -103,6 +103,9 @@ func (pool *Pool) Start() {
 			case 8:
 				message = nextClientForSketching(pool, message.Type)
 
+			case 9:
+				stopGame(pool)
+
 			default:
 				break
 			}

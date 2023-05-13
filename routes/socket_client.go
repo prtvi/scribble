@@ -12,11 +12,11 @@ import (
 // color string hash value without the #
 
 type Client struct {
-	ID, Name, Color string
-	HasSketched     bool
-	Score           int
-	Conn            *websocket.Conn
-	Pool            *Pool
+	ID, Name, Color         string
+	HasSketched, HasGuessed bool
+	Score                   int
+	Conn                    *websocket.Conn
+	Pool                    *Pool
 }
 
 // read messages received from client

@@ -12,6 +12,7 @@ import "time"
 // 6 - Get all client info   - send to all but after processing
 // 7 - start game ack        - send to all but after processing
 // 8 - request for next word - send to all but after processing
+// 9 - all clients done playing - send to all
 
 // SocketMessage.ClientId & SocketMessage.ClientName: string
 // The client that triggers conn/disconnection to server, Register/Unregister event at server

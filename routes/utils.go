@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
 	"strings"
@@ -26,7 +27,8 @@ func removeClientFromList(list []*Client, client *Client) []*Client {
 }
 
 func pickClient(pool *Pool) *Client {
-	var client *Client = pool.Clients[0]
+	// picks that client that hasn't drawn yet
+	var client *Client = nil
 
 	for _, c := range pool.Clients {
 		if !c.HasSketched {
@@ -35,8 +37,12 @@ func pickClient(pool *Pool) *Client {
 		}
 	}
 
-	client.HasSketched = true
-	return client
+	if client != nil {
+		client.HasSketched = true
+		return client
+	}
+
+	return nil
 }
 
 func updateScore(pool *Pool, message model.SocketMessage) {
@@ -44,7 +50,7 @@ func updateScore(pool *Pool, message model.SocketMessage) {
 
 	var guesserClient *Client = nil
 	for _, c := range pool.Clients {
-		// increment score only if the guesser is not the sketcher
+		// init guesserClient only if the guesser is not the sketcher
 		if c.ID == message.ClientId &&
 			pool.CurrSketcher.ID != message.ClientId {
 			guesserClient = c
@@ -53,9 +59,13 @@ func updateScore(pool *Pool, message model.SocketMessage) {
 	}
 
 	// if the sketcher is the guesser, then the guesserClient will be nil, hence check if guesserClient is nil
-	// check if the word matches with the current word
-	if guesserClient != nil && strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) {
+	// check if the word matches with the current word and check if the guesserClient hasn't already guessed
+	if guesserClient != nil &&
+		strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) &&
+		!guesserClient.HasGuessed {
+		// increment score and flag as guessed
 		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
+		guesserClient.HasGuessed = true
 	}
 }
 
@@ -111,7 +121,7 @@ func startGameAck(pool *Pool, messageType int) model.SocketMessage {
 }
 
 func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
-	// if this request previously made, which means the expiry of the word is in future, then just return the curr stat
+	// if this request was previously made which means the current word is set, which means the expiry of the word is in future, then just return the curr stat
 
 	if pool.CurrWordExpiresAt.Sub(time.Now()) > 0 {
 		return model.SocketMessage{
@@ -124,7 +134,11 @@ func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
 	}
 
 	// else begin the client sketching flow
-	beginClientSketchingFlow(pool)
+	isClient := beginClientSketchingFlow(pool)
+	if !isClient {
+		// if no client left to pick then end the game by sending the scores, type 9
+		return getClientInfoList(pool, 9)
+	}
 
 	return model.SocketMessage{
 		Type:              messageType,
@@ -135,8 +149,26 @@ func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
 	}
 }
 
-func beginClientSketchingFlow(pool *Pool) {
+func beginClientSketchingFlow(pool *Pool) bool {
 	pool.CurrWord = utils.GetRandomWord()
 	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
-	pool.CurrSketcher = pickClient(pool)
+
+	client := pickClient(pool)
+	fmt.Println("client picked:", client)
+	if client == nil {
+		return false
+	}
+
+	pool.CurrSketcher = client
+
+	// reset client.HasGuessed when called upon for next word
+	for _, c := range pool.Clients {
+		c.HasGuessed = false
+	}
+
+	return true
+}
+
+func stopGame(pool *Pool) {
+
 }

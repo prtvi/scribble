@@ -15,7 +15,7 @@
 
 	<link rel="stylesheet" href="public/style.css" />
 
-	{{ if ne .ClientName "" }}
+	{{ if .ClientNameExists }}
 	<title>{{ .ClientName }} | Scribble</title>
 	{{ else }}
 	<title>Scribble</title>

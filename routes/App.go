@@ -94,6 +94,9 @@ func RegisterToPool(c echo.Context) error {
 		"GameStartDurationInSeconds": GameStartDurationInSeconds,
 		"TimeForEachWordInSeconds":   TimeForEachWordInSeconds,
 
+		// for rendering title on browser
+		"ClientNameExists": true,
+
 		// init as js vars
 		"PoolId":         poolId,
 		"ClientId":       clientId,

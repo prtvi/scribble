@@ -64,6 +64,8 @@ function initSocket() {
 		// 5 === clear canvas
 		// 6 === all client info
 		// 7 === start game
+		// 8 === request next word
+		// 9 === finish game and display scores
 
 		switch (socketMessage.type) {
 			case 1:
@@ -106,6 +108,10 @@ function initSocket() {
 
 			case 8:
 				beginClientSketchingFlow(socketMessage);
+				break;
+
+			case 9:
+				displayScores(socketMessage);
 				break;
 
 			default:
@@ -181,6 +187,27 @@ function getSecondsLeftFrom(futureTime) {
 	const now = new Date().getTime();
 	const diff = futureTime - now;
 	return Math.round(diff / 1000);
+}
+
+function displayScores(socketMessage) {
+	const dataArr = JSON.parse(socketMessage.content);
+
+	let html = `<table>
+	<tr>
+		<th>Name</th>
+		<th>Score</th>
+	</tr>`;
+	dataArr.forEach(
+		item => (html += `<tr><td>${item.name}</td><td>${item.score}</td></tr>`)
+	);
+	html += `</table>`;
+
+	document.querySelector('.score-board').innerHTML = html;
+
+	window.clearInterval(renderClientsTimerId);
+	window.clearInterval(startGameTimerId);
+	window.clearTimeout(startGameAfterTimeoutId);
+	window.clearInterval(wordExpiryTimerId);
 }
 
 // ------------------------ start game ------------------------
