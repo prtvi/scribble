@@ -13,6 +13,18 @@ const GameStartDurationInSeconds = 120
 const TimeForEachWordInSeconds = 20
 const ScoreForCorrectGuess = 15
 
+var messageTypeMap = map[int]string{
+	1: "connected client",
+	2: "disconnected client",
+	3: "text message",
+	4: "canvas data",
+	5: "clear canvas",
+	6: "client info",
+	7: "start game req",
+	8: "req next word",
+	9: "all clients done playing",
+}
+
 func removeClientFromList(list []*Client, client *Client) []*Client {
 	var idxToRemove int
 	for i, c := range list {
@@ -137,6 +149,8 @@ func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
 	isClient := beginClientSketchingFlow(pool)
 	if !isClient {
 		// if no client left to pick then end the game by sending the scores, type 9
+		pool.HasGameEnded = true
+		fmt.Println("no client found")
 		return getClientInfoList(pool, 9)
 	}
 
@@ -150,16 +164,15 @@ func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
 }
 
 func beginClientSketchingFlow(pool *Pool) bool {
-	pool.CurrWord = utils.GetRandomWord()
-	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
 
 	client := pickClient(pool)
-	fmt.Println("client picked:", client)
 	if client == nil {
 		return false
 	}
 
 	pool.CurrSketcher = client
+	pool.CurrWord = utils.GetRandomWord()
+	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
 
 	// reset client.HasGuessed when called upon for next word
 	for _, c := range pool.Clients {

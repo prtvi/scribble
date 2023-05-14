@@ -8,21 +8,15 @@ import (
 )
 
 type Pool struct {
-	ID                   string
-	Capacity             int
-	Register             chan *Client
-	Unregister           chan *Client
-	Clients              []*Client
-	Broadcast            chan model.SocketMessage
-	ColorAssignmentIndex int
-	CreatedTime          time.Time
-	GameStartTime        time.Time
-	HasGameStarted       bool
-
-	// not initialised when start
-	CurrWord          string
-	CurrWordExpiresAt time.Time
-	CurrSketcher      *Client
+	ID                                            string
+	Capacity, ColorAssignmentIndex                int
+	Register, Unregister                          chan *Client
+	Clients                                       []*Client
+	Broadcast                                     chan model.SocketMessage
+	CreatedTime, GameStartTime, CurrWordExpiresAt time.Time
+	HasGameStarted, HasGameEnded                  bool
+	CurrSketcher                                  *Client
+	CurrWord                                      string
 }
 
 func NewPool(uuid string, capacity int) *Pool {
@@ -86,7 +80,7 @@ func (pool *Pool) Start() {
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message to all clients
-			utils.Cp("blue", "SocketMessage received, type:", utils.Cs("reset", fmt.Sprintf("%d,", message.Type)), utils.Cs("blue", "broadcasting ..."))
+			utils.Cp("blue", "sm recv, type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type]), utils.Cs("blue", "broadcasting ..."))
 
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
