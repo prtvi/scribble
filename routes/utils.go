@@ -174,6 +174,8 @@ func beginClientSketchingFlow(pool *Pool) bool {
 	pool.CurrWord = utils.GetRandomWord()
 	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
 
+	fmt.Println("Current word:", pool.CurrWord)
+
 	// reset client.HasGuessed when called upon for next word
 	for _, c := range pool.Clients {
 		c.HasGuessed = false

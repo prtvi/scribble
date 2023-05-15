@@ -17,7 +17,7 @@
 					type="text"
 					name="clientName"
 					id="clientName"
-					value="p1"
+					value="p{{ .CurrentSize }}"
 					required
 					autofocus
 				/>
@@ -62,7 +62,7 @@
 			<div class="score-board"></div>
 
 			<!-- if game has not started then render this part -->
-			{{ if eq .HasGameStarted "" }}
+			{{ if eq .HasGameStarted false }}
 
 			<div class="start-game">
 				<div>
@@ -80,7 +80,6 @@
 				const clientName = '{{ .ClientName }}';
 				const clientColor = '{{ .ClientColor }}';
 				const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
-				const hasGameStarted = Boolean('{{ .HasGameStarted }}');
 			</script>
 
 			<script src="public/app.js"></script>

@@ -132,19 +132,27 @@ function initSocket() {
 }
 
 function sendViaSocket(responseMsg) {
+	/*  socket.readyState: int
+			0 - connecting
+			1 - open
+			2 - closing
+			3 - closed
+	*/
+
 	if (socket.readyState === socket.OPEN)
 		socket.send(JSON.stringify(responseMsg));
-	else
+	else {
 		console.log(
 			'socket already closed | yet opening | in closing state',
 			socket.readyState
 		);
+
+		clearAllIntervals(renderClientsTimerId);
+	}
 }
 
 function checkGameBeginStat() {
 	// checks if game has already started based on "has Game Started" variable
-
-	if (hasGameStarted) return;
 
 	// if game has not started then, begin the countdown and render time left
 	// and request start game on time-up
@@ -179,6 +187,8 @@ function checkGameBeginStat() {
 		const responseMsg = {
 			type: 7,
 			content: 'start the game bro!',
+			clientId,
+			clientName,
 			poolId,
 		};
 
@@ -289,6 +299,8 @@ function getAllClientsEL() {
 	const responseMsg = {
 		type: 6,
 		content: '',
+		clientId,
+		clientName,
 		poolId,
 	};
 
@@ -309,7 +321,9 @@ function renderClients(allClients) {
 		const clientNameHolder = document.createElement('div');
 		const clientName = document.createElement('p');
 
-		clientName.innerHTML = `#${i + 1} ${n.name}: ${n.score} points`;
+		clientName.innerHTML = `#${i + 1} ${n.name}${
+			n.score === 0 ? '' : `: ${n.score} points`
+		}`;
 		clientName.style.color = `#${n.color}`;
 		clientNameHolder.appendChild(clientName);
 
@@ -349,6 +363,7 @@ function sendChatMsgBtnEL(e) {
 		content: msg,
 		clientName,
 		clientId,
+		poolId,
 	};
 
 	// convert object to string to transmit
@@ -408,6 +423,7 @@ function requestCanvasClear() {
 		type: 5,
 		content: 'clear canvas',
 		clientId,
+		clientName,
 		poolId,
 	};
 
@@ -425,6 +441,7 @@ function sendImgData() {
 		content: String(canvas.toDataURL('img/png')),
 		clientName,
 		clientId,
+		poolId,
 	};
 
 	// sending canvas data

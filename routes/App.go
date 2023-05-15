@@ -53,6 +53,7 @@ func App(c echo.Context) error {
 	// else if every check, checks out then render "RegisterToPool" form
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": true,
+		"CurrentSize":    len(pool.Clients),
 		"ConnectSocket":  false,
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
@@ -79,9 +80,9 @@ func RegisterToPool(c echo.Context) error {
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
 	// check if game has started
-	var hasGameStarted string = ""
+	var hasGameStarted bool = false
 	if pool.HasGameStarted {
-		hasGameStarted = "true"
+		hasGameStarted = true
 	}
 
 	// render ConnectSocket form to establish socket connection

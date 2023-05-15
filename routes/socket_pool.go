@@ -80,9 +80,9 @@ func (pool *Pool) Start() {
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message to all clients
-			utils.Cp("blue", "sm recv, type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type]), utils.Cs("blue", "broadcasting ..."))
-
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
+
+			utils.Cp("blue", "sm recv, type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type], utils.Cs("blue", "from:"), message.ClientName), utils.Cs("blue", "broadcasting ..."))
 
 			switch message.Type {
 			case 3:
