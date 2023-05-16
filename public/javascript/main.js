@@ -5,45 +5,34 @@ const ctx = canvas.getContext('2d');
 
 // init socket connection and check game begin status
 const socket = initSocket();
-checkGameBeginStat();
+const startGameTimerId = gameStartTimer();
 
 var wordExpiryTimerId, currentWordExpiresAt;
 
-function checkGameBeginStat() {
+function gameStartTimer() {
 	// start game countdown to show user how much time is left for game to start
-	const startGameTimerId = setInterval(
+	return setInterval(
 		() =>
 			(document.querySelector('.loading').textContent =
 				getSecondsLeftFrom(gameStartTime)),
 		1000
 	);
+}
 
-	// add event listener to start game button to start game
-	const startGameBtn = document.querySelector('.start-game-btn');
-	startGameBtn.addEventListener('click', requestStartGameEL);
+function startGame(socketMessage) {
+	// called when socket receives message from server with type as 6
+	if (socketMessage.content !== 'true') return;
 
-	// start game after this timeout
-	const startGameAfterTimeoutId = setTimeout(
-		requestStartGameEL,
-		getSecondsLeftFrom(gameStartTime) * 1000
-	);
+	console.log('game started by server');
 
-	function requestStartGameEL() {
-		// runs when the game starts, makes socket conn call to server to start the game
-		// clear the countdown timers
-		clearAllIntervals(startGameTimerId, startGameAfterTimeoutId);
+	paintUtils.hasGameStarted = true;
+	clearAllIntervals(startGameTimerId);
 
-		// generate response and send
-		const responseMsg = {
-			type: 7,
-			content: 'start the game bro!',
-			clientId,
-			clientName,
-			poolId,
-		};
+	// hide the div and toggle paintUtils.has Game Started
+	const startGameDiv = document.querySelector('.start-game');
+	startGameDiv.classList.add('hidden');
 
-		sendViaSocket(responseMsg);
-	}
+	return beginClientSketchingFlow(socketMessage);
 }
 
 function beginClientSketchingFlow(socketMessage) {
@@ -63,7 +52,7 @@ function beginClientSketchingFlow(socketMessage) {
 		timeLeftDiv.querySelector('span').textContent = secondsLeft;
 
 		if (secondsLeft <= 0) {
-			clearInterval(wordExpiryTimerId);
+			clearAllIntervals(wordExpiryTimerId);
 			console.log('timer for word cleared');
 
 			// trigger next word for next player: TODO
@@ -98,18 +87,4 @@ function beginClientSketchingFlow(socketMessage) {
 	}
 
 	return [currentWordExpiresAt, wordExpiryTimerId];
-}
-
-function startGame(socketMessage) {
-	// called when socket receives message from server with type as 6
-	if (socketMessage.content !== 'true') return;
-
-	console.log('game started by server');
-	paintUtils.hasGameStarted = true;
-
-	// hide the div and toggle paintUtils.has Game Started
-	const startGameDiv = document.querySelector('.start-game');
-	startGameDiv && startGameDiv.classList.add('hidden');
-
-	return beginClientSketchingFlow(socketMessage);
 }

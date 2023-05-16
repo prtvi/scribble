@@ -79,16 +79,7 @@ func RegisterToPool(c echo.Context) error {
 	clientId := utils.GenerateUUID()[0:8]
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
-	// check if game has started
-	var (
-		hasGameStarted bool
-		isFirstJoinee  bool
-	)
-
-	if pool.HasGameStarted {
-		hasGameStarted = true
-	}
-
+	var isFirstJoinee bool
 	if len(pool.Clients) == 0 {
 		isFirstJoinee = true
 	}
@@ -107,12 +98,11 @@ func RegisterToPool(c echo.Context) error {
 		"ClientNameExists": true,
 
 		// init as js vars
-		"PoolId":         poolId,
-		"ClientId":       clientId,
-		"ClientName":     clientName,
-		"ClientColor":    clientColor,
-		"GameStartTime":  utils.FormatTimeLong(pool.GameStartTime),
-		"HasGameStarted": hasGameStarted,
-		"IsFirstJoinee":  isFirstJoinee,
+		"PoolId":        poolId,
+		"ClientId":      clientId,
+		"ClientName":    clientName,
+		"ClientColor":   clientColor,
+		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
+		"IsFirstJoinee": isFirstJoinee,
 	})
 }
