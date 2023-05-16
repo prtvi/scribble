@@ -80,9 +80,17 @@ func RegisterToPool(c echo.Context) error {
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
 	// check if game has started
-	var hasGameStarted bool = false
+	var (
+		hasGameStarted bool
+		isFirstJoinee  bool
+	)
+
 	if pool.HasGameStarted {
 		hasGameStarted = true
+	}
+
+	if len(pool.Clients) == 0 {
+		isFirstJoinee = true
 	}
 
 	// render ConnectSocket form to establish socket connection
@@ -105,5 +113,6 @@ func RegisterToPool(c echo.Context) error {
 		"ClientColor":    clientColor,
 		"GameStartTime":  utils.FormatTimeLong(pool.GameStartTime),
 		"HasGameStarted": hasGameStarted,
+		"IsFirstJoinee":  isFirstJoinee,
 	})
 }
