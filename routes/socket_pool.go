@@ -104,6 +104,7 @@ func (pool *Pool) Start() {
 				break
 			}
 
+			// dont broadcast everything to everyone
 			for _, c := range pool.Clients {
 				c.Conn.WriteJSON(message)
 			}
