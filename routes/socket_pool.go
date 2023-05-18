@@ -8,15 +8,15 @@ import (
 )
 
 type Pool struct {
-	ID                                            string
-	Capacity, ColorAssignmentIndex                int
-	Register, Unregister                          chan *Client
-	Clients                                       []*Client
-	Broadcast                                     chan model.SocketMessage
-	CreatedTime, GameStartTime, CurrWordExpiresAt time.Time
-	HasGameStarted, HasGameEnded                  bool
-	CurrSketcher                                  *Client
-	CurrWord                                      string
+	ID                                                string
+	Capacity, ColorAssignmentIndex                    int
+	Register, Unregister                              chan *Client
+	Clients                                           []*Client
+	Broadcast                                         chan model.SocketMessage
+	CreatedTime, GameStartTime, CurrWordExpiresAt     time.Time
+	HasGameStarted, HasGameEnded, HasBroadcastStarted bool
+	CurrSketcher                                      *Client
+	CurrWord                                          string
 }
 
 func NewPool(uuid string, capacity int) *Pool {
@@ -34,7 +34,12 @@ func NewPool(uuid string, capacity int) *Pool {
 		ColorAssignmentIndex: 0,
 		CreatedTime:          now,
 		GameStartTime:        later,
+		CurrWordExpiresAt:    time.Time{},
 		HasGameStarted:       false,
+		HasGameEnded:         false,
+		HasBroadcastStarted:  false,
+		CurrSketcher:         nil,
+		CurrWord:             "",
 	}
 }
 
@@ -58,6 +63,14 @@ func (pool *Pool) Start() {
 					ClientName: client.Name,
 				})
 			}
+
+			if len(pool.Clients) == 1 && !pool.HasBroadcastStarted {
+				pool.HasBroadcastStarted = true
+				utils.Cp("red", "broadcasting client info start!")
+
+				go RunTaskEvery(time.Second*RenderClientsEvery, broadcastClientInfoMessage, pool)
+			}
+
 			break
 
 		case client := <-pool.Unregister:
@@ -88,8 +101,8 @@ func (pool *Pool) Start() {
 			case 3:
 				updateScore(pool, message)
 
-			case 6:
-				message = getClientInfoList(pool, message.Type)
+			// case 6:
+			// 	message = getClientInfoList(pool, message.Type)
 
 			case 7:
 				message = startGameAck(pool, message.Type)

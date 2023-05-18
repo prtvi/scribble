@@ -99,7 +99,7 @@ function initSocket() {
 	function socketOnClose() {
 		// on socket conn close, stop all timer or intervals
 		console.log('Socket connection closed, stopping timers and timeouts!');
-		clearAllIntervals(renderClientsTimerId);
+		// clearAllIntervals(render Clients TimerId);
 	}
 
 	return socket;
@@ -121,6 +121,6 @@ function sendViaSocket(responseMsg) {
 			socket.readyState
 		);
 
-		clearAllIntervals(renderClientsTimerId);
+		// clearAllIntervals(render Clients TimerId);
 	}
 }

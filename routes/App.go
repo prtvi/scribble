@@ -79,10 +79,7 @@ func RegisterToPool(c echo.Context) error {
 	clientId := utils.GenerateUUID()[0:8]
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
 
-	var isFirstJoinee bool
-	if len(pool.Clients) == 0 {
-		isFirstJoinee = true
-	}
+	isFirstJoinee := (len(pool.Clients) == 0)
 
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered

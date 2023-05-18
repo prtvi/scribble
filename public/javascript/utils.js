@@ -40,7 +40,7 @@ function displayScores(socketMessage) {
 
 	document.querySelector('.score-board').innerHTML = html;
 
-	clearAllIntervals(renderClientsTimerId, wordExpiryTimerId);
+	clearAllIntervals(wordExpiryTimerId);
 }
 
 // get all clients and render
@@ -59,7 +59,9 @@ function getAllClientsEL() {
 }
 
 function renderClients(allClients) {
-	// called when the socket conn receives a message from server as type 5
+	// called when the socket conn receives a message from server as type 6
+
+	if (allClients.length === 0) return;
 
 	const membersDiv = document.querySelector('.members');
 	membersDiv.innerHTML = '';
@@ -119,5 +121,5 @@ function sendChatMsgBtnEL(e) {
 	sendViaSocket(responseMsg);
 }
 
-const renderClientsTimerId = setInterval(getAllClientsEL, 15 * 1000);
+// const renderClientsTimerId = setInterval(getAllClientsEL, 15 * 1000);
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);

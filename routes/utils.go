@@ -9,9 +9,12 @@ import (
 	"time"
 )
 
-const GameStartDurationInSeconds = 120
-const TimeForEachWordInSeconds = 20
-const ScoreForCorrectGuess = 15
+const (
+	GameStartDurationInSeconds = 120
+	TimeForEachWordInSeconds   = 20
+	ScoreForCorrectGuess       = 15
+	RenderClientsEvery         = 5
+)
 
 var messageTypeMap = map[int]string{
 	1: "connected client",
@@ -182,6 +185,21 @@ func beginClientSketchingFlow(pool *Pool) bool {
 	}
 
 	return true
+}
+
+func broadcastClientInfoMessage(pool *Pool) {
+	utils.Cp("yellow", "broadcasting message 6 - client info")
+	for _, c := range pool.Clients {
+		c.Conn.WriteJSON(getClientInfoList(pool, 6))
+	}
+}
+
+func RunTaskEvery(duration time.Duration, task func(pool *Pool), pool *Pool) {
+	// runs a task every duration period, to be run as a sep go routine
+	for {
+		time.Sleep(duration)
+		task(pool)
+	}
 }
 
 func stopGame(pool *Pool) {

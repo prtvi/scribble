@@ -25,7 +25,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 			color = "cyan"
 		}
 
-		utils.Cp(color, fmt.Sprintf("%s: %s  %s", reqMethod, utils.Cs("white", fmt.Sprintf("%s", c.Request().URL)), utils.Cs(color, dt)))
+		utils.Cp(color, fmt.Sprintf("%s: %s  %s", reqMethod, fmt.Sprintf("%s", c.Request().URL), dt))
 
 		return next(c)
 	}
