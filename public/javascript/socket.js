@@ -9,7 +9,6 @@ function initSocket() {
 	socket.onopen = () => {
 		// on socket open success, get all clients and render them on UI
 		console.log('Socket successfully connected!');
-		getAllClientsEL();
 	};
 
 	socket.onmessage = socketOnMessage;
@@ -99,7 +98,6 @@ function initSocket() {
 	function socketOnClose() {
 		// on socket conn close, stop all timer or intervals
 		console.log('Socket connection closed, stopping timers and timeouts!');
-		// clearAllIntervals(render Clients TimerId);
 	}
 
 	return socket;
@@ -120,7 +118,5 @@ function sendViaSocket(responseMsg) {
 			'socket already closed | yet opening | in closing state',
 			socket.readyState
 		);
-
-		// clearAllIntervals(render Clients TimerId);
 	}
 }

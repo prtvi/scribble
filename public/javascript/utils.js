@@ -43,20 +43,7 @@ function displayScores(socketMessage) {
 	clearAllIntervals(wordExpiryTimerId);
 }
 
-// get all clients and render
-
-function getAllClientsEL() {
-	// makes a socket connection call to request client info list
-	const responseMsg = {
-		type: 6,
-		content: '',
-		clientId,
-		clientName,
-		poolId,
-	};
-
-	sendViaSocket(responseMsg);
-}
+// render clients
 
 function renderClients(allClients) {
 	// called when the socket conn receives a message from server as type 6
@@ -121,5 +108,4 @@ function sendChatMsgBtnEL(e) {
 	sendViaSocket(responseMsg);
 }
 
-// const renderClientsTimerId = setInterval(getAllClientsEL, 15 * 1000);
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);

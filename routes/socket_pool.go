@@ -8,15 +8,15 @@ import (
 )
 
 type Pool struct {
-	ID                                                string
-	Capacity, ColorAssignmentIndex                    int
-	Register, Unregister                              chan *Client
-	Clients                                           []*Client
-	Broadcast                                         chan model.SocketMessage
-	CreatedTime, GameStartTime, CurrWordExpiresAt     time.Time
-	HasGameStarted, HasGameEnded, HasBroadcastStarted bool
-	CurrSketcher                                      *Client
-	CurrWord                                          string
+	ID                                                          string
+	Capacity, ColorAssignmentIndex                              int
+	Register, Unregister                                        chan *Client
+	Clients                                                     []*Client
+	Broadcast                                                   chan model.SocketMessage
+	CreatedTime, GameStartTime, CurrWordExpiresAt               time.Time
+	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted bool
+	CurrSketcher                                                *Client
+	CurrWord                                                    string
 }
 
 func NewPool(uuid string, capacity int) *Pool {
@@ -25,21 +25,21 @@ func NewPool(uuid string, capacity int) *Pool {
 	later := now.Add(time.Second * GameStartDurationInSeconds)
 
 	return &Pool{
-		ID:                   uuid,
-		Capacity:             capacity,
-		Register:             make(chan *Client),
-		Unregister:           make(chan *Client),
-		Clients:              make([]*Client, 0),
-		Broadcast:            make(chan model.SocketMessage),
-		ColorAssignmentIndex: 0,
-		CreatedTime:          now,
-		GameStartTime:        later,
-		CurrWordExpiresAt:    time.Time{},
-		HasGameStarted:       false,
-		HasGameEnded:         false,
-		HasBroadcastStarted:  false,
-		CurrSketcher:         nil,
-		CurrWord:             "",
+		ID:                            uuid,
+		Capacity:                      capacity,
+		Register:                      make(chan *Client),
+		Unregister:                    make(chan *Client),
+		Clients:                       make([]*Client, 0),
+		Broadcast:                     make(chan model.SocketMessage),
+		ColorAssignmentIndex:          0,
+		CreatedTime:                   now,
+		GameStartTime:                 later,
+		CurrWordExpiresAt:             time.Time{},
+		HasGameStarted:                false,
+		HasGameEnded:                  false,
+		HasClientInfoBroadcastStarted: false,
+		CurrSketcher:                  nil,
+		CurrWord:                      "",
 	}
 }
 
@@ -55,20 +55,18 @@ func (pool *Pool) Start() {
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
 
 			// all clients (c from loop) to one (registered client): all-1
-			for _, c := range pool.Clients {
-				c.Conn.WriteJSON(model.SocketMessage{
-					Type:       1,
-					Content:    fmt.Sprintf("CONNECTED_%s", client.Name),
-					ClientId:   client.ID,
-					ClientName: client.Name,
-				})
-			}
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:       1,
+				Content:    fmt.Sprintf("CONNECTED_%s", client.Name),
+				ClientId:   client.ID,
+				ClientName: client.Name,
+			})
 
-			if len(pool.Clients) == 1 && !pool.HasBroadcastStarted {
-				pool.HasBroadcastStarted = true
-				utils.Cp("red", "broadcasting client info start!")
+			if len(pool.Clients) == 1 && !pool.HasClientInfoBroadcastStarted {
+				pool.HasClientInfoBroadcastStarted = true
+				utils.Cp("yellowBg", "broadcasting client info start!")
 
-				go RunTaskEvery(time.Second*RenderClientsEvery, broadcastClientInfoMessage, pool)
+				go pool.BroadcastClientInfoMessage()
 			}
 
 			break
@@ -81,14 +79,13 @@ func (pool *Pool) Start() {
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
 			// all clients (c from loop) to one (disconnected client): all-1
-			for _, c := range pool.Clients {
-				c.Conn.WriteJSON(model.SocketMessage{
-					Type:       2,
-					Content:    fmt.Sprintf("DISCONNECTED_%s", client.Name),
-					ClientId:   client.ID,
-					ClientName: client.Name,
-				})
-			}
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:       2,
+				Content:    fmt.Sprintf("DISCONNECTED_%s", client.Name),
+				ClientId:   client.ID,
+				ClientName: client.Name,
+			})
+
 			break
 
 		case message := <-pool.Broadcast:
@@ -100,27 +97,26 @@ func (pool *Pool) Start() {
 			switch message.Type {
 			case 3:
 				updateScore(pool, message)
-
-			// case 6:
-			// 	message = getClientInfoList(pool, message.Type)
+				pool.BroadcastMsg(message)
 
 			case 7:
-				message = startGameAck(pool, message.Type)
+				// message = startGameAck(pool, message.Type)
+				pool.StartGame()
 
 			case 8:
 				message = nextClientForSketching(pool, message.Type)
 
 			case 9:
-				stopGame(pool)
+				pool.EndGame()
 
 			default:
 				break
 			}
 
 			// dont broadcast everything to everyone
-			for _, c := range pool.Clients {
-				c.Conn.WriteJSON(message)
-			}
+			// for _, c := range pool.Clients {
+			// 	c.Conn.WriteJSON(message)
+			// }
 		}
 	}
 }

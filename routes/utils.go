@@ -187,21 +187,60 @@ func beginClientSketchingFlow(pool *Pool) bool {
 	return true
 }
 
-func broadcastClientInfoMessage(pool *Pool) {
-	utils.Cp("yellow", "broadcasting message 6 - client info")
+//
+
+func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
 	for _, c := range pool.Clients {
-		c.Conn.WriteJSON(getClientInfoList(pool, 6))
+		c.Conn.WriteJSON(message)
 	}
 }
 
-func RunTaskEvery(duration time.Duration, task func(pool *Pool), pool *Pool) {
-	// runs a task every duration period, to be run as a sep go routine
+func (pool *Pool) BroadcastClientInfoMessage() {
 	for {
-		time.Sleep(duration)
-		task(pool)
+		time.Sleep(time.Second * RenderClientsEvery)
+
+		utils.Cp("yellow", "broadcasting message 6 - client info")
+
+		msg := getClientInfoList(pool, 6)
+		pool.BroadcastMsg(msg)
 	}
 }
 
-func stopGame(pool *Pool) {
+func (pool *Pool) StartGame() {
+	pool.HasGameStarted = true
+	utils.Cp("greenBg", "Game started!")
+
+	// diff := pool.CreatedTime.Sub(pool.GameStartTime)
+	// time.Sleep(diff)
+}
+
+func (pool *Pool) beginClientSketchingFlow() model.SocketMessage {
+	client := pickClient(pool)
+
+	if client == nil {
+
+	}
+
+	pool.CurrSketcher = client
+	pool.CurrWord = utils.GetRandomWord()
+	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
+
+	fmt.Println("Current word:", pool.CurrWord)
+
+	// reset client.HasGuessed when called upon for next word
+	for _, c := range pool.Clients {
+		c.HasGuessed = false
+	}
+
+	return model.SocketMessage{
+		Type:              7,
+		Content:           "true",
+		CurrSketcherId:    pool.CurrSketcher.ID,
+		CurrWord:          pool.CurrWord,
+		CurrWordExpiresAt: pool.CurrWordExpiresAt,
+	}
+}
+
+func (pool *Pool) EndGame() {
 
 }
