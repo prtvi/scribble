@@ -62,6 +62,7 @@ func (pool *Pool) Start() {
 				ClientName: client.Name,
 			})
 
+			// start broadcasting client info list
 			if len(pool.Clients) == 1 && !pool.HasClientInfoBroadcastStarted {
 				pool.HasClientInfoBroadcastStarted = true
 				utils.Cp("yellowBg", "broadcasting client info start!")
@@ -100,7 +101,6 @@ func (pool *Pool) Start() {
 				pool.BroadcastMsg(message)
 
 			case 7:
-				// message = startGameAck(pool, message.Type)
 				pool.StartGame()
 
 			case 8:

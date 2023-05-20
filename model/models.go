@@ -23,6 +23,7 @@ import "time"
 type SocketMessage struct {
 	Type              int       `json:"type"`
 	Content           string    `json:"content"`
+	Success           bool      `json:"success"`
 	ClientId          string    `json:"clientId,omitempty"`
 	ClientName        string    `json:"clientName,omitempty"`
 	PoolId            string    `json:"poolId,omitempty"`

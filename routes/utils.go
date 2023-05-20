@@ -208,10 +208,19 @@ func (pool *Pool) BroadcastClientInfoMessage() {
 
 func (pool *Pool) StartGame() {
 	pool.HasGameStarted = true
-	utils.Cp("greenBg", "Game started!")
 
-	// diff := pool.CreatedTime.Sub(pool.GameStartTime)
-	// time.Sleep(diff)
+	go func() {
+		diff := pool.CreatedTime.Sub(pool.GameStartTime)
+		time.Sleep(diff)
+
+		pool.BroadcastMsg(model.SocketMessage{
+			Type:    7,
+			Content: "Game has started",
+			Success: true,
+		})
+
+		utils.Cp("greenBg", "Game started!")
+	}()
 }
 
 func (pool *Pool) beginClientSketchingFlow() model.SocketMessage {
