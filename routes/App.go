@@ -75,6 +75,12 @@ func RegisterToPool(c echo.Context) error {
 		return c.Render(http.StatusOK, "app", dataForAppRoute)
 	}
 
+	// if client reloads after game has already started
+	if pool.HasGameStarted {
+		dataForAppRoute["Message"] = "Game has already started!"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
 	// generate client id and color
 	clientId := utils.GenerateUUID()[0:8]
 	clientColor := utils.COLORS[pool.ColorAssignmentIndex]

@@ -63,11 +63,18 @@ func (pool *Pool) Start() {
 			})
 
 			// start broadcasting client info list
-			if len(pool.Clients) == 1 && !pool.HasClientInfoBroadcastStarted {
+			if len(pool.Clients) == 1 &&
+				!pool.HasClientInfoBroadcastStarted &&
+				!pool.HasGameStarted {
+
 				pool.HasClientInfoBroadcastStarted = true
 				utils.Cp("yellowBg", "broadcasting client info start!")
 
+				// begin braodcasting client info at regular intervals
 				go pool.BroadcastClientInfoMessage()
+
+				// begin game start coutndown
+				go pool.startGameCountdown()
 			}
 
 			break
@@ -93,11 +100,11 @@ func (pool *Pool) Start() {
 			// on message received from any of the clients in the pool, broadcast the message to all clients
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
-			utils.Cp("blue", "sm recv, type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type], utils.Cs("blue", "from:"), message.ClientName), utils.Cs("blue", "broadcasting ..."))
+			utils.Cp("blue", "sm recv, type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type], utils.Cs("blue", "from:"), message.ClientName))
 
 			switch message.Type {
 			case 3:
-				updateScore(pool, message)
+				pool.UpdateScore(message)
 				pool.BroadcastMsg(message)
 
 			case 7:

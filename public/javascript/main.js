@@ -21,7 +21,7 @@ function gameStartTimer() {
 
 function startGame(socketMessage) {
 	// called when socket receives message from server with type as 6
-	if (socketMessage.content !== 'true') return;
+	if (!socketMessage.success) return;
 
 	console.log('game started by server');
 
@@ -32,7 +32,7 @@ function startGame(socketMessage) {
 	const startGameDiv = document.querySelector('.start-game');
 	startGameDiv.classList.add('hidden');
 
-	return beginClientSketchingFlow(socketMessage);
+	// return beginClientSketchingFlow(socketMessage);
 }
 
 function beginClientSketchingFlow(socketMessage) {
