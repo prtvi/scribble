@@ -1,13 +1,10 @@
 'use strict';
 
-console.log('game will be started by', clientName);
+console.log('game will be started by me');
 
 // add event listener to start game button to start game
-const startGameBtn = document.querySelector('.start-game-btn');
-startGameBtn.addEventListener('click', () => {
-	// runs when the game starts, makes socket conn call to server to start the game
-	// generate response and send
-
+// makes socket conn call to server to start the game
+document.querySelector('.start-game-btn').addEventListener('click', () => {
 	const responseMsg = {
 		type: 7,
 		content: 'start the game bro!',
@@ -16,5 +13,6 @@ startGameBtn.addEventListener('click', () => {
 		poolId,
 	};
 
+	console.log('requesting game to start');
 	sendViaSocket(responseMsg);
 });

@@ -19,8 +19,12 @@ func GenerateUUID() string {
 }
 
 func FormatTimeLong(t time.Time) string {
-	// 2023-09-19 23:34:09
-	return t.String()[0:19]
+	// 2023-09-19 23:34:09.23432
+	return t.String()[0:26]
+}
+
+func GetSecondsLeftFrom(t time.Time) int {
+	return int(t.Sub(time.Now()).Seconds())
 }
 
 func GetRandomWord() string {

@@ -94,7 +94,7 @@ func RegisterToPool(c echo.Context) error {
 		"ConnectSocket":  true,
 
 		// variables in DOM
-		"GameStartDurationInSeconds": GameStartDurationInSeconds,
+		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),
 		"TimeForEachWordInSeconds":   TimeForEachWordInSeconds,
 
 		// for rendering title on browser

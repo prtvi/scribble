@@ -78,7 +78,6 @@ function initSocket() {
 				break;
 
 			case 7:
-				// [currentWordExpiresAt, wordExpiryTimerId] = startGame(socketMessage);
 				startGame(socketMessage);
 				break;
 

@@ -52,9 +52,6 @@ func (pool *Pool) Start() {
 			pool.Clients = append(pool.Clients, client)
 			pool.ColorAssignmentIndex += 1
 
-			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
-
-			// all clients (c from loop) to one (registered client): all-1
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       1,
 				Content:    fmt.Sprintf("CONNECTED_%s", client.Name),
@@ -68,14 +65,16 @@ func (pool *Pool) Start() {
 				!pool.HasGameStarted {
 
 				pool.HasClientInfoBroadcastStarted = true
-				utils.Cp("yellowBg", "broadcasting client info start!")
+				utils.Cp("yellowBg", "Broadcasting client info start!")
 
 				// begin braodcasting client info at regular intervals
 				go pool.BroadcastClientInfoMessage()
 
-				// begin game start coutndown
+				// begin game start countdown
 				go pool.startGameCountdown()
 			}
+
+			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
 
 			break
 
@@ -84,15 +83,14 @@ func (pool *Pool) Start() {
 			pool.Clients = removeClientFromList(pool.Clients, client)
 			// pool.ColorAssignmentIndex -= 1 // TODO
 
-			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
-
-			// all clients (c from loop) to one (disconnected client): all-1
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       2,
 				Content:    fmt.Sprintf("DISCONNECTED_%s", client.Name),
 				ClientId:   client.ID,
 				ClientName: client.Name,
 			})
+
+			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
 			break
 

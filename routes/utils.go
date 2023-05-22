@@ -5,7 +5,6 @@ import (
 	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
-	"strings"
 	"time"
 )
 
@@ -29,6 +28,7 @@ var messageTypeMap = map[int]string{
 }
 
 func removeClientFromList(list []*Client, client *Client) []*Client {
+	// removes the given client from the given slice and returns the new slice
 	var idxToRemove int
 	for i, c := range list {
 		if c == client {
@@ -43,6 +43,7 @@ func removeClientFromList(list []*Client, client *Client) []*Client {
 
 func pickClient(pool *Pool) *Client {
 	// picks that client that hasn't drawn yet
+
 	var client *Client = nil
 
 	for _, c := range pool.Clients {
@@ -82,6 +83,8 @@ func getClientInfoList(pool *Pool, messageType int) model.SocketMessage {
 		Content: string(byteInfo),
 	}
 }
+
+//
 
 func startGameAck(pool *Pool, messageType int) model.SocketMessage {
 	// returns if game has started or not embedded in model.SocketMessage
@@ -161,114 +164,4 @@ func beginClientSketchingFlow(pool *Pool) bool {
 	}
 
 	return true
-}
-
-//
-func (pool *Pool) UpdateScore(message model.SocketMessage) {
-	// update score for the client that guesses the word right
-
-	if pool.CurrSketcher == nil {
-		return
-	}
-
-	var guesserClient *Client = nil
-	for _, c := range pool.Clients {
-		// init guesserClient only if the guesser is not the sketcher
-		if c.ID == message.ClientId &&
-			pool.CurrSketcher.ID != message.ClientId {
-			guesserClient = c
-			break
-		}
-	}
-
-	// if the sketcher is the guesser, then the guesserClient will be nil, hence check if guesserClient is nil
-	// check if the word matches with the current word and check if the guesserClient hasn't already guessed
-	if guesserClient != nil &&
-		strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) &&
-		!guesserClient.HasGuessed {
-		// increment score and flag as guessed
-		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
-		guesserClient.HasGuessed = true
-	}
-}
-
-func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
-	for _, c := range pool.Clients {
-		c.Conn.WriteJSON(message)
-	}
-}
-
-func (pool *Pool) BroadcastClientInfoMessage() {
-	for {
-		time.Sleep(time.Second * RenderClientsEvery)
-
-		utils.Cp("yellow", "broadcasting message 6 - client info")
-
-		msg := getClientInfoList(pool, 6)
-		pool.BroadcastMsg(msg)
-	}
-}
-
-func (pool *Pool) startGameCountdown() {
-	diff := pool.GameStartTime.Sub(pool.CreatedTime)
-	time.Sleep(diff)
-
-	if pool.HasGameStarted {
-		fmt.Println("game started using button so exiting countdown")
-		return
-	}
-
-	pool.HasGameStarted = true
-	utils.Cp("greenBg", "Game started by server using countdown!")
-
-	pool.BroadcastMsg(model.SocketMessage{
-		Type:    7,
-		Content: "Game has started",
-		Success: true,
-	})
-}
-
-func (pool *Pool) StartGame() {
-	pool.HasGameStarted = true
-
-	pool.BroadcastMsg(model.SocketMessage{
-		Type:    7,
-		Content: "Game has started",
-		Success: true,
-	})
-
-	utils.Cp("greenBg", "Game started by client using btn!")
-}
-
-//
-
-func (pool *Pool) beginClientSketchingFlow() model.SocketMessage {
-	client := pickClient(pool)
-
-	if client == nil {
-
-	}
-
-	pool.CurrSketcher = client
-	pool.CurrWord = utils.GetRandomWord()
-	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
-
-	fmt.Println("Current word:", pool.CurrWord)
-
-	// reset client.HasGuessed when called upon for next word
-	for _, c := range pool.Clients {
-		c.HasGuessed = false
-	}
-
-	return model.SocketMessage{
-		Type:              7,
-		Content:           "true",
-		CurrSketcherId:    pool.CurrSketcher.ID,
-		CurrWord:          pool.CurrWord,
-		CurrWordExpiresAt: pool.CurrWordExpiresAt,
-	}
-}
-
-func (pool *Pool) EndGame() {
-
 }
