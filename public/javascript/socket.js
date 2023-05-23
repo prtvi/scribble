@@ -31,17 +31,6 @@ function initSocket() {
 		// parse json string into json object
 		const socketMessage = JSON.parse(message.data);
 
-		// socketMessage.type
-		// 1 === CONNECTED
-		// 2 === DISCONNECTED
-		// 3 === string data
-		// 4 === canvas data
-		// 5 === clear canvas
-		// 6 === all client info
-		// 7 === start game
-		// 8 === request next word
-		// 9 === finish game and display scores
-
 		switch (socketMessage.type) {
 			case 1:
 				if (socketMessage.clientId === clientId)
@@ -82,13 +71,14 @@ function initSocket() {
 				break;
 
 			case 8:
-				[currentWordExpiresAt, wordExpiryTimerId] =
-					beginClientSketchingFlow(socketMessage);
+				console.log(socketMessage);
+				// [currentWordExpiresAt, wordExpiryTimerId] =
+				// 	beginClientSketchingFlow(socketMessage);
 				break;
 
-			case 9:
-				displayScores(socketMessage);
-				break;
+			// case 9:
+			// 	displayScores(socketMessage);
+			// 	break;
 
 			default:
 				break;

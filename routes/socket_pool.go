@@ -71,7 +71,7 @@ func (pool *Pool) Start() {
 				go pool.BroadcastClientInfoMessage()
 
 				// begin game start countdown
-				go pool.startGameCountdown()
+				go pool.StartGameCountdown()
 			}
 
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
@@ -105,23 +105,21 @@ func (pool *Pool) Start() {
 				pool.UpdateScore(message)
 				pool.BroadcastMsg(message)
 
+			case 4, 5:
+				pool.BroadcastMsg(message)
+
 			case 7:
 				pool.StartGame()
 
-			case 8:
-				message = nextClientForSketching(pool, message.Type)
+			// case 8:
+			// 	message = nextClientForSketching(pool, message.Type)
 
-			case 9:
-				pool.EndGame()
+			// case 9:
+			// 	pool.EndGame()
 
 			default:
 				break
 			}
-
-			// dont broadcast everything to everyone
-			// for _, c := range pool.Clients {
-			// 	c.Conn.WriteJSON(message)
-			// }
 		}
 	}
 }

@@ -2,29 +2,28 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	model "scribble/model"
-	utils "scribble/utils"
-	"time"
 )
 
 const (
 	GameStartDurationInSeconds = 30
-	TimeForEachWordInSeconds   = 20
+	TimeForEachWordInSeconds   = 60
 	ScoreForCorrectGuess       = 15
 	RenderClientsEvery         = 10
 )
 
 var messageTypeMap = map[int]string{
-	1: "connected client",
-	2: "disconnected client",
-	3: "text message",
-	4: "canvas data",
-	5: "clear canvas",
-	6: "client info",
-	7: "start game req",
-	8: "req next word",
-	9: "all clients done playing",
+	1: "connected client",    // server b=> clients
+	2: "disconnected client", // server b=> clients
+	3: "text message",        // client b=> clients
+	4: "canvas data",         // client b=> clients
+	5: "clear canvas",        // client b=> clients
+	6: "client info",         // server b=> clients --at regular intervals
+	7: "start game",          // client  => server --to start the game
+	8: "word assigned",       // server  => client
+
+	9:  "req next word", //
+	10: "all clients done playing",
 }
 
 func removeClientFromList(list []*Client, client *Client) []*Client {
@@ -82,86 +81,4 @@ func getClientInfoList(pool *Pool, messageType int) model.SocketMessage {
 		Type:    messageType,
 		Content: string(byteInfo),
 	}
-}
-
-//
-
-func startGameAck(pool *Pool, messageType int) model.SocketMessage {
-	// returns if game has started or not embedded in model.SocketMessage
-
-	if pool.HasGameStarted {
-		return model.SocketMessage{
-			Type:              messageType,
-			Content:           "true",
-			CurrSketcherId:    pool.CurrSketcher.ID,
-			CurrWord:          pool.CurrWord,
-			CurrWordExpiresAt: pool.CurrWordExpiresAt,
-		}
-	}
-
-	// flag game started variable for the pool as true
-	pool.HasGameStarted = true
-	utils.Cp("yellow", "Game started!")
-
-	beginClientSketchingFlow(pool)
-
-	return model.SocketMessage{
-		Type:              messageType,
-		Content:           "true",
-		CurrSketcherId:    pool.CurrSketcher.ID,
-		CurrWord:          pool.CurrWord,
-		CurrWordExpiresAt: pool.CurrWordExpiresAt,
-	}
-}
-
-func nextClientForSketching(pool *Pool, messageType int) model.SocketMessage {
-	// if this request was previously made which means the current word is set, which means the expiry of the word is in future, then just return the curr stat
-
-	if pool.CurrWordExpiresAt.Sub(time.Now()) > 0 {
-		return model.SocketMessage{
-			Type:              messageType,
-			Content:           "true",
-			CurrSketcherId:    pool.CurrSketcher.ID,
-			CurrWord:          pool.CurrWord,
-			CurrWordExpiresAt: pool.CurrWordExpiresAt,
-		}
-	}
-
-	// else begin the client sketching flow
-	isClient := beginClientSketchingFlow(pool)
-	if !isClient {
-		// if no client left to pick then end the game by sending the scores, type 9
-		pool.HasGameEnded = true
-		fmt.Println("no client found")
-		return getClientInfoList(pool, 9)
-	}
-
-	return model.SocketMessage{
-		Type:              messageType,
-		Content:           "true",
-		CurrSketcherId:    pool.CurrSketcher.ID,
-		CurrWord:          pool.CurrWord,
-		CurrWordExpiresAt: pool.CurrWordExpiresAt,
-	}
-}
-
-func beginClientSketchingFlow(pool *Pool) bool {
-
-	client := pickClient(pool)
-	if client == nil {
-		return false
-	}
-
-	pool.CurrSketcher = client
-	pool.CurrWord = utils.GetRandomWord()
-	pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
-
-	fmt.Println("Current word:", pool.CurrWord)
-
-	// reset client.HasGuessed when called upon for next word
-	for _, c := range pool.Clients {
-		c.HasGuessed = false
-	}
-
-	return true
 }

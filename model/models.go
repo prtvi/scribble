@@ -2,28 +2,10 @@ package model
 
 import "time"
 
-// SocketMessage.Type: int
-// Determines the content type in SocketMessage.Content field
-// 1 - Connected             - send to all
-// 2 - Disconnected          - send to all
-// 3 - Text message          - send to all, also update score
-// 4 - Canvas data as string - send to all
-// 5 - clear canvas          - send to all
-// 6 - Get all client info   - send to all but after processing
-// 7 - start game ack        - send to all but after processing
-// 8 - request for next word - send to all but after processing
-// 9 - all clients done playing - send to all
-
-// SocketMessage.ClientId & SocketMessage.ClientName: string
-// The client that triggers conn/disconnection to server, Register/Unregister event at server
-
-// SocketMessage.PoolId: string
-// Used by client to request all client info list and start game
-
 type SocketMessage struct {
 	Type              int       `json:"type"`
 	Content           string    `json:"content"`
-	Success           bool      `json:"success"`
+	Success           bool      `json:"success,omitempty"`
 	ClientId          string    `json:"clientId,omitempty"`
 	ClientName        string    `json:"clientName,omitempty"`
 	PoolId            string    `json:"poolId,omitempty"`
