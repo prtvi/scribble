@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
@@ -19,9 +20,9 @@ func (pool *Pool) BroadcastClientInfoMessage() {
 	// starts a timer to broadcast client info after every regular interval
 	for {
 		time.Sleep(time.Second * RenderClientsEvery)
-		// utils.Cp("yellow", "broadcasting message 6 - client info")
+		utils.Cp("yellow", "Broadcasting client info")
 
-		msg := getClientInfoList(pool)
+		msg := pool.getClientInfoList()
 		pool.BroadcastMsg(msg)
 	}
 }
@@ -54,7 +55,7 @@ func (pool *Pool) StartGameCountdown() {
 	utils.Cp("greenBg", "Game started! by server using countdown")
 
 	// start game flow
-	pool.begin()
+	go pool.BeginGameFlow()
 }
 
 func (pool *Pool) StartGame() {
@@ -64,18 +65,16 @@ func (pool *Pool) StartGame() {
 	utils.Cp("greenBg", "Game started! by client using btn")
 
 	// start game flow
-	pool.begin()
+	go pool.BeginGameFlow()
 }
 
-func (pool *Pool) begin() {
+func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
-	time.Sleep(time.Second * 1)
-	fmt.Println("new word flow")
+	d := time.Duration(time.Second * 2)
+	utils.Cp("green", "Starting game in", d.String())
+	time.Sleep(d)
 
-	for i, c := range pool.Clients {
-
-		fmt.Println("iteration #", i+1)
-
+	for _, c := range pool.Clients {
 		pool.CurrSketcher = c
 		pool.CurrWord = utils.GetRandomWord()
 		pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
@@ -94,10 +93,53 @@ func (pool *Pool) begin() {
 		})
 
 		st := pool.CurrWordExpiresAt.Sub(time.Now())
-		fmt.Println("sleeping for ...", st)
+		utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
 		time.Sleep(st)
-		fmt.Println("sleep over")
 	}
+
+	pool.EndGame()
+}
+
+func (pool *Pool) getClientInfoList() model.SocketMessage {
+	// returns client info list embedded in model.SocketMessage
+
+	clientInfoList := make([]model.ClientInfo, 0)
+
+	// append client info into an array
+	for _, client := range pool.Clients {
+		clientInfoList = append(clientInfoList, model.ClientInfo{
+			ID:    client.ID,
+			Name:  client.Name,
+			Color: client.Color,
+			Score: client.Score,
+		})
+	}
+
+	// marshall array in byte and send as string
+	byteInfo, _ := json.Marshal(clientInfoList)
+	return model.SocketMessage{
+		Type:    6,
+		TypeStr: messageTypeMap[6],
+		Content: string(byteInfo),
+	}
+}
+
+func (pool *Pool) appendClientToList(client *Client) {
+	pool.Clients = append(pool.Clients, client)
+}
+
+func (pool *Pool) removeClientFromList(client *Client) {
+	list := pool.Clients
+	var idxToRemove int
+	for i, c := range list {
+		if c == client {
+			idxToRemove = i
+			break
+		}
+	}
+
+	list[idxToRemove] = list[len(list)-1]
+	pool.Clients = list[:len(list)-1]
 }
 
 func (pool *Pool) UpdateScore(message model.SocketMessage) {
@@ -129,8 +171,13 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) {
 	}
 }
 
-//
-
 func (pool *Pool) EndGame() {
+	utils.Cp("yellow", "All players done playing!")
+	pool.HasGameEnded = true
 
+	pool.BroadcastMsg(model.SocketMessage{
+		Type:    9,
+		TypeStr: messageTypeMap[9],
+		Content: pool.getClientInfoList().Content,
+	})
 }

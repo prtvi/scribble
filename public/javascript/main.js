@@ -7,7 +7,7 @@ const ctx = canvas.getContext('2d');
 const socket = initSocket();
 const startGameTimerId = gameStartTimer();
 
-var wordExpiryTimerId, currentWordExpiresAt;
+let wordExpiryTimerIdG;
 
 function gameStartTimer() {
 	// start game countdown to show user how much time is left for game to start
@@ -52,17 +52,6 @@ function beginClientSketchingFlow(socketMessage) {
 		if (secondsLeft <= 0) {
 			clearAllIntervals(wordExpiryTimerId);
 			console.log('timer for word cleared');
-
-			// trigger next word for next player: TODO
-			// requestCanvasClear();
-
-			// const responseMsg = {
-			// 	type: 8,
-			// 	content: 'next word',
-			// };
-
-			// await wait(5 * 1000);
-			// sendViaSocket(responseMsg);
 		}
 	}, 1000);
 
@@ -82,7 +71,11 @@ function beginClientSketchingFlow(socketMessage) {
 		paintUtils.isAllowedToPaint = false;
 		document.querySelector('.painter-utils').classList.add('hidden');
 		document.querySelector('.your-word').textContent = '';
+
+		document
+			.querySelector('.clear-canvas')
+			.removeEventListener('click', requestCanvasClear);
 	}
 
-	return [currentWordExpiresAt, wordExpiryTimerId];
+	return wordExpiryTimerId;
 }

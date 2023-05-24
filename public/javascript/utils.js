@@ -40,7 +40,7 @@ function displayScores(socketMessage) {
 
 	document.querySelector('.score-board').innerHTML = html;
 
-	clearAllIntervals(wordExpiryTimerId);
+	clearAllIntervals(wordExpiryTimerIdG);
 }
 
 // render clients

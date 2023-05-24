@@ -9,9 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// map of {poolId: pool}
-var HUB = map[string]*Pool{}
-
 // / middleware
 func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {

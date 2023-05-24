@@ -49,7 +49,7 @@ func (pool *Pool) Start() {
 		select {
 		case client := <-pool.Register:
 			// on client register, append the client to Pool.Client slice
-			pool.Clients = append(pool.Clients, client)
+			pool.appendClientToList(client)
 			pool.ColorAssignmentIndex += 1
 
 			pool.BroadcastMsg(model.SocketMessage{
@@ -80,7 +80,7 @@ func (pool *Pool) Start() {
 
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client slice
-			pool.Clients = removeClientFromList(pool.Clients, client)
+			pool.removeClientFromList(client)
 			// pool.ColorAssignmentIndex -= 1 // TODO
 
 			pool.BroadcastMsg(model.SocketMessage{
@@ -110,12 +110,6 @@ func (pool *Pool) Start() {
 
 			case 7:
 				pool.StartGame()
-
-			// case 8:
-			// 	message = nextClientForSketching(pool, message.Type)
-
-			// case 9:
-			// 	pool.EndGame()
 
 			default:
 				break

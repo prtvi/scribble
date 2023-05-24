@@ -71,14 +71,12 @@ function initSocket() {
 				break;
 
 			case 8:
-				console.log(socketMessage);
-				// [currentWordExpiresAt, wordExpiryTimerId] =
-				// 	beginClientSketchingFlow(socketMessage);
+				wordExpiryTimerIdG = beginClientSketchingFlow(socketMessage);
 				break;
 
-			// case 9:
-			// 	displayScores(socketMessage);
-			// 	break;
+			case 9:
+				displayScores(socketMessage);
+				break;
 
 			default:
 				break;
@@ -88,12 +86,13 @@ function initSocket() {
 	function socketOnClose() {
 		// on socket conn close, stop all timer or intervals
 		console.log('Socket connection closed, stopping timers and timeouts!');
+		clearAllIntervals(wordExpiryTimerIdG, startGameTimerId);
 	}
 
 	return socket;
 }
 
-function sendViaSocket(responseMsg) {
+function sendViaSocket(socketMsg) {
 	/*  socket.readyState: int
 			0 - connecting
 			1 - open
@@ -101,12 +100,13 @@ function sendViaSocket(responseMsg) {
 			3 - closed
 	*/
 
-	if (socket.readyState === socket.OPEN)
-		socket.send(JSON.stringify(responseMsg));
+	if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(socketMsg));
 	else {
 		console.log(
 			'socket already closed | yet opening | in closing state',
 			socket.readyState
 		);
+
+		clearAllIntervals(wordExpiryTimerIdG, startGameTimerId);
 	}
 }

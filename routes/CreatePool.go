@@ -35,11 +35,10 @@ func CreatePoolLink(c echo.Context) error {
 	HUB[poolId] = pool
 	go pool.Start()
 
-	utils.Cp("blue", "Hub size (number of pools):", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
+	utils.Cp("blue", "HUB size:", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
 
 	// generate link to join the pool
 	link := "/app?join=" + poolId
-	utils.Cp("yellow", "Pool link:", utils.Cs("whiteU", "http://localhost:1323"+link))
 
 	// send the link for the same
 	dataForCreatePoolRoute["Link"] = link
