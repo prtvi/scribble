@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	utils "scribble/utils"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -42,4 +43,147 @@ func HandlerWsConnection(c echo.Context) error {
 
 	// register connection
 	return ServeWs(HUB[poolId], c.Response().Writer, c.Request())
+}
+
+// -----------------------------------------------------------------------------
+
+var dataForAppRoute = map[string]any{
+	"RegisterToPool": false,
+	"ConnectSocket":  false,
+	"Message":        "",
+}
+
+// GET /app
+func App(c echo.Context) error {
+	// if /app?join=poolId, then render the playing areax
+	// if /app          , then render message
+
+	poolId := c.QueryParam("join")
+
+	// if poolId is empty then do not render any forms, just display message
+	if poolId == "" {
+		dataForAppRoute["Message"] = "Hi there, are you lost?!"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
+	// check if pool exists, if is does not exist then render no form
+	pool, ok := HUB[poolId]
+	if !ok {
+		// if not then do not render both forms and display message
+		dataForAppRoute["Message"] = "Pool expired or non-existent!"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
+	// if game has already started then do not render both forms and display message
+	if pool.HasGameStarted {
+		dataForAppRoute["Message"] = "Sorry! The game has already started! 🥹"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
+	// if pool exists, get its capacity and curr size
+	poolCap := pool.Capacity
+	poolCurrSizePlus1 := len(pool.Clients) + 1
+
+	if poolCurrSizePlus1 > poolCap {
+		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
+		dataForAppRoute["Message"] = "Your party is full!"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
+	// else if every check, checks out then render "RegisterToPool" form
+	return c.Render(http.StatusOK, "app", map[string]any{
+		"RegisterToPool": true,
+		"CurrentSize":    len(pool.Clients),
+		"ConnectSocket":  false,
+
+		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
+		"PoolId": poolId,
+	})
+}
+
+// POST /app
+func RegisterToPool(c echo.Context) error {
+	// on post request made to this route to capture clientName from "RegisterToPool" post form
+
+	poolId := c.FormValue("poolId")
+	clientName := c.FormValue("clientName")
+
+	// extra check to prevent user from joining any random pool which does not exist
+	pool, ok := HUB[poolId]
+	if !ok {
+		dataForAppRoute["Message"] = "Pool expired or non-existent!"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
+	// if client reloads after game has already started
+	if pool.HasGameStarted {
+		dataForAppRoute["Message"] = "Game has already started!"
+		return c.Render(http.StatusOK, "app", dataForAppRoute)
+	}
+
+	// generate client id and color
+	clientId := utils.GenerateUUID()[0:8]
+	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
+
+	isFirstJoinee := (len(pool.Clients) == 0)
+
+	// render ConnectSocket form to establish socket connection
+	// socket connection will start only if "ConnectSocket" form is rendered
+	return c.Render(http.StatusOK, "app", map[string]any{
+		"RegisterToPool": false,
+		"ConnectSocket":  true,
+
+		// variables in DOM
+		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),
+		"TimeForEachWordInSeconds":   TimeForEachWordInSeconds,
+
+		// for rendering title on browser
+		"ClientNameExists": true,
+
+		// init as js vars
+		"PoolId":        poolId,
+		"ClientId":      clientId,
+		"ClientName":    clientName,
+		"ClientColor":   clientColor,
+		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
+		"IsFirstJoinee": isFirstJoinee,
+	})
+}
+
+// -----------------------------------------------------------------------------
+
+var dataForCreatePoolRoute = map[string]any{
+	"Link": "",
+}
+
+// GET /create-pool
+func CreatePool(c echo.Context) error {
+	// render a form to create a new pool
+	return c.Render(http.StatusOK, "createPool", dataForCreatePoolRoute)
+}
+
+// POST /create-pool
+func CreatePoolLink(c echo.Context) error {
+	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
+
+	// get the pool capacity from form input
+	capacity, _ := strconv.Atoi(c.FormValue("capacity"))
+	utils.Cp("yellow", "Pool capacity:", utils.Cs("white", c.FormValue("capacity")))
+
+	// create a new pool with an uuid
+	poolId := utils.GenerateUUID()
+	pool := NewPool(poolId, capacity)
+
+	// append to global Hub map, and start listening to pool connections
+	HUB[poolId] = pool
+	go pool.Start()
+
+	utils.Cp("blue", "HUB size:", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
+
+	// generate link to join the pool
+	link := "/app?join=" + poolId
+
+	// send the link for the same
+	dataForCreatePoolRoute["Link"] = link
+	return c.Render(http.StatusOK, "createPool", dataForCreatePoolRoute)
 }
