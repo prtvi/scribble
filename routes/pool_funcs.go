@@ -21,7 +21,7 @@ func (pool *Pool) BroadcastClientInfoMessage() {
 		time.Sleep(time.Second * RenderClientsEvery)
 		// utils.Cp("yellow", "broadcasting message 6 - client info")
 
-		msg := getClientInfoList(pool, 6)
+		msg := getClientInfoList(pool)
 		pool.BroadcastMsg(msg)
 	}
 }
@@ -31,7 +31,7 @@ func (pool *Pool) startGameAndBroadcast() {
 	pool.HasGameStarted = true
 	pool.BroadcastMsg(model.SocketMessage{
 		Type:    7,
-		Content: "Game has started",
+		TypeStr: messageTypeMap[7],
 		Success: true,
 	})
 }
@@ -87,7 +87,7 @@ func (pool *Pool) begin() {
 
 		pool.BroadcastMsg(model.SocketMessage{
 			Type:              8,
-			Content:           "new word for a client",
+			TypeStr:           messageTypeMap[8],
 			CurrSketcherId:    pool.CurrSketcher.ID,
 			CurrWord:          pool.CurrWord,
 			CurrWordExpiresAt: pool.CurrWordExpiresAt,

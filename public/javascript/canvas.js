@@ -45,15 +45,15 @@ function displayImgOnCanvas(imgData) {
 
 function requestCanvasClear() {
 	// broadcast clear canvas
-	const responseMsg = {
+	const socketMsg = {
 		type: 5,
-		content: 'clear canvas',
+		typeStr: 'clear_canvas',
 		clientId,
 		clientName,
 		poolId,
 	};
 
-	sendViaSocket(responseMsg);
+	sendViaSocket(socketMsg);
 }
 
 function clearCanvas() {
@@ -62,8 +62,9 @@ function clearCanvas() {
 
 function sendImgData() {
 	// called by paint function
-	const responseMsg = {
+	const socketMsg = {
 		type: 4,
+		typeStr: 'canvas_data',
 		content: String(canvas.toDataURL('img/png')),
 		clientName,
 		clientId,
@@ -71,7 +72,7 @@ function sendImgData() {
 	};
 
 	// sending canvas data
-	sendViaSocket(responseMsg);
+	sendViaSocket(socketMsg);
 }
 
 window.addEventListener('load', () => {

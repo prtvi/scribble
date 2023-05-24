@@ -13,14 +13,14 @@ const (
 )
 
 var messageTypeMap = map[int]string{
-	1: "connected client",    // server b=> clients
-	2: "disconnected client", // server b=> clients
-	3: "text message",        // client b=> clients
-	4: "canvas data",         // client b=> clients
-	5: "clear canvas",        // client b=> clients
-	6: "client info",         // server b=> clients --at regular intervals
-	7: "start game",          // client  => server --to start the game
-	8: "word assigned",       // server  => client
+	1: "client_connect",    // server b=> clients
+	2: "client_disconnect", // server b=> clients
+	3: "text_msg",          // client b=> clients
+	4: "canvas_data",       // client b=> clients
+	5: "clear_canvas",      // client b=> clients
+	6: "client_info",       // server b=> clients --at regular intervals
+	7: "start_game",        // client  => server --to start the game
+	8: "word_assigned",     // server  => client
 
 	9:  "req next word", //
 	10: "all clients done playing",
@@ -60,7 +60,7 @@ func pickClient(pool *Pool) *Client {
 	return nil
 }
 
-func getClientInfoList(pool *Pool, messageType int) model.SocketMessage {
+func getClientInfoList(pool *Pool) model.SocketMessage {
 	// returns client info list embedded in model.SocketMessage
 
 	clientInfoList := make([]model.ClientInfo, 0)
@@ -78,7 +78,8 @@ func getClientInfoList(pool *Pool, messageType int) model.SocketMessage {
 	// marshall array in byte and send as string
 	byteInfo, _ := json.Marshal(clientInfoList)
 	return model.SocketMessage{
-		Type:    messageType,
+		Type:    6,
+		TypeStr: messageTypeMap[6],
 		Content: string(byteInfo),
 	}
 }

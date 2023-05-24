@@ -96,8 +96,9 @@ function sendChatMsgBtnEL(e) {
 	if (msg.length === 0 || msg === '') return;
 
 	// create string response object
-	const responseMsg = {
+	const socketMsg = {
 		type: 3,
+		typeStr: 'text_msg',
 		content: msg,
 		clientName,
 		clientId,
@@ -105,7 +106,7 @@ function sendChatMsgBtnEL(e) {
 	};
 
 	// convert object to string to transmit
-	sendViaSocket(responseMsg);
+	sendViaSocket(socketMsg);
 }
 
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);

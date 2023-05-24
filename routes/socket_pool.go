@@ -54,7 +54,7 @@ func (pool *Pool) Start() {
 
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       1,
-				Content:    fmt.Sprintf("CONNECTED_%s", client.Name),
+				TypeStr:    messageTypeMap[1],
 				ClientId:   client.ID,
 				ClientName: client.Name,
 			})
@@ -85,7 +85,7 @@ func (pool *Pool) Start() {
 
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       2,
-				Content:    fmt.Sprintf("DISCONNECTED_%s", client.Name),
+				TypeStr:    messageTypeMap[2],
 				ClientId:   client.ID,
 				ClientName: client.Name,
 			})

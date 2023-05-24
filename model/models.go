@@ -4,7 +4,8 @@ import "time"
 
 type SocketMessage struct {
 	Type              int       `json:"type"`
-	Content           string    `json:"content"`
+	TypeStr           string    `json:"typeStr"`
+	Content           string    `json:"content,omitempty"`
 	Success           bool      `json:"success,omitempty"`
 	ClientId          string    `json:"clientId,omitempty"`
 	ClientName        string    `json:"clientName,omitempty"`
