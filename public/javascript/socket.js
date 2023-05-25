@@ -31,6 +31,8 @@ function initSocket() {
 		// parse json string into json object
 		const socketMessage = JSON.parse(message.data);
 
+		if (socketMessage.type !== 4) console.log(socketMessage.typeStr);
+
 		switch (socketMessage.type) {
 			case 1:
 				if (socketMessage.clientId === clientId)

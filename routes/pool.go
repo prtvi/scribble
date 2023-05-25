@@ -21,7 +21,7 @@ func NewPool(uuid string, capacity int) *Pool {
 		Unregister:                    make(chan *Client),
 		Clients:                       make([]*Client, 0),
 		Broadcast:                     make(chan model.SocketMessage),
-		ColorAssignmentIndex:          0,
+		ColorList:                     utils.COLORS[:10],
 		CreatedTime:                   now,
 		GameStartTime:                 later,
 		CurrWordExpiresAt:             time.Time{},
@@ -40,7 +40,6 @@ func (pool *Pool) Start() {
 		case client := <-pool.Register:
 			// on client register, append the client to Pool.Client slice
 			pool.appendClientToList(client)
-			pool.ColorAssignmentIndex += 1
 
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       1,
@@ -71,7 +70,6 @@ func (pool *Pool) Start() {
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client slice
 			pool.removeClientFromList(client)
-			// pool.ColorAssignmentIndex -= 1 // TODO
 
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       2,
@@ -143,21 +141,33 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 }
 
 func (pool *Pool) appendClientToList(client *Client) {
+	// append the client into the list
 	pool.Clients = append(pool.Clients, client)
+
+	// remove the color that was picked in GetColorForClient func from the list, the first color was picked from the list
+	pool.ColorList[0] = pool.ColorList[len(pool.ColorList)-1]
+	pool.ColorList = pool.ColorList[:len(pool.ColorList)-1]
 }
 
 func (pool *Pool) removeClientFromList(client *Client) {
-	list := pool.Clients
+	// take the removed client's color and append it to the color list
+	pool.ColorList = append(pool.ColorList, client.Color)
+
+	// remove the client from the list
 	var idxToRemove int
-	for i, c := range list {
+	for i, c := range pool.Clients {
 		if c == client {
 			idxToRemove = i
 			break
 		}
 	}
 
-	list[idxToRemove] = list[len(list)-1]
-	pool.Clients = list[:len(list)-1]
+	pool.Clients[idxToRemove] = pool.Clients[len(pool.Clients)-1]
+	pool.Clients = pool.Clients[:len(pool.Clients)-1]
+}
+
+func (pool *Pool) GetColorForClient() string {
+	return pool.ColorList[0]
 }
 
 func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
@@ -236,6 +246,11 @@ func (pool *Pool) BeginGameFlow() {
 		st := pool.CurrWordExpiresAt.Sub(time.Now())
 		utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
 		time.Sleep(st)
+
+		pool.BroadcastMsg(model.SocketMessage{
+			Type:    5,
+			TypeStr: messageTypeMap[5],
+		})
 	}
 
 	pool.EndGame()
@@ -271,7 +286,7 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) {
 }
 
 func (pool *Pool) EndGame() {
-	utils.Cp("yellow", "All players done playing!")
+	utils.Cp("yellowBg", "All players done playing!")
 	pool.HasGameEnded = true
 
 	pool.BroadcastMsg(model.SocketMessage{

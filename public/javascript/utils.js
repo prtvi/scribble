@@ -24,8 +24,6 @@ function clearAllIntervals(...ids) {
 }
 
 function displayScores(socketMessage) {
-	console.table(socketMessage);
-
 	const dataArr = JSON.parse(socketMessage.content);
 
 	let html = `<table>

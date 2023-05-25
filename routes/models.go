@@ -20,7 +20,8 @@ type Client struct {
 
 type Pool struct {
 	ID                                                          string
-	Capacity, ColorAssignmentIndex                              int
+	Capacity                                                    int
+	ColorList                                                   []string
 	Register, Unregister                                        chan *Client
 	Clients                                                     []*Client
 	Broadcast                                                   chan model.SocketMessage

@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var COLORS = []string{"36fdc3", "ff2200", "90c335", "d17161", "a16014", "2f38a0", "11ea10", "9e5df3", "87425b", "180dab", "91ff00", "00ffc8", "00fff2", "ff5100", "ffe100", "ddff00", "c8ff00", "ece8f8", "8FB803", "FAC8D2", "9A2EAF", "C099A6", "FB1974", "CC4E0B", "8FB288", "4A2073", "9484E0", "0A2980", "399299", "E0F066", "159988", "309C0D", "2CE997", "BB0B39", "D5860F", "38204E", "583E3C", "F4F4F4", "1C542D", "8673A1"}
+var COLORS = []string{"36fdc3", "ff2200", "90c335", "d17161", "a16014", "2f38a0", "11ea10", "9e5df3", "87425b", "180dab", "91ff00", "00ffc8", "00fff2", "ff5100", "ffe100", "ddff00", "c8ff00", "ece8f8", "8fb803", "fac8d2", "9a2eaf", "c099a6", "fb1974", "cc4e0b", "8fb288", "4a2073", "9484e0", "0a2980", "399299", "e0f066", "159988", "309c0d", "2ce997", "bb0b39", "d5860f", "38204e", "583e3c", "f4f4f4", "1c542d", "8673a1"}
 
 var WORDS = []string{"Mountain", "Water", "Ball", "Bottle", "Car", "Tree", "Clock", "Tshirt", "Lollipop", "Soap", "Bag", "Umbrella", "Pillow", "Shoes", "Headphones", "Bulb", "Fan", "Fruit", "Grass", "Coffee", "Phone"}
 

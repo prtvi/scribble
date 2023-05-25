@@ -123,7 +123,7 @@ func RegisterToPool(c echo.Context) error {
 
 	// generate client id and color
 	clientId := utils.GenerateUUID()[0:8]
-	clientColor := utils.COLORS[pool.ColorAssignmentIndex]
+	clientColor := pool.GetColorForClient()
 
 	isFirstJoinee := (len(pool.Clients) == 0)
 

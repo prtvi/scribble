@@ -34,8 +34,6 @@ function startGame(socketMessage) {
 }
 
 function beginClientSketchingFlow(socketMessage) {
-	console.table(socketMessage);
-
 	// initialise the time at which this word expires
 	const currentWordExpiresAt = new Date(
 		socketMessage.currWordExpiresAt
