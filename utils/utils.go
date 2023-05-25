@@ -38,6 +38,13 @@ func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) float64 {
 	return math.Abs(t1.Sub(t2).Seconds())
 }
 
+func ShuffleList(list []string) []string {
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(list), func(i, j int) { list[i], list[j] = list[j], list[i] })
+
+	return list
+}
+
 var reset string = "\033[0m"
 var colorMap map[string]string = map[string]string{
 	"reset": reset,
