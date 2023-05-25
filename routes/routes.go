@@ -132,6 +132,7 @@ func RegisterToPool(c echo.Context) error {
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": false,
 		"ConnectSocket":  true,
+		"JoiningLink":    pool.JoiningLink,
 
 		// variables in DOM
 		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),
@@ -182,6 +183,7 @@ func CreatePoolLink(c echo.Context) error {
 
 	// generate link to join the pool
 	link := "/app?join=" + poolId
+	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
 
 	// send the link for the same
 	dataForCreatePoolRoute["Link"] = link

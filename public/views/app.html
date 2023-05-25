@@ -30,6 +30,9 @@
 			<!-- render this form when post request to /app is made, render this form for chat msgs and then estalblish socket connection -->
 			{{ if .ConnectSocket }}
 
+			<!-- joining link -->
+			<button class="joining-link">Copy joining link</button>
+
 			<!-- members in pool -->
 			<div class="members"></div>
 
@@ -79,6 +82,8 @@
 				const clientName = '{{ .ClientName }}';
 				const clientColor = '{{ .ClientColor }}';
 				const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
+
+				const joiningLink = '{{ .JoiningLink }}';
 			</script>
 
 			<script src="public/javascript/utils.js"></script>

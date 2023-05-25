@@ -19,7 +19,7 @@ type Client struct {
 }
 
 type Pool struct {
-	ID                                                          string
+	ID, JoiningLink                                             string
 	Capacity                                                    int
 	ColorList                                                   []string
 	Register, Unregister                                        chan *Client

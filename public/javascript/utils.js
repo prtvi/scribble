@@ -108,3 +108,8 @@ function sendChatMsgBtnEL(e) {
 }
 
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
+
+// copy joining link
+document
+	.querySelector('.joining-link')
+	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));

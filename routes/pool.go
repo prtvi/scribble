@@ -16,6 +16,7 @@ func NewPool(uuid string, capacity int) *Pool {
 
 	return &Pool{
 		ID:                            uuid,
+		JoiningLink:                   "",
 		Capacity:                      capacity,
 		Register:                      make(chan *Client),
 		Unregister:                    make(chan *Client),
@@ -188,6 +189,11 @@ func (pool *Pool) BroadcastClientInfoMessage() {
 
 		msg := pool.getClientInfoList()
 		pool.BroadcastMsg(msg)
+
+		// stop broadcasting when game ends
+		if pool.HasGameEnded {
+			break
+		}
 	}
 }
 

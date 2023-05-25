@@ -29,8 +29,8 @@ function startGame(socketMessage) {
 	clearAllIntervals(startGameTimerId);
 
 	// hide the div and toggle paintUtils.has Game Started
-	const startGameDiv = document.querySelector('.start-game');
-	startGameDiv.classList.add('hidden');
+	document.querySelector('.start-game').classList.add('hidden');
+	document.querySelector('.joining-link').classList.add('hidden');
 }
 
 function beginClientSketchingFlow(socketMessage) {
