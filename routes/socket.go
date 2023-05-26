@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	model "scribble/model"
+	utils "scribble/utils"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -76,5 +78,20 @@ func (c *Client) Read() {
 
 		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- clientMsg
+	}
+}
+
+func Maintainer() {
+	// clears the pools in which the game has ended every 10 mins
+
+	for {
+		time.Sleep(time.Minute * 10) // TODO
+
+		for key, pool := range HUB {
+			if pool != nil && pool.HasGameEnded {
+				utils.Cp("yellowBg", "Removing pool from HUB", key)
+				delete(HUB, key)
+			}
+		}
 	}
 }

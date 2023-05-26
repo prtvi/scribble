@@ -12,6 +12,8 @@ func main() {
 	e.Static("/public", "public")
 	e.Renderer = utils.InitTemplates()
 
+	go routes.Maintainer()
+
 	ee := e.Group("", routes.Logger)
 
 	ee.GET("/", routes.Welcome)
