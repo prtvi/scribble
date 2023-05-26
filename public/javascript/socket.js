@@ -72,6 +72,10 @@ function initSocket() {
 				startGame(socketMessage);
 				break;
 
+			case 71:
+				renderRoundDetails(socketMessage);
+				break;
+
 			case 8:
 				wordExpiryTimerIdG = beginClientSketchingFlow(socketMessage);
 				break;

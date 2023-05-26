@@ -113,3 +113,8 @@ document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
 document
 	.querySelector('.joining-link')
 	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
+
+function renderRoundDetails(socketMessage) {
+	document.querySelector('.round-details').textContent =
+		socketMessage.currRound;
+}

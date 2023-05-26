@@ -20,7 +20,7 @@ type Client struct {
 
 type Pool struct {
 	ID, JoiningLink                                             string
-	Capacity                                                    int
+	Capacity, CurrRound                                         int
 	ColorList                                                   []string
 	Register, Unregister                                        chan *Client
 	Clients                                                     []*Client

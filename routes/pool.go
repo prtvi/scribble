@@ -18,6 +18,7 @@ func NewPool(uuid string, capacity int) *Pool {
 		ID:                            uuid,
 		JoiningLink:                   "",
 		Capacity:                      capacity,
+		CurrRound:                     1,
 		Register:                      make(chan *Client),
 		Unregister:                    make(chan *Client),
 		Clients:                       make([]*Client, 0),
@@ -265,40 +266,54 @@ func (pool *Pool) BeginGameFlow() {
 	utils.Cp("green", "Starting game in", d.String())
 	time.Sleep(d)
 
-	// loop over all clients and assign words to each client and sleep until next client's turn
-	for _, c := range pool.Clients {
+	// loop over the number of rounds
+	for i := 0; i < NumberOfRounds; i++ {
+		pool.CurrRound = i + 1
 
-		// select client and assign the word
-		pool.CurrSketcher = c
-		pool.CurrWord = utils.GetRandomWord()
-		pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
-		c.HasSketched = true
+		// broadcast round number
+		pool.BroadcastMsg(model.SocketMessage{
+			Type:      71,
+			TypeStr:   messageTypeMap[71],
+			CurrRound: pool.CurrRound,
+		})
 
-		// flag all clients as not guessed
-		for _, cl := range pool.Clients {
-			cl.HasGuessed = false
+		time.Sleep(time.Second * 2)
+
+		// loop over all clients and assign words to each client and sleep until next client's turn
+		for _, c := range pool.Clients {
+
+			// select client and assign the word
+			pool.CurrSketcher = c
+			pool.CurrWord = utils.GetRandomWord()
+			pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
+			c.HasSketched = true
+
+			// flag all clients as not guessed
+			for _, cl := range pool.Clients {
+				cl.HasGuessed = false
+			}
+
+			// broadcast current word, current sketcher and other details to all clients
+			// TODO: send the whole thing to client who's sketching, send minimal details to rest
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:              8,
+				TypeStr:           messageTypeMap[8],
+				CurrSketcherId:    pool.CurrSketcher.ID,
+				CurrWord:          pool.CurrWord,
+				CurrWordExpiresAt: pool.CurrWordExpiresAt,
+			})
+
+			// sleep until the word expires
+			st := pool.CurrWordExpiresAt.Sub(time.Now())
+			utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
+			time.Sleep(st)
+
+			// once the client's turn is done, broadcast clear canvas event
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:    5,
+				TypeStr: messageTypeMap[5],
+			})
 		}
-
-		// broadcast current word, current sketcher and other details to all clients
-		// TODO: send the whole thing to client who's sketching, send minimal details to rest
-		pool.BroadcastMsg(model.SocketMessage{
-			Type:              8,
-			TypeStr:           messageTypeMap[8],
-			CurrSketcherId:    pool.CurrSketcher.ID,
-			CurrWord:          pool.CurrWord,
-			CurrWordExpiresAt: pool.CurrWordExpiresAt,
-		})
-
-		// sleep until the word expires
-		st := pool.CurrWordExpiresAt.Sub(time.Now())
-		utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
-		time.Sleep(st)
-
-		// once the client's turn is done, broadcast clear canvas event
-		pool.BroadcastMsg(model.SocketMessage{
-			Type:    5,
-			TypeStr: messageTypeMap[5],
-		})
 	}
 
 	// once all clients are done playing, end the game and broadcast the same

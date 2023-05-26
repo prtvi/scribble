@@ -10,6 +10,7 @@ type SocketMessage struct {
 	ClientId          string    `json:"clientId,omitempty"`
 	ClientName        string    `json:"clientName,omitempty"`
 	PoolId            string    `json:"poolId,omitempty"`
+	CurrRound         int       `json:"currRound"`
 	CurrSketcherId    string    `json:"currSketcherId,omitempty"`
 	CurrWord          string    `json:"currWord,omitempty"`
 	CurrWordExpiresAt time.Time `json:"currWordExpiresAt,omitempty"`
