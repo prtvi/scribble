@@ -9,102 +9,101 @@
 			<!-- render this form when get request to /app is made, then capture form response and register to pool -->
 			{{ if .RegisterToPool }}
 
-			<form action="/app" method="post">
-				<input type="hidden" name="poolId" value="{{ .PoolId }}" />
+			<div class="content">
+				<form action="/app" method="post">
+					<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-				<label for="clientName">Enter your name to join:</label>
-				<input
-					type="text"
-					name="clientName"
-					id="clientName"
-					value="p{{ .CurrentSize }}"
-					required
-					autofocus
-				/>
+					<label for="clientName">Enter your name to join:</label>
+					<input
+						type="text"
+						name="clientName"
+						id="clientName"
+						value="p{{ .CurrentSize }}"
+						required
+						autofocus
+					/>
 
-				<button type="submit">Join</button>
-			</form>
+					<button type="submit">Join</button>
+				</form>
+			</div>
 
 			{{ end }}
 
 			<!-- render this form when post request to /app is made, render this form for chat msgs and then estalblish socket connection -->
 			{{ if .ConnectSocket }}
 
-			<!-- round details -->
-			<div>Round: <span class="round-details">1</span></div>
+			<div class="content">
+				<!-- round details -->
+				<div>Round: <span class="round-details">1</span></div>
 
-			<!-- joining link -->
-			<button class="joining-link">Copy joining link</button>
+				<!-- joining link -->
+				<button class="joining-link">Copy joining link</button>
 
-			<!-- members in pool -->
-			<div class="members"></div>
+				<!-- members in pool -->
+				<div class="members"></div>
 
-			<!-- messages -->
-			<div class="messages"></div>
+				<!-- messages -->
+				<div class="messages"></div>
 
-			<!-- chat box -->
-			<form>
-				<label for="msg">Chat:</label>
-				<input type="text" class="msg" required />
+				<!-- chat box -->
+				<form>
+					<label for="msg">Chat:</label>
+					<input type="text" class="msg" required />
 
-				<button class="send-msg">Send</button>
-			</form>
+					<button class="send-msg">Send</button>
+				</form>
 
-			<!-- canvas -->
-			<canvas class="canv"></canvas>
+				<!-- canvas -->
+				<canvas class="canv"></canvas>
 
-			<!-- painter utils -->
-			<div class="hidden painter-utils">
-				<div class="your-word"></div>
-				<button class="clear-canvas">Clear</button>
-			</div>
-
-			<!-- time left for word -->
-			<div class="hidden time-left-for-word">
-				Time left: <span>{{ .TimeForEachWordInSeconds }}</span> seconds
-			</div>
-
-			<!-- score board -->
-			<div class="score-board"></div>
-
-			<div class="start-game">
-				<div>
-					Waiting for others to join, starting game in
-					<span class="loading">{{ .GameStartDurationInSeconds }}</span> seconds
+				<!-- painter utils -->
+				<div class="hidden painter-utils">
+					<div class="your-word"></div>
+					<button class="clear-canvas">Clear</button>
 				</div>
 
-				<!-- show start game button only to first joinee -->
-				{{ if .IsFirstJoinee }}
-				<button class="start-game-btn">Start now</button>
+				<!-- time left for word -->
+				<div class="hidden time-left-for-word">
+					Time left: <span>{{ .TimeForEachWordInSeconds }}</span> seconds
+				</div>
+
+				<!-- score board -->
+				<div class="score-board"></div>
+
+				<div class="start-game">
+					<div>
+						Waiting for others to join, starting game in
+						<span class="loading">{{ .GameStartDurationInSeconds }}</span>
+						seconds
+					</div>
+					<button class="start-game-btn">Start now</button>
+				</div>
+
+				<script>
+					const poolId = '{{ .PoolId }}';
+					const clientId = '{{ .ClientId }}';
+					const clientName = '{{ .ClientName }}';
+					const clientColor = '{{ .ClientColor }}';
+					const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
+
+					const joiningLink = '{{ .JoiningLink }}';
+				</script>
+
+				<script src="public/javascript/utils.js"></script>
+				<script src="public/javascript/canvas.js"></script>
+				<script src="public/javascript/socket.js"></script>
+				<script src="public/javascript/main.js"></script>
+				<script src="public/javascript/startGame.js"></script>
+
 				{{ end }}
 			</div>
-
-			<script>
-				const poolId = '{{ .PoolId }}';
-				const clientId = '{{ .ClientId }}';
-				const clientName = '{{ .ClientName }}';
-				const clientColor = '{{ .ClientColor }}';
-				const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
-
-				const joiningLink = '{{ .JoiningLink }}';
-			</script>
-
-			<script src="public/javascript/utils.js"></script>
-			<script src="public/javascript/canvas.js"></script>
-			<script src="public/javascript/socket.js"></script>
-			<script src="public/javascript/main.js"></script>
-
-			{{ if .IsFirstJoinee }}
-			<script src="public/javascript/startGame.js"></script>
-			{{ end }}
-
-			<!--  -->
-			{{ end }}
 
 			<!-- if pool does not exist or some error occurs then render message only, render this part when .Message is not "empty" -->
 			{{ if ne .Message "" }}
 
-			<p>{{ .Message }}</p>
+			<div class="content">
+				<p>{{ .Message }}</p>
+			</div>
 
 			{{ end }}
 		</div>

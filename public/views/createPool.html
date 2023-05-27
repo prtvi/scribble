@@ -5,36 +5,49 @@
 	{{ template "header" .}}
 
 	<body>
-		{{ if eq .Link "" }}
+		<main class="main">
+			<div class="content">
+				<div class="title"><h1>Scribble</h1></div>
 
-		<form action="/create-pool" method="post">
-			<input
-				type="number"
-				name="capacity"
-				min="2"
-				max="10"
-				required
-				value="4"
-			/>
-			<button type="submit">Create a new link</button>
-		</form>
+				<div class="subtext">
+					<p>Create a private room</p>
+				</div>
 
-		{{ else }}
+				<form action="/create-pool" method="post">
+					<label class="form-label" for="capacity">Room size:</label>
+					<input
+						type="number"
+						name="capacity"
+						min="2"
+						max="10"
+						required
+						value="4"
+					/>
+					<button class="btn form-btn" type="submit">Create a new room</button>
+				</form>
 
-		<a href="{{ .Link }}" class="copy-link">Click here to join</a>
+				{{ if .RoomCreated }}
 
-		<button class="copy-link-btn">Copy link</button>
+				<a href="{{ .Link }}" class="copy-link"
+					><button class="btn">Click here to join</button></a
+				>
 
-		<script>
-			const aTag = document.querySelector('.copy-link');
-			document
-				.querySelector('.copy-link-btn')
-				.addEventListener('click', () =>
-					navigator.clipboard.writeText(aTag.href)
-				);
-		</script>
+				<button class="btn copy-link-btn">Copy link</button>
 
-		{{ end }}
+				<script>
+					const aTag = document.querySelector('.copy-link');
+					document
+						.querySelector('.copy-link-btn')
+						.addEventListener('click', () =>
+							navigator.clipboard.writeText(aTag.href)
+						);
+
+					document.querySelector('.form-btn').disabled = true;
+				</script>
+
+				{{ end }}
+			</div>
+		</main>
 	</body>
 </html>
 

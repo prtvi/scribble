@@ -47,12 +47,6 @@ func HandlerWsConnection(c echo.Context) error {
 
 // -----------------------------------------------------------------------------
 
-var dataForAppRoute = map[string]any{
-	"RegisterToPool": false,
-	"ConnectSocket":  false,
-	"Message":        "",
-}
-
 // GET /app
 func App(c echo.Context) error {
 	// if /app?join=poolId, then render the playing areax
@@ -62,22 +56,31 @@ func App(c echo.Context) error {
 
 	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" {
-		dataForAppRoute["Message"] = "Hi there, are you lost?!"
-		return c.Render(http.StatusOK, "app", dataForAppRoute)
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Hi there, are you lost?!",
+		})
 	}
 
 	// check if pool exists, if is does not exist then render no form
 	pool, ok := HUB[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
-		dataForAppRoute["Message"] = "Pool expired or non-existent!"
-		return c.Render(http.StatusOK, "app", dataForAppRoute)
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Pool expired or non-existent!",
+		})
 	}
 
 	// if game has already started then do not render both forms and display message
 	if pool.HasGameStarted {
-		dataForAppRoute["Message"] = "Sorry! The game has already started! 🥹"
-		return c.Render(http.StatusOK, "app", dataForAppRoute)
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Sorry! The game has already started! 🥹",
+		})
 	}
 
 	// if pool exists, get its capacity and curr size
@@ -86,8 +89,11 @@ func App(c echo.Context) error {
 
 	if poolCurrSizePlus1 > poolCap {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
-		dataForAppRoute["Message"] = "Your party is full!"
-		return c.Render(http.StatusOK, "app", dataForAppRoute)
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Your party is full!",
+		})
 	}
 
 	// else if every check, checks out then render "RegisterToPool" form
@@ -111,21 +117,27 @@ func RegisterToPool(c echo.Context) error {
 	// extra check to prevent user from joining any random pool which does not exist
 	pool, ok := HUB[poolId]
 	if !ok {
-		dataForAppRoute["Message"] = "Pool expired or non-existent!"
-		return c.Render(http.StatusOK, "app", dataForAppRoute)
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Pool expired or non-existent!",
+		})
 	}
 
 	// if client reloads after game has already started
 	if pool.HasGameStarted {
-		dataForAppRoute["Message"] = "Game has already started!"
-		return c.Render(http.StatusOK, "app", dataForAppRoute)
+		return c.Render(http.StatusOK, "app", map[string]any{
+			"RegisterToPool": false,
+			"ConnectSocket":  false,
+			"Message":        "Sorry! The game has already started! 🥹",
+		})
 	}
 
 	// generate client id and color
 	clientId := utils.GenerateUUID()[0:8]
 	clientColor := pool.GetColorForClient()
 
-	isFirstJoinee := (len(pool.Clients) == 0)
+	// isFirstJoinee := (len(pool.Clients) == 0)
 
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered
@@ -147,20 +159,19 @@ func RegisterToPool(c echo.Context) error {
 		"ClientName":    clientName,
 		"ClientColor":   clientColor,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
-		"IsFirstJoinee": isFirstJoinee,
+		// "IsFirstJoinee": isFirstJoinee,
 	})
 }
 
 // -----------------------------------------------------------------------------
 
-var dataForCreatePoolRoute = map[string]any{
-	"Link": "",
-}
-
 // GET /create-pool
 func CreatePool(c echo.Context) error {
 	// render a form to create a new pool
-	return c.Render(http.StatusOK, "createPool", dataForCreatePoolRoute)
+	return c.Render(http.StatusOK, "createPool", map[string]any{
+		"RoomCreated": false,
+		"Link":        "",
+	})
 }
 
 // POST /create-pool
@@ -186,6 +197,8 @@ func CreatePoolLink(c echo.Context) error {
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
 
 	// send the link for the same
-	dataForCreatePoolRoute["Link"] = link
-	return c.Render(http.StatusOK, "createPool", dataForCreatePoolRoute)
+	return c.Render(http.StatusOK, "createPool", map[string]any{
+		"RoomCreated": true,
+		"Link":        link,
+	})
 }

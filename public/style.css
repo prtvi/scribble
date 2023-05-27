@@ -1,10 +1,58 @@
+:root {
+	--bg: #add8e6;
+	--fw-100: 100;
+	--fw-200: 200;
+	--fw-300: 300;
+	--fw-400: 400;
+	--fw-500: 500;
+}
+
 * {
 	padding: 0;
 	margin: 0;
 	font-family: 'Poppins', sans-serif;
-	background-color: #202124;
-	color: #d4d4c9;
 }
+
+.main {
+	height: 100vh;
+	background-color: var(--bg);
+}
+
+.content {
+	text-align: center;
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.title {
+	font-weight: var(--fw-500);
+	margin-bottom: 20px;
+}
+
+.subtext {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.btn {
+	width: 100px;
+	height: 40px;
+	border-radius: 15px;
+}
+
+.form-label {
+	font-weight: var(--fw-200);
+	font-size: 15px;
+}
+
+.form-btn {
+	margin-top: 10px;
+}
+
+/*  */
 
 canvas {
 	border: 1px solid lightcyan;
