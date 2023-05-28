@@ -14,6 +14,8 @@ func main() {
 
 	go routes.Maintainer()
 
+	// routes.DebugMode()
+
 	ee := e.Group("", routes.Logger)
 
 	ee.GET("/", routes.Welcome)

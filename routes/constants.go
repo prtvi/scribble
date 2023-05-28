@@ -1,7 +1,7 @@
 package routes
 
 const (
-	GameStartDurationInSeconds = 10
+	GameStartDurationInSeconds = 1000
 	TimeForEachWordInSeconds   = 45 // 75 finally
 	ScoreForCorrectGuess       = 25
 	RenderClientsEvery         = 8

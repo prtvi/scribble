@@ -95,3 +95,14 @@ func Maintainer() {
 		}
 	}
 }
+
+func DebugMode() {
+	poolId := "debug"
+	pool := NewPool(poolId, 4)
+
+	HUB[poolId] = pool
+	go pool.Start()
+
+	link := "/app?join=" + poolId
+	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link)
+}

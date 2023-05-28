@@ -33,13 +33,13 @@
 }
 
 .subtext {
-	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
 .btn {
-	width: 100px;
-	height: 40px;
+	width: fit-content;
+	height: fit-content;
+	padding: 8px;
 	border-radius: 15px;
 }
 
@@ -48,15 +48,15 @@
 	font-size: 15px;
 }
 
-.form-btn {
-	margin-top: 10px;
+#clientName {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding: 5px;
+	border-radius: 5px;
 }
 
-/*  */
-
-canvas {
-	border: 1px solid lightcyan;
-	background-color: gray;
+.form-btn {
+	margin-top: 10px;
 }
 
 .hidden {

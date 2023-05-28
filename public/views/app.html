@@ -10,10 +10,14 @@
 			{{ if .RegisterToPool }}
 
 			<div class="content">
+				<div class="title"><h1>Scribble</h1></div>
+
 				<form action="/app" method="post">
 					<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-					<label for="clientName">Enter your name to join:</label>
+					<label class="form-label" for="clientName"
+						>Enter your name to join:</label
+					>
 					<input
 						type="text"
 						name="clientName"
@@ -23,7 +27,7 @@
 						autofocus
 					/>
 
-					<button type="submit">Join</button>
+					<button class="btn" type="submit">Join</button>
 				</form>
 			</div>
 
@@ -32,40 +36,53 @@
 			<!-- render this form when post request to /app is made, render this form for chat msgs and then estalblish socket connection -->
 			{{ if .ConnectSocket }}
 
-			<div class="content">
-				<!-- round details -->
-				<div>Round: <span class="round-details">1</span></div>
+			<div class="game-content">
+				<!-- status bar -->
+				<div class="status-bar">
+					<!-- round details -->
+					<div class="round"><span class="round-details">Round: 1</span></div>
 
-				<!-- joining link -->
-				<button class="joining-link">Copy joining link</button>
+					<!-- time left for word -->
+					<div class="time-left-for-word"><span>Waiting</span></div>
 
-				<!-- members in pool -->
-				<div class="members"></div>
+					<!-- letters in word/status -->
+					<div class="word"><span>_ _ _ _ _ _</span></div>
 
-				<!-- messages -->
-				<div class="messages"></div>
+					<!-- joining link -->
+					<div class="joining-link-div">
+						<button class="btn joining-link">Copy joining link</button>
+					</div>
+				</div>
+
+				<!-- canvas -->
+				<div class="canvas-container">
+					<canvas class="canv"></canvas>
+
+					<!-- painter utils -->
+					<div class="hidden painter-utils">
+						<button class="btn clear-canvas">Clear</button>
+					</div>
+				</div>
+
+				<div class="container">
+					<!-- members in pool -->
+					<div class="side members"></div>
+
+					<!-- messages -->
+					<div class="side messages"></div>
+				</div>
 
 				<!-- chat box -->
 				<form>
-					<label for="msg">Chat:</label>
-					<input type="text" class="msg" required />
+					<input
+						type="text"
+						class="msg"
+						placeholder="Type your guess here"
+						required
+					/>
 
-					<button class="send-msg">Send</button>
+					<button class="btn send-msg">Send</button>
 				</form>
-
-				<!-- canvas -->
-				<canvas class="canv"></canvas>
-
-				<!-- painter utils -->
-				<div class="hidden painter-utils">
-					<div class="your-word"></div>
-					<button class="clear-canvas">Clear</button>
-				</div>
-
-				<!-- time left for word -->
-				<div class="hidden time-left-for-word">
-					Time left: <span>{{ .TimeForEachWordInSeconds }}</span> seconds
-				</div>
 
 				<!-- score board -->
 				<div class="score-board"></div>
@@ -76,7 +93,7 @@
 						<span class="loading">{{ .GameStartDurationInSeconds }}</span>
 						seconds
 					</div>
-					<button class="start-game-btn">Start now</button>
+					<button class="btn start-game-btn">Start now</button>
 				</div>
 
 				<script>

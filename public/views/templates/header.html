@@ -17,6 +17,11 @@
 
 	<link rel="stylesheet" href="public/style.css" />
 
+	{{ if .AddAppCss }}
+	<link rel="stylesheet" href="public/app.css" />
+	{{ end }}
+
+	<!--  -->
 	{{ if .ClientNameExists }}
 	<title>{{ .ClientName }} · Scribble</title>
 	{{ else }}

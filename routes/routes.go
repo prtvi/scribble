@@ -152,6 +152,7 @@ func RegisterToPool(c echo.Context) error {
 
 		// for rendering title on browser
 		"ClientNameExists": true,
+		"AddAppCss":        true,
 
 		// init as js vars
 		"PoolId":        poolId,

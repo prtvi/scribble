@@ -115,6 +115,7 @@ document
 	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
 
 function renderRoundDetails(socketMessage) {
-	document.querySelector('.round-details').textContent =
-		socketMessage.currRound;
+	document.querySelector(
+		'.round-details'
+	).textContent = `Round: ${socketMessage.currRound}`;
 }

@@ -192,7 +192,7 @@ func (pool *Pool) BroadcastClientInfoMessage() {
 		pool.BroadcastMsg(msg)
 
 		// stop broadcasting when game ends
-		if pool.HasGameEnded {
+		if pool.HasGameEnded || len(pool.Clients) == 0 {
 			break
 		}
 	}

@@ -41,11 +41,10 @@ function beginClientSketchingFlow(socketMessage) {
 
 	// start timer for the word expiry
 	const wordExpiryTimerId = setInterval(async () => {
-		const timeLeftDiv = document.querySelector('.time-left-for-word');
-		timeLeftDiv.classList.remove('hidden');
+		const timeLeftDiv = document.querySelector('.time-left-for-word span');
 
 		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
-		timeLeftDiv.querySelector('span').textContent = secondsLeft;
+		timeLeftDiv.textContent = `Time: ${secondsLeft} seconds`;
 
 		if (secondsLeft <= 0) {
 			clearAllIntervals(wordExpiryTimerId);
@@ -57,19 +56,22 @@ function beginClientSketchingFlow(socketMessage) {
 	if (clientId === socketMessage.currSketcherId) {
 		paintUtils.isAllowedToPaint = true;
 
-		// display the word by unhiding the painter-utils div
-		document.querySelector('.painter-utils').classList.remove('hidden');
-		document.querySelector('.your-word').textContent = socketMessage.currWord;
+		// display the word
+		document.querySelector('.word').textContent = socketMessage.currWord;
 
-		// add EL for clearing the canvas
+		// display painter utils div and add EL for clearing the canvas
+		document.querySelector('.painter-utils').classList.remove('hidden');
 		document
 			.querySelector('.clear-canvas')
 			.addEventListener('click', requestCanvasClear);
 	} else {
 		paintUtils.isAllowedToPaint = false;
-		document.querySelector('.painter-utils').classList.add('hidden');
-		document.querySelector('.your-word').textContent = '';
 
+		// show word length
+		document.querySelector('.word').textContent = socketMessage.currWord.length;
+
+		// display painter utils div and remove EL
+		document.querySelector('.painter-utils').classList.add('hidden');
 		document
 			.querySelector('.clear-canvas')
 			.removeEventListener('click', requestCanvasClear);
