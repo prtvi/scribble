@@ -9,8 +9,6 @@
 }
 
 .status-bar > div {
-	/* display: inline; */
-	border: 1px solid red;
 	font-size: 12px;
 	vertical-align: middle;
 }
