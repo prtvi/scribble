@@ -50,7 +50,7 @@ canvas {
 
 .container {
 	background-color: white;
-	height: 200px;
+	height: 250px;
 	width: 100%;
 	display: flex;
 	justify-content: center;
@@ -60,7 +60,28 @@ canvas {
 	width: 45%;
 	margin: 5px;
 	background-color: aqua;
-	height: 190px;
+	height: calc(inherit - 10px);
 	text-align: center;
 	vertical-align: middle;
+	padding: 5px;
+}
+
+.member {
+	background-color: antiquewhite;
+	padding: 3px 5px 3px 5px;
+	margin-bottom: 5px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.member-num {
+	font-size: 11px;
+}
+
+.member-name {
+	font-size: 13px;
+}
+
+.member-score {
+	font-size: 11px;
 }

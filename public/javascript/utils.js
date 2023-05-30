@@ -56,16 +56,28 @@ function renderClients(allClients) {
 
 	// render
 	allClients.forEach((n, i) => {
-		const clientNameHolder = document.createElement('div');
-		const clientName = document.createElement('p');
+		const clientNameDiv = document.createElement('div');
+		clientNameDiv.classList.add('member');
 
-		clientName.innerHTML = `#${i + 1} ${n.name}${
-			n.score === 0 ? '' : `: ${n.score} points`
-		}`;
+		const clientNum = document.createElement('span');
+		clientNum.classList.add('member-num');
+
+		const clientName = document.createElement('span');
+		clientName.classList.add('member-name');
 		clientName.style.color = `#${n.color}`;
-		clientNameHolder.appendChild(clientName);
 
-		membersDiv.appendChild(clientNameHolder);
+		const clientScore = document.createElement('span');
+		clientScore.classList.add('member-score');
+
+		clientNum.textContent = `#${i + 1}`;
+		clientName.textContent = n.name;
+		clientScore.textContent = `${n.score} points`;
+
+		clientNameDiv.appendChild(clientNum);
+		clientNameDiv.appendChild(clientName);
+		clientNameDiv.appendChild(clientScore);
+
+		membersDiv.appendChild(clientNameDiv);
 	});
 }
 
