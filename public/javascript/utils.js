@@ -89,8 +89,13 @@ function appendChatMsgToDOM(msg) {
 	if (msg.length === 0 || msg === '') return;
 
 	const messagesDiv = document.querySelector('.messages');
+
 	const msgDiv = document.createElement('div');
-	const text = document.createTextNode(msg);
+	msgDiv.classList.add('message');
+
+	const text = document.createElement('span');
+	text.textContent = msg;
+
 	msgDiv.appendChild(text);
 	messagesDiv.appendChild(msgDiv);
 

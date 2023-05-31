@@ -51,6 +51,9 @@ func (pool *Pool) Start() {
 				ClientName: client.Name,
 			})
 
+			// send client info list once client joins
+			pool.BroadcastMsg(pool.getClientInfoList())
+
 			// start broadcasting client info list on first client join
 			if len(pool.Clients) == 1 &&
 				!pool.HasClientInfoBroadcastStarted &&
@@ -262,9 +265,9 @@ func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
 	// wait a few seconds
-	d := time.Duration(time.Second * 2)
-	utils.Cp("green", "Starting game in", d.String())
-	time.Sleep(d)
+	// d := time.Duration(time.Second * 2)
+	// utils.Cp("green", "Starting game in", d.String())
+	// time.Sleep(d)
 
 	// loop over the number of rounds
 	for i := 0; i < NumberOfRounds; i++ {
