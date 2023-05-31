@@ -9,6 +9,18 @@ const paintUtils = {
 	isAllowedToPaint: false,
 };
 
+function getCanvasSize() {
+	const { w } = getWindowDimensions();
+	const cw = w - 10;
+	const ch = cw / 1.5;
+
+	return { w: cw, h: ch };
+}
+
+function getWindowDimensions() {
+	return { w: window.innerWidth, h: window.innerHeight };
+}
+
 function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }

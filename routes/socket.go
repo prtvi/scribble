@@ -91,6 +91,7 @@ func Maintainer() {
 			if pool != nil && pool.HasGameEnded {
 				utils.Cp("yellowBg", "Removing pool from HUB", key)
 				delete(HUB, key)
+				fmt.Println(len(HUB))
 			}
 		}
 	}

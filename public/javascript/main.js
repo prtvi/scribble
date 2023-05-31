@@ -3,6 +3,12 @@
 const canvas = document.querySelector('.canv');
 const ctx = canvas.getContext('2d');
 
+const { w, h } = getCanvasSize();
+console.log(w, h);
+
+canvas.width = w;
+canvas.height = h;
+
 // init socket connection and check game begin status
 const socket = initSocket();
 const startGameTimerId = gameStartTimer();
