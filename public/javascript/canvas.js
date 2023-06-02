@@ -36,11 +36,15 @@ async function paint(event) {
 	sendImgData();
 }
 
-function displayImgOnCanvas(imgData) {
+function displayImgOnCanvas(socketMessage) {
 	// display image data on canvas
+
+	if (clientId === socketMessage.currSketcherId) return;
+
 	var img = new Image();
-	img.onload = () => ctx.drawImage(img, 0, 0);
-	img.setAttribute('src', imgData);
+	// scale up/down canvas data based on current canvas size using outer bounds
+	img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+	img.setAttribute('src', socketMessage.content);
 }
 
 function requestCanvasClear() {

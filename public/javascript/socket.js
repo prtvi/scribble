@@ -31,7 +31,8 @@ function initSocket() {
 		// parse json string into json object
 		const socketMessage = JSON.parse(message.data);
 
-		if (socketMessage.type !== 4) console.log(socketMessage.typeStr);
+		if (socketMessage.type !== 4)
+			console.log(socketMessage.type, socketMessage.typeStr);
 
 		switch (socketMessage.type) {
 			case 1:
@@ -57,7 +58,7 @@ function initSocket() {
 				break;
 
 			case 4:
-				displayImgOnCanvas(socketMessage.content);
+				displayImgOnCanvas(socketMessage);
 				break;
 
 			case 5:
@@ -109,7 +110,7 @@ function sendViaSocket(socketMsg) {
 	if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(socketMsg));
 	else {
 		console.log(
-			'socket already closed | yet opening | in closing state',
+			'0: connecting | 1: open | 2: closing | 3: closed, current state:',
 			socket.readyState
 		);
 

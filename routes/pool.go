@@ -101,6 +101,7 @@ func (pool *Pool) Start() {
 				pool.BroadcastMsg(message)
 
 			case 4, 5:
+				message.CurrSketcherId = pool.CurrSketcher.ID
 				pool.BroadcastMsg(message)
 
 			case 7:
@@ -196,6 +197,7 @@ func (pool *Pool) BroadcastClientInfoMessage() {
 
 		// stop broadcasting when game ends
 		if pool.HasGameEnded || len(pool.Clients) == 0 {
+			utils.Cp("yellow", "Stopped broadcasting client info")
 			break
 		}
 	}

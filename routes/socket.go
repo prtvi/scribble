@@ -87,11 +87,12 @@ func Maintainer() {
 	for {
 		time.Sleep(time.Minute * 10) // TODO - to be tested
 
-		for key, pool := range HUB {
+		for poolId, pool := range HUB {
 			if pool != nil && pool.HasGameEnded {
-				utils.Cp("yellowBg", "Removing pool from HUB", key)
-				delete(HUB, key)
-				fmt.Println(len(HUB))
+				utils.Cp("yellowBg", "Removing pool from HUB, poolId:", poolId)
+				delete(HUB, poolId)
+
+				fmt.Println("Size of HUB:", len(HUB))
 			}
 		}
 	}

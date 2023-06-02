@@ -4,7 +4,6 @@ const canvas = document.querySelector('.canv');
 const ctx = canvas.getContext('2d');
 
 const { w, h } = getCanvasSize();
-console.log(w, h);
 
 canvas.width = w;
 canvas.height = h;
@@ -52,10 +51,7 @@ function beginClientSketchingFlow(socketMessage) {
 		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
 		timeLeftDiv.textContent = `Time: ${secondsLeft} seconds`;
 
-		if (secondsLeft <= 0) {
-			clearAllIntervals(wordExpiryTimerId);
-			console.log('timer for word cleared');
-		}
+		if (secondsLeft <= 0) clearAllIntervals(wordExpiryTimerId);
 	}, 1000);
 
 	// for enabling drawing access if clientId matches
