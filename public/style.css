@@ -41,6 +41,7 @@
 	height: fit-content;
 	padding: 8px;
 	border-radius: 15px;
+	cursor: pointer;
 }
 
 .form-label {

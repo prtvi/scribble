@@ -63,7 +63,7 @@ func (pool *Pool) Start() {
 				utils.Cp("yellowBg", "Broadcasting client info start!")
 
 				// begin braodcasting client info at regular intervals
-				go pool.BroadcastClientInfoMessage()
+				go pool.BeginBroadcastClientInfoMessage()
 
 				// begin start-game countdown
 				go pool.StartGameCountdown()
@@ -185,15 +185,14 @@ func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
 	}
 }
 
-func (pool *Pool) BroadcastClientInfoMessage() {
+func (pool *Pool) BeginBroadcastClientInfoMessage() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
 	for {
 		time.Sleep(time.Second * RenderClientsEvery)
 		utils.Cp("yellow", "Broadcasting client info")
 
-		msg := pool.getClientInfoList()
-		pool.BroadcastMsg(msg)
+		pool.BroadcastMsg(pool.getClientInfoList())
 
 		// stop broadcasting when game ends
 		if pool.HasGameEnded || len(pool.Clients) == 0 {
@@ -260,6 +259,9 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) {
 		// increment score and flag as guessed
 		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
 		guesserClient.HasGuessed = true
+
+		// broadcast client info list to update score on UI immediately
+		pool.BroadcastMsg(pool.getClientInfoList())
 	}
 }
 

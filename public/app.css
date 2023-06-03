@@ -92,3 +92,21 @@ canvas {
 	margin-bottom: 5px;
 	text-align: left;
 }
+
+.chat-box {
+	margin-top: 5px;
+	display: flex;
+	justify-content: center;
+	height: fit-content;
+}
+
+.chat-box input {
+	height: 25px;
+	width: 200px;
+}
+
+.chat-box .btn {
+	/* height: 20px; */
+	padding: 2px;
+	width: 60px;
+}

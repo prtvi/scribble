@@ -94,6 +94,13 @@ func Maintainer() {
 
 				fmt.Println("Size of HUB:", len(HUB))
 			}
+
+			if now := time.Now(); now.Sub(pool.CreatedTime) > time.Duration(time.Minute*10) {
+				utils.Cp("yellowBg", "Removing pool from HUB after game not started for 10 mins, poolId:", poolId)
+				delete(HUB, poolId)
+
+				fmt.Println("Size of HUB:", len(HUB))
+			}
 		}
 	}
 }
