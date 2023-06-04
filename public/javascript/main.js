@@ -66,7 +66,7 @@ function beginClientSketchingFlow(socketMessage) {
 		paintUtils.isAllowedToPaint = false;
 
 		// show word length
-		word.textContent = socketMessage.currWord.length;
+		word.textContent = `${socketMessage.currWord.length} characters`;
 
 		// display painter utils div and remove EL
 		painterUtilsDiv.classList.add('hidden');

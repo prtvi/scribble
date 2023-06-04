@@ -82,14 +82,18 @@
 				<!-- chat box -->
 				<div class="chat-box">
 					<form>
-						<input
-							type="text"
-							class="msg"
-							placeholder="Type your guess here"
-							required
-						/>
+						<div class="input-wrapper">
+							<input
+								type="text"
+								class="msg"
+								placeholder="Type your guess here"
+								maxlength="50"
+								required
+							/>
+							<span>0</span>
 
-						<button class="btn send-msg">Send</button>
+							<button class="btn send-msg">Send</button>
+						</div>
 					</form>
 				</div>
 

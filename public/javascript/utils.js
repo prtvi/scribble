@@ -103,6 +103,7 @@ function appendChatMsgToDOM(msg) {
 	msgDiv.scrollIntoView();
 
 	document.querySelector('.msg').value = '';
+	document.querySelector('.input-wrapper span').textContent = 0;
 }
 
 function sendChatMsgBtnEL(e) {
@@ -142,6 +143,12 @@ function hideOverlay() {
 }
 
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
+
+// show number of characters typed in chat box
+document.querySelector('.msg').addEventListener('input', function (e) {
+	document.querySelector('.input-wrapper span').textContent =
+		e.target.value.length;
+});
 
 // copy joining link
 document

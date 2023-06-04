@@ -145,6 +145,7 @@ func RegisterToPool(c echo.Context) error {
 		"RegisterToPool": false,
 		"ConnectSocket":  true,
 		"JoiningLink":    pool.JoiningLink,
+		"Message":        "",
 
 		// variables in DOM
 		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),

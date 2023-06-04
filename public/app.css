@@ -133,12 +133,25 @@ canvas {
 	height: fit-content;
 }
 
+.input-wrapper {
+	position: relative;
+}
+
 .chat-box input {
 	height: 25px;
-	width: 200px;
+	width: 180px;
+	padding-right: 30px;
+	font-size: var(--fs-3);
+}
+
+.input-wrapper span {
+	position: absolute;
+	right: 60px;
+	line-height: 25px;
+	font-size: var(--fs-2);
 }
 
 .chat-box .btn {
 	padding: 2px;
-	width: 60px;
+	width: 50px;
 }
