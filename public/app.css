@@ -56,10 +56,17 @@ canvas {
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 2;
 	cursor: pointer;
+	font-size: 13px;
+	color: white;
 
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+#overlay > div {
+	padding: 10px;
+	margin: 0 auto;
 }
 
 .mc-container {

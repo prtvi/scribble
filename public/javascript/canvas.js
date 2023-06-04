@@ -1,5 +1,33 @@
 'use strict';
 
+function initCanvasAndOverlay() {
+	const canvas = document.querySelector('.canv');
+	const ctx = canvas.getContext('2d');
+
+	const { w, h } = getCanvasSize();
+
+	canvas.width = w;
+	canvas.height = h;
+
+	const overlay = document.querySelector('#overlay');
+	const cc = document.querySelector('.canvas-container');
+
+	overlay.style.top = `${cc.offsetTop}px`;
+	overlay.style.height = `${cc.offsetHeight}px`;
+
+	return { canvas, ctx, overlay };
+}
+
+function getCanvasSize() {
+	const w = window.innerWidth;
+	const cw = w - 10;
+	const ch = cw / 1.5;
+
+	return { w: cw, h: ch };
+}
+
+// drawing
+
 function updatePositionCanvas(event) {
 	paintUtils.coords.x = event.clientX - canvas.offsetLeft;
 	paintUtils.coords.y = event.clientY - canvas.offsetTop;

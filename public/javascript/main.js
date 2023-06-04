@@ -1,20 +1,6 @@
 'use strict';
 
-const canvas = document.querySelector('.canv');
-const ctx = canvas.getContext('2d');
-
-const { w, h } = getCanvasSize();
-
-canvas.width = w;
-canvas.height = h;
-
-(function () {
-	const overlayElement = document.querySelector('#overlay');
-	const cc = document.querySelector('.canvas-container');
-
-	overlayElement.style.top = `${cc.offsetTop}px`;
-	overlayElement.style.height = `${cc.offsetHeight}px`;
-})();
+const { canvas, ctx, overlay } = initCanvasAndOverlay();
 
 // init socket connection and check game begin status
 const socket = initSocket();
@@ -42,7 +28,7 @@ function startGame(socketMessage) {
 	clearAllIntervals(startGameTimerId);
 
 	// hide the div and toggle paintUtils.has Game Started
-	toggleOverlay();
+	hideOverlay();
 	document.querySelector('.joining-link').classList.add('hidden');
 }
 

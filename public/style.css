@@ -39,7 +39,8 @@
 .btn {
 	width: fit-content;
 	height: fit-content;
-	padding: 8px;
+	padding: 5px;
+	font-size: 12px;
 	border-radius: 15px;
 	cursor: pointer;
 }

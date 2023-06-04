@@ -9,14 +9,6 @@ const paintUtils = {
 	isAllowedToPaint: false,
 };
 
-function getCanvasSize() {
-	const w = window.innerWidth;
-	const cw = w - 10;
-	const ch = cw / 1.5;
-
-	return { w: cw, h: ch };
-}
-
 function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -34,7 +26,7 @@ function clearAllIntervals(...ids) {
 function displayScores(socketMessage) {
 	const dataArr = JSON.parse(socketMessage.content);
 
-	let html = `<table>
+	let html = `<div> <table>
 	<tr>
 		<th>Name</th>
 		<th>Score</th>
@@ -42,9 +34,10 @@ function displayScores(socketMessage) {
 	dataArr.forEach(
 		item => (html += `<tr><td>${item.name}</td><td>${item.score}</td></tr>`)
 	);
-	html += `</table>`;
+	html += `</table> </div>`;
 
-	document.querySelector('.score-board').innerHTML = html;
+	overlay.innerHTML = html;
+	displayOverlay();
 
 	clearAllIntervals(wordExpiryTimerIdG);
 }
@@ -134,20 +127,23 @@ function sendChatMsgBtnEL(e) {
 	sendViaSocket(socketMsg);
 }
 
-document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
-
-// copy joining link
-document
-	.querySelector('.joining-link')
-	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
-
 function renderRoundDetails(socketMessage) {
 	document.querySelector(
 		'.round-details'
 	).textContent = `Round: ${socketMessage.currRound}`;
 }
 
-function toggleOverlay() {
-	const overlay = document.querySelector('#overlay');
-	overlay.classList.toggle('hidden');
+function displayOverlay() {
+	overlay.style.display = 'flex';
 }
+
+function hideOverlay() {
+	overlay.style.display = 'none';
+}
+
+document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
+
+// copy joining link
+document
+	.querySelector('.joining-link')
+	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
