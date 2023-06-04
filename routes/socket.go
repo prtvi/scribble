@@ -106,6 +106,12 @@ func Maintainer() {
 }
 
 func DebugMode() {
+	GameStartDurationInSeconds = time.Duration(time.Second * 500)
+	TimeForEachWordInSeconds = time.Duration(time.Second * 15)
+	RenderClientsEvery = time.Duration(time.Second * 10)
+	ScoreForCorrectGuess = 25
+	NumberOfRounds = 2
+
 	poolId := "debug"
 	pool := NewPool(poolId, 4)
 
@@ -114,4 +120,6 @@ func DebugMode() {
 
 	link := "/app?join=" + poolId
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link)
+
+	utils.Cp("greenBg", "----------- DEBUG MODE -----------")
 }

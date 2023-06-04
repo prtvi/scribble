@@ -10,15 +10,11 @@ const paintUtils = {
 };
 
 function getCanvasSize() {
-	const { w } = getWindowDimensions();
+	const w = window.innerWidth;
 	const cw = w - 10;
 	const ch = cw / 1.5;
 
 	return { w: cw, h: ch };
-}
-
-function getWindowDimensions() {
-	return { w: window.innerWidth, h: window.innerHeight };
 }
 
 function wait(ms) {
@@ -111,6 +107,8 @@ function appendChatMsgToDOM(msg) {
 	msgDiv.appendChild(text);
 	messagesDiv.appendChild(msgDiv);
 
+	msgDiv.scrollIntoView();
+
 	document.querySelector('.msg').value = '';
 }
 
@@ -147,4 +145,9 @@ function renderRoundDetails(socketMessage) {
 	document.querySelector(
 		'.round-details'
 	).textContent = `Round: ${socketMessage.currRound}`;
+}
+
+function toggleOverlay() {
+	const overlay = document.querySelector('#overlay');
+	overlay.classList.toggle('hidden');
 }

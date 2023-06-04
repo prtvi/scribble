@@ -8,6 +8,14 @@ const { w, h } = getCanvasSize();
 canvas.width = w;
 canvas.height = h;
 
+(function () {
+	const overlayElement = document.querySelector('#overlay');
+	const cc = document.querySelector('.canvas-container');
+
+	overlayElement.style.top = `${cc.offsetTop}px`;
+	overlayElement.style.height = `${cc.offsetHeight}px`;
+})();
+
 // init socket connection and check game begin status
 const socket = initSocket();
 const startGameTimerId = gameStartTimer();
@@ -34,7 +42,7 @@ function startGame(socketMessage) {
 	clearAllIntervals(startGameTimerId);
 
 	// hide the div and toggle paintUtils.has Game Started
-	document.querySelector('.start-game').classList.add('hidden');
+	toggleOverlay();
 	document.querySelector('.joining-link').classList.add('hidden');
 }
 

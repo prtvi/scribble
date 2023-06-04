@@ -1,10 +1,12 @@
 package routes
 
-const (
-	GameStartDurationInSeconds = 1000
-	TimeForEachWordInSeconds   = 45 // 75 finally
+import "time"
+
+var (
+	GameStartDurationInSeconds = time.Duration(time.Second * 120)
+	TimeForEachWordInSeconds   = time.Duration(time.Second * 75)
+	RenderClientsEvery         = time.Duration(time.Second * 5)
 	ScoreForCorrectGuess       = 25
-	RenderClientsEvery         = 8
 	NumberOfRounds             = 3
 )
 

@@ -12,7 +12,7 @@ import (
 func NewPool(uuid string, capacity int) *Pool {
 	// returns a new Pool
 	now := time.Now()
-	later := now.Add(time.Second * GameStartDurationInSeconds)
+	later := now.Add(GameStartDurationInSeconds)
 
 	return &Pool{
 		ID:                            uuid,
@@ -65,7 +65,7 @@ func (pool *Pool) Start() {
 				// begin braodcasting client info at regular intervals
 				go pool.BeginBroadcastClientInfoMessage()
 
-				// begin start-game countdown
+				// begin start game countdown
 				go pool.StartGameCountdown()
 			}
 
@@ -189,7 +189,7 @@ func (pool *Pool) BeginBroadcastClientInfoMessage() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
 	for {
-		time.Sleep(time.Second * RenderClientsEvery)
+		time.Sleep(RenderClientsEvery)
 		utils.Cp("yellow", "Broadcasting client info")
 
 		pool.BroadcastMsg(pool.getClientInfoList())
@@ -292,7 +292,7 @@ func (pool *Pool) BeginGameFlow() {
 			// select client and assign the word
 			pool.CurrSketcher = c
 			pool.CurrWord = utils.GetRandomWord()
-			pool.CurrWordExpiresAt = time.Now().Add(time.Second * TimeForEachWordInSeconds)
+			pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
 			c.HasSketched = true
 
 			// flag all clients as not guessed

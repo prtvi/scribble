@@ -56,6 +56,18 @@
 
 				<!-- canvas -->
 				<div class="canvas-container">
+					<div id="overlay">
+						<div>
+							<p>
+								Waiting for others to join, starting game in
+								<span class="loading">{{ .GameStartDurationInSeconds }}</span>
+								seconds
+							</p>
+
+							<button class="btn start-game-btn">Start now</button>
+						</div>
+					</div>
+
 					<canvas class="canv"></canvas>
 
 					<!-- painter utils -->
@@ -64,7 +76,8 @@
 					</div>
 				</div>
 
-				<div class="container">
+				<!-- members and chat container -->
+				<div class="mc-container">
 					<!-- members in pool -->
 					<div class="side members"></div>
 
@@ -88,15 +101,6 @@
 
 				<!-- score board -->
 				<div class="score-board"></div>
-
-				<div class="start-game">
-					<div>
-						Waiting for others to join, starting game in
-						<span class="loading">{{ .GameStartDurationInSeconds }}</span>
-						seconds
-					</div>
-					<button class="btn start-game-btn">Start now</button>
-				</div>
 
 				<script>
 					const poolId = '{{ .PoolId }}';
