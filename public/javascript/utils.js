@@ -129,7 +129,7 @@ function sendChatMsgBtnEL(e) {
 
 function renderRoundDetails(socketMessage) {
 	document.querySelector(
-		'.round-details'
+		'.round span'
 	).textContent = `Round: ${socketMessage.currRound}`;
 }
 

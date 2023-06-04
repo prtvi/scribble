@@ -29,7 +29,7 @@ function startGame(socketMessage) {
 
 	// hide the div and toggle paintUtils.has Game Started
 	hideOverlay();
-	document.querySelector('.joining-link').classList.add('hidden');
+	document.querySelector('.joining-link-div').classList.add('hidden');
 }
 
 function beginClientSketchingFlow(socketMessage) {
@@ -48,29 +48,29 @@ function beginClientSketchingFlow(socketMessage) {
 		if (secondsLeft <= 0) clearAllIntervals(wordExpiryTimerId);
 	}, 1000);
 
+	const word = document.querySelector('.word span');
+	const painterUtilsDiv = document.querySelector('.painter-utils');
+	const clearCanvasBtn = document.querySelector('.clear-canvas');
+
 	// for enabling drawing access if clientId matches
 	if (clientId === socketMessage.currSketcherId) {
 		paintUtils.isAllowedToPaint = true;
 
 		// display the word
-		document.querySelector('.word').textContent = socketMessage.currWord;
+		word.textContent = socketMessage.currWord;
 
 		// display painter utils div and add EL for clearing the canvas
-		document.querySelector('.painter-utils').classList.remove('hidden');
-		document
-			.querySelector('.clear-canvas')
-			.addEventListener('click', requestCanvasClear);
+		painterUtilsDiv.classList.remove('hidden');
+		clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	} else {
 		paintUtils.isAllowedToPaint = false;
 
 		// show word length
-		document.querySelector('.word').textContent = socketMessage.currWord.length;
+		word.textContent = socketMessage.currWord.length;
 
 		// display painter utils div and remove EL
-		document.querySelector('.painter-utils').classList.add('hidden');
-		document
-			.querySelector('.clear-canvas')
-			.removeEventListener('click', requestCanvasClear);
+		painterUtilsDiv.classList.add('hidden');
+		clearCanvasBtn.removeEventListener('click', requestCanvasClear);
 	}
 
 	return wordExpiryTimerId;

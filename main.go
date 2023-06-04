@@ -14,7 +14,7 @@ func main() {
 
 	go routes.Maintainer()
 
-	// routes.DebugMode()
+	routes.DebugMode()
 
 	ee := e.Group("", routes.Logger)
 
