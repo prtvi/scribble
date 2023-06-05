@@ -63,14 +63,13 @@ function beginClientSketchingFlow(socketMessage) {
 		painterUtilsDiv.classList.remove('hidden');
 		clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	} else {
-		paintUtils.isAllowedToPaint = false;
-
 		// show word length
 		word.textContent = `${socketMessage.currWord.length} characters`;
 
+		// paintUtils.isAllowedToPaint = false;
 		// display painter utils div and remove EL
-		painterUtilsDiv.classList.add('hidden');
-		clearCanvasBtn.removeEventListener('click', requestCanvasClear);
+		// painterUtilsDiv.classList.add('hidden');
+		// clearCanvasBtn.removeEventListener('click', requestCanvasClear);
 	}
 
 	return wordExpiryTimerId;

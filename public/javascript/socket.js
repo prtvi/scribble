@@ -39,30 +39,36 @@ function initSocket() {
 				if (socketMessage.clientId === clientId)
 					// if the current clientId and the clientId from response match then
 					appendChatMsgToDOM(
-						`You joined the pool as ${socketMessage.clientName}!`
+						`You joined the pool as ${socketMessage.clientName}!`,
+						''
 					);
 				else
 					appendChatMsgToDOM(
-						`${socketMessage.clientName} has joined the pool!`
+						`${socketMessage.clientName} has joined the pool!`,
+						''
 					);
 				break;
 
 			case 2:
-				appendChatMsgToDOM(`${socketMessage.clientName} has left the pool!`);
+				appendChatMsgToDOM(
+					`${socketMessage.clientName} has left the pool!`,
+					''
+				);
 				break;
 
 			case 3:
 				appendChatMsgToDOM(
-					`${socketMessage.clientName}: ${socketMessage.content}`
+					`${socketMessage.clientName}: ${socketMessage.content}`,
+					''
 				);
 				break;
 
 			case 31:
-				appendChatMsgToDOM(socketMessage.content);
+				appendChatMsgToDOM(socketMessage.content, '#00ff00');
 				break;
 
 			case 32:
-				appendChatMsgToDOM(`${socketMessage.content} was the right word!`);
+				appendChatMsgToDOM(socketMessage.content, '#ffa500');
 				break;
 
 			case 4:
@@ -87,6 +93,10 @@ function initSocket() {
 
 			case 8:
 				wordExpiryTimerIdG = beginClientSketchingFlow(socketMessage);
+				break;
+
+			case 81:
+				disableSketching(socketMessage);
 				break;
 
 			case 9:

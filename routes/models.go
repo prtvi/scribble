@@ -2,6 +2,7 @@ package routes
 
 import (
 	model "scribble/model"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -16,6 +17,7 @@ type Client struct {
 	Score                   int
 	Conn                    *websocket.Conn
 	Pool                    *Pool
+	mu                      sync.Mutex
 }
 
 type Pool struct {

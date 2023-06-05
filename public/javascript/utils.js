@@ -42,6 +42,19 @@ function displayScores(socketMessage) {
 	clearAllIntervals(wordExpiryTimerIdG);
 }
 
+function disableSketching(socketMessage) {
+	if (clientId !== socketMessage.currSketcherId) return;
+
+	const painterUtilsDiv = document.querySelector('.painter-utils');
+	const clearCanvasBtn = document.querySelector('.clear-canvas');
+
+	paintUtils.isAllowedToPaint = false;
+
+	// display painter utils div and remove EL
+	painterUtilsDiv.classList.add('hidden');
+	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
+}
+
 // render clients
 
 function renderClients(allClients) {
@@ -56,10 +69,7 @@ function renderClients(allClients) {
 	allClients = JSON.parse(allClients);
 
 	// render
-	allClients.forEach((n, i) => {
-		const clientNameDiv = getClientNameDiv(n, i);
-		membersDiv.appendChild(clientNameDiv);
-	});
+	allClients.forEach((n, i) => membersDiv.appendChild(getClientNameDiv(n, i)));
 }
 
 function getClientNameDiv(clientInfo, iteration) {
@@ -96,7 +106,7 @@ function getClientNameDiv(clientInfo, iteration) {
 
 //  chat
 
-function appendChatMsgToDOM(msg) {
+function appendChatMsgToDOM(msg, formatColor) {
 	// adds the msg into the DOM
 
 	if (msg.length === 0 || msg === '') return;
@@ -108,6 +118,7 @@ function appendChatMsgToDOM(msg) {
 
 	const text = document.createElement('span');
 	text.textContent = msg;
+	text.style.color = formatColor || '#000';
 
 	msgDiv.appendChild(text);
 	messagesDiv.appendChild(msgDiv);

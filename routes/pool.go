@@ -93,8 +93,6 @@ func (pool *Pool) Start() {
 			// on message received from any of the clients in the pool, broadcast the message
 			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
 
-			utils.Cp("blue", "sm recv, type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type], utils.Cs("blue", "from:"), message.ClientName))
-
 			switch message.Type {
 			case 3:
 				correctGuess := pool.UpdateScore(message)
@@ -185,9 +183,14 @@ func (pool *Pool) GetColorForClient() string {
 }
 
 func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
+	utils.Cp("cyan", "Broadcasting type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type], utils.Cs("blue", "from:"), message.ClientName))
+
 	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
+		c.mu.Lock()
 		err := c.Conn.WriteJSON(message)
+		c.mu.Unlock()
+
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -199,13 +202,11 @@ func (pool *Pool) BeginBroadcastClientInfoMessage() {
 	// starts an infinite loop to broadcast client info after every regular interval
 	for {
 		time.Sleep(RenderClientsEvery)
-		utils.Cp("yellow", "Broadcasting client info")
-
 		pool.BroadcastMsg(pool.getClientInfoList())
 
 		// stop broadcasting when game ends
 		if pool.HasGameEnded || len(pool.Clients) == 0 {
-			utils.Cp("yellow", "Stopped broadcasting client info")
+			utils.Cp("yellowBg", "Stopped broadcasting client info")
 			break
 		}
 	}
@@ -281,11 +282,6 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
 func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
-	// wait a few seconds
-	// d := time.Duration(time.Second * 2)
-	// utils.Cp("green", "Starting game in", d.String())
-	// time.Sleep(d)
-
 	// loop over the number of rounds
 	for i := 0; i < NumberOfRounds; i++ {
 		pool.CurrRound = i + 1
@@ -297,10 +293,16 @@ func (pool *Pool) BeginGameFlow() {
 			CurrRound: pool.CurrRound,
 		})
 
-		time.Sleep(time.Second * 2)
+		// time.Sleep(time.Second * 2)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
+
+			// once the client's turn is done, broadcast clear canvas event
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:    5,
+				TypeStr: messageTypeMap[5],
+			})
 
 			// select client and assign the word
 			pool.CurrSketcher = c
@@ -328,18 +330,21 @@ func (pool *Pool) BeginGameFlow() {
 			utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
 			time.Sleep(st)
 
+			// broadcast turn_over
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:           81,
+				TypeStr:        messageTypeMap[81],
+				CurrSketcherId: pool.CurrSketcher.ID,
+			})
+
 			// reveal the word
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:    32,
 				TypeStr: messageTypeMap[32],
-				Content: pool.CurrWord,
+				Content: fmt.Sprintf("%s was the correct word!", pool.CurrWord),
 			})
 
-			// once the client's turn is done, broadcast clear canvas event
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:    5,
-				TypeStr: messageTypeMap[5],
-			})
+			time.Sleep(time.Second * 2)
 		}
 	}
 

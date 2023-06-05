@@ -25,5 +25,6 @@ var messageTypeMap = map[int]string{
 	7:  "start_game",        // client  => server  --to start the game
 	71: "round_num",         // server b=> clients
 	8:  "word_assigned",     // server b=> clients
+	81: "turn_over",         // server b=> clients
 	9:  "end_game",          // server b=> clients
 }

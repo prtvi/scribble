@@ -107,10 +107,10 @@ func Maintainer() {
 
 func DebugMode() {
 	GameStartDurationInSeconds = time.Duration(time.Second * 500)
-	TimeForEachWordInSeconds = time.Duration(time.Second * 15)
+	TimeForEachWordInSeconds = time.Duration(time.Second * 30)
 	RenderClientsEvery = time.Duration(time.Second * 10)
 	ScoreForCorrectGuess = 25
-	NumberOfRounds = 2
+	NumberOfRounds = 3
 
 	poolId := "debug"
 	pool := NewPool(poolId, 4)
