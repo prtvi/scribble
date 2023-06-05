@@ -97,7 +97,13 @@ func (pool *Pool) Start() {
 
 			switch message.Type {
 			case 3:
-				pool.UpdateScore(message)
+				correctGuess := pool.UpdateScore(message)
+				if correctGuess {
+					message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
+					message.Type = 31
+					message.TypeStr = messageTypeMap[31]
+				}
+
 				pool.BroadcastMsg(message)
 
 			case 4, 5:
@@ -181,7 +187,10 @@ func (pool *Pool) GetColorForClient() string {
 func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
 	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
-		c.Conn.WriteJSON(message)
+		err := c.Conn.WriteJSON(message)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 
@@ -233,12 +242,12 @@ func (pool *Pool) StartGameRequest() {
 	go pool.BeginGameFlow()
 }
 
-func (pool *Pool) UpdateScore(message model.SocketMessage) {
-	// update score for the client that guesses the word right
+func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
+	// update score for the client that guesses the word right, return true if correctly guessed
 
 	// when the game has not begun, the curr sketcher will be nil
 	if pool.CurrSketcher == nil {
-		return
+		return false
 	}
 
 	var guesserClient *Client = nil
@@ -262,7 +271,11 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) {
 
 		// broadcast client info list to update score on UI immediately
 		pool.BroadcastMsg(pool.getClientInfoList())
+
+		return true
 	}
+
+	return false
 }
 
 func (pool *Pool) BeginGameFlow() {
@@ -314,6 +327,13 @@ func (pool *Pool) BeginGameFlow() {
 			st := pool.CurrWordExpiresAt.Sub(time.Now())
 			utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
 			time.Sleep(st)
+
+			// reveal the word
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:    32,
+				TypeStr: messageTypeMap[32],
+				Content: pool.CurrWord,
+			})
 
 			// once the client's turn is done, broadcast clear canvas event
 			pool.BroadcastMsg(model.SocketMessage{

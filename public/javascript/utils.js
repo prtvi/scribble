@@ -57,29 +57,41 @@ function renderClients(allClients) {
 
 	// render
 	allClients.forEach((n, i) => {
-		const clientNameDiv = document.createElement('div');
-		clientNameDiv.classList.add('member');
-
-		const clientNum = document.createElement('span');
-		clientNum.classList.add('member-num');
-
-		const clientName = document.createElement('span');
-		clientName.classList.add('member-name');
-		clientName.style.color = `#${n.color}`;
-
-		const clientScore = document.createElement('span');
-		clientScore.classList.add('member-score');
-
-		clientNum.textContent = `#${i + 1}`;
-		clientName.textContent = n.name;
-		clientScore.textContent = `${n.score} points`;
-
-		clientNameDiv.appendChild(clientNum);
-		clientNameDiv.appendChild(clientName);
-		clientNameDiv.appendChild(clientScore);
-
+		const clientNameDiv = getClientNameDiv(n, i);
 		membersDiv.appendChild(clientNameDiv);
 	});
+}
+
+function getClientNameDiv(clientInfo, iteration) {
+	// client name div
+	const clientNameDiv = document.createElement('div');
+	clientNameDiv.classList.add('member');
+
+	// client num span
+	const clientNumSpan = document.createElement('span');
+	clientNumSpan.classList.add('member-num');
+	clientNumSpan.textContent = `#${iteration + 1}`;
+
+	// client name span
+	const clientNameSpan = document.createElement('span');
+	clientNameSpan.classList.add('member-name');
+	clientNameSpan.style.color = `#${clientInfo.color}`;
+
+	if (clientName === clientInfo.name)
+		clientNameSpan.textContent = `${clientInfo.name} (you)`;
+	else clientNameSpan.textContent = clientInfo.name;
+
+	// client score span
+	const clientScoreSpan = document.createElement('span');
+	clientScoreSpan.classList.add('member-score');
+	clientScoreSpan.textContent = `${clientInfo.score} points`;
+
+	// append everything to client name div
+	clientNameDiv.appendChild(clientNumSpan);
+	clientNameDiv.appendChild(clientNameSpan);
+	clientNameDiv.appendChild(clientScoreSpan);
+
+	return clientNameDiv;
 }
 
 //  chat

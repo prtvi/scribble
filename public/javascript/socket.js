@@ -57,6 +57,14 @@ function initSocket() {
 				);
 				break;
 
+			case 31:
+				appendChatMsgToDOM(socketMessage.content);
+				break;
+
+			case 32:
+				appendChatMsgToDOM(`${socketMessage.content} was the right word!`);
+				break;
+
 			case 4:
 				displayImgOnCanvas(socketMessage);
 				break;
