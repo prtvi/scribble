@@ -279,6 +279,12 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
 	return false
 }
 
+func (pool *Pool) flagAllClientsAsNotGuessed() {
+	for _, cl := range pool.Clients {
+		cl.HasGuessed = false
+	}
+}
+
 func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
@@ -293,7 +299,7 @@ func (pool *Pool) BeginGameFlow() {
 			CurrRound: pool.CurrRound,
 		})
 
-		// time.Sleep(time.Second * 2)
+		time.Sleep(time.Second * 2)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
@@ -311,9 +317,7 @@ func (pool *Pool) BeginGameFlow() {
 			c.HasSketched = true
 
 			// flag all clients as not guessed
-			for _, cl := range pool.Clients {
-				cl.HasGuessed = false
-			}
+			pool.flagAllClientsAsNotGuessed()
 
 			// broadcast current word, current sketcher and other details to all clients
 			// TODO: send the whole thing to client who's sketching, send minimal details to rest

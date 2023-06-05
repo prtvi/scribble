@@ -155,6 +155,9 @@ function renderRoundDetails(socketMessage) {
 	document.querySelector(
 		'.round span'
 	).textContent = `Round: ${socketMessage.currRound}`;
+
+	overlay.innerHTML = `<div>Round: ${socketMessage.currRound}</div>`;
+	displayOverlay();
 }
 
 function displayOverlay() {
