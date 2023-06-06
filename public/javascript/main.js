@@ -33,13 +33,15 @@ function startGame(socketMessage) {
 }
 
 function beginClientSketchingFlow(socketMessage) {
+	hideOverlay();
+
 	// initialise the time at which this word expires
 	const currentWordExpiresAt = new Date(
 		socketMessage.currWordExpiresAt
 	).getTime();
 
 	// start timer for the word expiry
-	const wordExpiryTimerId = setInterval(async () => {
+	const wordExpiryTimerId = setInterval(() => {
 		const timeLeftDiv = document.querySelector('.time-left-for-word span');
 
 		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);

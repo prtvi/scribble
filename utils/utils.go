@@ -19,19 +19,29 @@ func GenerateUUID() string {
 }
 
 func FormatTimeLong(t time.Time) string {
-	// 2023-09-19 23:34:09.23432
-	return t.String()[0:26]
+	// 2021-12-12T12:23:34.002342369
+	return t.Format(time.RFC3339Nano)
 }
 
 func GetSecondsLeftFrom(t time.Time) int {
 	return int(t.Sub(time.Now()).Seconds())
 }
 
-func GetRandomWord() string {
-	rand.Seed(time.Now().Unix())
-	n := rand.Int() % len(WORDS)
+func GetRandomWord(arr []string) string {
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Int() % len(arr)
 
-	return WORDS[n]
+	return arr[n]
+}
+
+func Get3RandomWords(arr []string) []string {
+	ret := make([]string, 3)
+
+	for i := 0; i < 3; i++ {
+		ret[i] = GetRandomWord(arr)
+	}
+
+	return ret
 }
 
 func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) float64 {

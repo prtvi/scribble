@@ -71,6 +71,10 @@ function initSocket() {
 				appendChatMsgToDOM(socketMessage.content, '#ffa500');
 				break;
 
+			case 33:
+				showWordToSelect(socketMessage);
+				break;
+
 			case 4:
 				displayImgOnCanvas(socketMessage);
 				break;

@@ -6,6 +6,9 @@ var (
 	GameStartDurationInSeconds = time.Duration(time.Second * 120)
 	TimeForEachWordInSeconds   = time.Duration(time.Second * 75)
 	RenderClientsEvery         = time.Duration(time.Second * 5)
+	WaitAfterRoundStarts       = time.Duration(time.Second * 2)
+	WaitAfterTurnEnds          = time.Duration(time.Second * 2)
+	TimeoutForChoosingWord     = time.Duration(time.Second * 10)
 	ScoreForCorrectGuess       = 25
 	NumberOfRounds             = 3
 )
@@ -19,6 +22,8 @@ var messageTypeMap = map[int]string{
 	3:  "text_msg",          // client b=> clients
 	31: "correct_guess",     // server b=> clients
 	32: "reveal_word",       // server b=> clients
+	33: "choose_word",       // server b=> clients
+	34: "chosen_word",       // client  => server
 	4:  "canvas_data",       // client b=> clients
 	5:  "clear_canvas",      // client b=> clients
 	6:  "client_info",       // server b=> clients --at regular intervals

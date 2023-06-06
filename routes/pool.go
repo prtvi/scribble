@@ -104,6 +104,9 @@ func (pool *Pool) Start() {
 
 				pool.BroadcastMsg(message)
 
+			case 34:
+				pool.CurrWord = message.Content
+
 			case 4, 5:
 				message.CurrSketcherId = pool.CurrSketcher.ID
 				pool.BroadcastMsg(message)
@@ -176,6 +179,12 @@ func (pool *Pool) removeClientFromList(client *Client) {
 
 	pool.Clients[idxToRemove] = pool.Clients[len(pool.Clients)-1]
 	pool.Clients = pool.Clients[:len(pool.Clients)-1]
+}
+
+func (pool *Pool) flagAllClientsAsNotGuessed() {
+	for _, cl := range pool.Clients {
+		cl.HasGuessed = false
+	}
 }
 
 func (pool *Pool) GetColorForClient() string {
@@ -279,12 +288,6 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
 	return false
 }
 
-func (pool *Pool) flagAllClientsAsNotGuessed() {
-	for _, cl := range pool.Clients {
-		cl.HasGuessed = false
-	}
-}
-
 func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
@@ -299,25 +302,42 @@ func (pool *Pool) BeginGameFlow() {
 			CurrRound: pool.CurrRound,
 		})
 
-		time.Sleep(time.Second * 2)
+		time.Sleep(WaitAfterRoundStarts)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
 
-			// once the client's turn is done, broadcast clear canvas event
+			// broadcast clear canvas event
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:    5,
 				TypeStr: messageTypeMap[5],
 			})
 
-			// select client and assign the word
-			pool.CurrSketcher = c
-			pool.CurrWord = utils.GetRandomWord()
-			pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
-			c.HasSketched = true
-
 			// flag all clients as not guessed
 			pool.flagAllClientsAsNotGuessed()
+
+			// select the client
+			pool.CurrSketcher = c
+			c.HasSketched = true
+
+			// create a list of words for client to choose
+			words := utils.Get3RandomWords(utils.WORDS)
+
+			byteInfo, _ := json.Marshal(words)
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:             33,
+				TypeStr:          messageTypeMap[33],
+				Content:          string(byteInfo),
+				CurrSketcherId:   pool.CurrSketcher.ID,
+				CurrSketcherName: pool.CurrSketcher.Name,
+			})
+
+			// run an infinite loop until pool.CurrWord is initialised by sketcher client, initialised in pool.Start func, TODO: create a timeout instead
+			for pool.CurrWord == "" {
+			}
+
+			// add the word expiry
+			pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
 
 			// broadcast current word, current sketcher and other details to all clients
 			// TODO: send the whole thing to client who's sketching, send minimal details to rest
@@ -326,13 +346,11 @@ func (pool *Pool) BeginGameFlow() {
 				TypeStr:           messageTypeMap[8],
 				CurrSketcherId:    pool.CurrSketcher.ID,
 				CurrWord:          pool.CurrWord,
-				CurrWordExpiresAt: pool.CurrWordExpiresAt,
+				CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 			})
 
 			// sleep until the word expires
-			st := pool.CurrWordExpiresAt.Sub(time.Now())
-			utils.Cp("yellow", "Sleeping for ...", st.String(), c.Name)
-			time.Sleep(st)
+			time.Sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
 			// broadcast turn_over
 			pool.BroadcastMsg(model.SocketMessage{
@@ -348,7 +366,10 @@ func (pool *Pool) BeginGameFlow() {
 				Content: fmt.Sprintf("%s was the correct word!", pool.CurrWord),
 			})
 
-			time.Sleep(time.Second * 2)
+			pool.CurrWord = ""
+			pool.CurrSketcher = nil
+
+			time.Sleep(WaitAfterTurnEnds)
 		}
 	}
 

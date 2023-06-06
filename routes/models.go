@@ -21,7 +21,7 @@ type Client struct {
 }
 
 type Pool struct {
-	ID, JoiningLink                                             string
+	ID, JoiningLink, CurrWord                                   string
 	Capacity, CurrRound                                         int
 	ColorList                                                   []string
 	Register, Unregister                                        chan *Client
@@ -30,5 +30,4 @@ type Pool struct {
 	CreatedTime, GameStartTime, CurrWordExpiresAt               time.Time
 	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted bool
 	CurrSketcher                                                *Client
-	CurrWord                                                    string
 }

@@ -71,6 +71,12 @@ canvas {
 	margin: 0 auto;
 }
 
+.word-option {
+	padding: 4px;
+	background-color: black;
+	margin: 3px;
+}
+
 .painter-utils {
 	position: absolute;
 	right: 5px;

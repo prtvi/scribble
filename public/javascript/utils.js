@@ -160,6 +160,41 @@ function renderRoundDetails(socketMessage) {
 	displayOverlay();
 }
 
+function showWordToSelect(socketMessage) {
+	if (clientId === socketMessage.currSketcherId) {
+		const words = JSON.parse(socketMessage.content);
+
+		const html = `<div>
+		<p>Choose a word to draw</p>
+		<span class="word-option" id="0">${words[0]}</span>
+		<span class="word-option" id="1">${words[1]}</span>
+		<span class="word-option" id="2">${words[2]}</span>
+		</div>`;
+
+		overlay.innerHTML = html;
+		displayOverlay();
+
+		overlay.querySelector('div').addEventListener('click', function (e) {
+			const chosenWord = e.target.textContent.trim();
+			if (!words.includes(chosenWord)) return;
+
+			const socketMsg = {
+				type: 34,
+				typeStr: 'chosen_word',
+				content: e.target.textContent.trim(),
+				clientName,
+				clientId,
+				poolId,
+			};
+
+			sendViaSocket(socketMsg);
+		});
+	} else {
+		overlay.innerHTML = `<div>${socketMessage.currSketcherName} is choosing a word!</div>`;
+		displayOverlay();
+	}
+}
+
 function displayOverlay() {
 	overlay.style.display = 'flex';
 }

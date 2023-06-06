@@ -1,19 +1,31 @@
 package model
 
-import "time"
+// Type:              int identifier
+// TypeStr:           string identifier
+// Content:           can contain any kind of data, type of data identified using Type field
+// Success:           to acknowledge success for any event
+// ClientId:          incoming clientId from clients
+// ClientName:        incoming clientName from clients
+// PoolId:            associated poolId
+// CurrRound:         current round
+// CurrSketcherId:    current sketcher's ID
+// CurrSketcherName:  current sketcher's name
+// CurrWord:          current word to be guessed
+// CurrWordExpiresAt: current word's expiry time as a string
 
 type SocketMessage struct {
-	Type              int       `json:"type"`
-	TypeStr           string    `json:"typeStr"`
-	Content           string    `json:"content,omitempty"`
-	Success           bool      `json:"success,omitempty"`
-	ClientId          string    `json:"clientId,omitempty"`
-	ClientName        string    `json:"clientName,omitempty"`
-	PoolId            string    `json:"poolId,omitempty"`
-	CurrRound         int       `json:"currRound,omitempty"`
-	CurrSketcherId    string    `json:"currSketcherId,omitempty"`
-	CurrWord          string    `json:"currWord,omitempty"`
-	CurrWordExpiresAt time.Time `json:"currWordExpiresAt,omitempty"`
+	Type              int    `json:"type"`
+	TypeStr           string `json:"typeStr"`
+	Content           string `json:"content,omitempty"`
+	Success           bool   `json:"success,omitempty"`
+	ClientId          string `json:"clientId,omitempty"`
+	ClientName        string `json:"clientName,omitempty"`
+	PoolId            string `json:"poolId,omitempty"`
+	CurrRound         int    `json:"currRound,omitempty"`
+	CurrSketcherId    string `json:"currSketcherId,omitempty"`
+	CurrSketcherName  string `json:"currSketcherName,omitempty"`
+	CurrWord          string `json:"currWord,omitempty"`
+	CurrWordExpiresAt string `json:"currWordExpiresAt,omitempty"`
 }
 
 type ClientInfo struct {
