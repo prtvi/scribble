@@ -35,92 +35,6 @@ func NewPool(uuid string, capacity int) *Pool {
 	}
 }
 
-func (pool *Pool) Start() {
-	// start listening to pool connections and messages
-	for {
-		select {
-		case client := <-pool.Register:
-			// on client register, append the client to Pool.Clients slice
-			pool.appendClientToList(client)
-
-			// broadcast the joining of client
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:       1,
-				TypeStr:    messageTypeMap[1],
-				ClientId:   client.ID,
-				ClientName: client.Name,
-			})
-
-			// send client info list once client joins
-			pool.BroadcastMsg(pool.getClientInfoList())
-
-			// start broadcasting client info list on first client join
-			if len(pool.Clients) == 1 &&
-				!pool.HasClientInfoBroadcastStarted &&
-				!pool.HasGameStarted {
-
-				pool.HasClientInfoBroadcastStarted = true
-				utils.Cp("yellowBg", "Broadcasting client info start!")
-
-				// begin braodcasting client info at regular intervals
-				go pool.BeginBroadcastClientInfoMessage()
-
-				// begin start game countdown
-				go pool.StartGameCountdown()
-			}
-
-			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
-
-			break
-
-		case client := <-pool.Unregister:
-			// on client disconnect, delete the client from Pool.Client slice
-			pool.removeClientFromList(client)
-
-			// broadcast the leaving of client
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:       2,
-				TypeStr:    messageTypeMap[2],
-				ClientId:   client.ID,
-				ClientName: client.Name,
-			})
-
-			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
-
-			break
-
-		case message := <-pool.Broadcast:
-			// on message received from any of the clients in the pool, broadcast the message
-			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
-
-			switch message.Type {
-			case 3:
-				correctGuess := pool.UpdateScore(message)
-				if correctGuess {
-					message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
-					message.Type = 31
-					message.TypeStr = messageTypeMap[31]
-				}
-
-				pool.BroadcastMsg(message)
-
-			case 34:
-				pool.CurrWord = message.Content
-
-			case 4, 5:
-				message.CurrSketcherId = pool.CurrSketcher.ID
-				pool.BroadcastMsg(message)
-
-			case 7:
-				pool.StartGameRequest()
-
-			default:
-				break
-			}
-		}
-	}
-}
-
 func (pool *Pool) startGameAndBroadcast() {
 	// flag and broadcast the starting of the game
 	pool.HasGameStarted = true
@@ -288,6 +202,105 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
 	return false
 }
 
+func (pool *Pool) EndGame() {
+	// flag and broadcast game end
+
+	utils.Cp("yellowBg", "All players done playing!")
+
+	pool.HasGameEnded = true
+	pool.BroadcastMsg(model.SocketMessage{
+		Type:    9,
+		TypeStr: messageTypeMap[9],
+		Content: pool.getClientInfoList().Content,
+	})
+}
+
+func (pool *Pool) Start() {
+	// start listening to pool connections and messages
+	for {
+		select {
+		case client := <-pool.Register:
+			// on client register, append the client to Pool.Clients slice
+			pool.appendClientToList(client)
+
+			// broadcast the joining of client
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:       1,
+				TypeStr:    messageTypeMap[1],
+				ClientId:   client.ID,
+				ClientName: client.Name,
+			})
+
+			// send client info list once client joins
+			pool.BroadcastMsg(pool.getClientInfoList())
+
+			// start broadcasting client info list on first client join
+			if len(pool.Clients) == 1 &&
+				!pool.HasClientInfoBroadcastStarted &&
+				!pool.HasGameStarted {
+
+				pool.HasClientInfoBroadcastStarted = true
+				utils.Cp("yellowBg", "Broadcasting client info start!")
+
+				// begin braodcasting client info at regular intervals
+				go pool.BeginBroadcastClientInfoMessage()
+
+				// begin start game countdown
+				go pool.StartGameCountdown()
+			}
+
+			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
+
+			break
+
+		case client := <-pool.Unregister:
+			// on client disconnect, delete the client from Pool.Client slice
+			pool.removeClientFromList(client)
+
+			// broadcast the leaving of client
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:       2,
+				TypeStr:    messageTypeMap[2],
+				ClientId:   client.ID,
+				ClientName: client.Name,
+			})
+
+			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
+
+			break
+
+		case message := <-pool.Broadcast:
+			// on message received from any of the clients in the pool, broadcast the message
+			// any of the game logic there is will be applied when clients do something, which will happen after the message is received from any of the clients
+
+			switch message.Type {
+			case 3:
+				correctGuess := pool.UpdateScore(message)
+				if correctGuess {
+					message.Type = 31
+					message.TypeStr = messageTypeMap[31]
+					message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
+				}
+
+				pool.BroadcastMsg(message)
+
+			case 34:
+				pool.CurrWord = message.Content // client choosing word
+
+			case 4, 5:
+				message.CurrSketcherId = pool.CurrSketcher.ID
+				pool.BroadcastMsg(message)
+
+			case 7:
+				pool.StartGameRequest()
+
+			default:
+				break
+			}
+		}
+	}
+}
+
 func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
@@ -332,6 +345,19 @@ func (pool *Pool) BeginGameFlow() {
 				CurrSketcherName: pool.CurrSketcher.Name,
 			})
 
+			// start a timeout for assigning word if not chosen by client
+			go func() {
+				time.Sleep(TimeoutForChoosingWord)
+
+				if pool.CurrWord == "" {
+					fmt.Println("auto assigned")
+					pool.CurrWord = utils.GetRandomWord(words)
+					return
+				}
+
+				fmt.Println("exiting timeout wo auto assignment")
+			}()
+
 			// run an infinite loop until pool.CurrWord is initialised by sketcher client, initialised in pool.Start func, TODO: create a timeout instead
 			for pool.CurrWord == "" {
 			}
@@ -375,17 +401,4 @@ func (pool *Pool) BeginGameFlow() {
 
 	// once all clients are done playing, end the game and broadcast the same
 	pool.EndGame()
-}
-
-func (pool *Pool) EndGame() {
-	// flag and broadcast game end
-
-	utils.Cp("yellowBg", "All players done playing!")
-
-	pool.HasGameEnded = true
-	pool.BroadcastMsg(model.SocketMessage{
-		Type:    9,
-		TypeStr: messageTypeMap[9],
-		Content: pool.getClientInfoList().Content,
-	})
 }
