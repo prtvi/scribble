@@ -26,7 +26,7 @@ function getCanvasSize() {
 	return { w: cw, h: ch };
 }
 
-// drawing
+// drawing on canvas
 
 function updatePositionCanvas(event) {
 	paintUtils.coords.x = event.clientX - canvas.offsetLeft;
@@ -64,16 +64,9 @@ async function paint(event) {
 	sendImgData();
 }
 
-function displayImgOnCanvas(socketMessage) {
-	// display image data on canvas
+// render canvas data
 
-	if (clientId === socketMessage.currSketcherId) return;
-
-	var img = new Image();
-	// scale up/down canvas data based on current canvas size using outer bounds
-	img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-	img.setAttribute('src', socketMessage.content);
-}
+// clear canvas
 
 function requestCanvasClear() {
 	// broadcast clear canvas
@@ -88,10 +81,7 @@ function requestCanvasClear() {
 	sendViaSocket(socketMsg);
 }
 
-function clearCanvas() {
-	hideOverlay();
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+// send image data
 
 function sendImgData() {
 	// called by paint function
@@ -107,9 +97,3 @@ function sendImgData() {
 	// sending canvas data
 	sendViaSocket(socketMsg);
 }
-
-window.addEventListener('load', () => {
-	document.addEventListener('mousedown', startPainting);
-	document.addEventListener('mouseup', stopPainting);
-	document.addEventListener('mousemove', paint);
-});

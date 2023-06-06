@@ -1,6 +1,16 @@
 'use strict';
 
+// canvas, canvas ctx and overlay init
 const { canvas, ctx, overlay } = initCanvasAndOverlay();
+
+// utils for painting on canvas
+const paintUtils = {
+	coords: { x: 0, y: 0 },
+	color: `#${clientColor}`,
+	isPainting: false,
+	hasGameStarted: false,
+	isAllowedToPaint: false,
+};
 
 // init socket connection and check game begin status
 const socket = initSocket();
@@ -8,71 +18,36 @@ const startGameTimerId = gameStartTimer();
 
 let wordExpiryTimerIdG;
 
-function gameStartTimer() {
-	// start game countdown to show user how much time is left for game to start
-	return setInterval(
-		() =>
-			(document.querySelector('.loading').textContent =
-				getSecondsLeftFrom(gameStartTime)),
-		1000
-	);
-}
+// chat
+document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
 
-function startGame(socketMessage) {
-	// called when socket receives message from server with type as 6
-	if (!socketMessage.success) return;
+// show number of characters typed in chat box
+document.querySelector('.msg').addEventListener('input', function (e) {
+	document.querySelector('.input-wrapper span').textContent =
+		e.target.value.length;
+});
 
-	console.log('game started by server');
+// event listeners for drawing
+window.addEventListener('load', () => {
+	document.addEventListener('mousedown', startPainting);
+	document.addEventListener('mouseup', stopPainting);
+	document.addEventListener('mousemove', paint);
+});
 
-	paintUtils.hasGameStarted = true;
-	clearAllIntervals(startGameTimerId);
+// copy joining link
+document
+	.querySelector('.joining-link')
+	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
 
-	// hide the div and toggle paintUtils.has Game Started
-	hideOverlay();
-	document.querySelector('.joining-link-div').classList.add('hidden');
-}
+// add event listener to start game button to start game
+document.querySelector('.start-game-btn').addEventListener('click', () => {
+	const socketMsg = {
+		type: 7,
+		typeStr: 'start_game',
+		clientId,
+		clientName,
+		poolId,
+	};
 
-function beginClientSketchingFlow(socketMessage) {
-	hideOverlay();
-
-	// initialise the time at which this word expires
-	const currentWordExpiresAt = new Date(
-		socketMessage.currWordExpiresAt
-	).getTime();
-
-	// start timer for the word expiry
-	const wordExpiryTimerId = setInterval(() => {
-		const timeLeftDiv = document.querySelector('.time-left-for-word span');
-
-		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
-		timeLeftDiv.textContent = `Time: ${secondsLeft} seconds`;
-
-		if (secondsLeft <= 0) clearAllIntervals(wordExpiryTimerId);
-	}, 1000);
-
-	const word = document.querySelector('.word span');
-	const painterUtilsDiv = document.querySelector('.painter-utils');
-	const clearCanvasBtn = document.querySelector('.clear-canvas');
-
-	// for enabling drawing access if clientId matches
-	if (clientId === socketMessage.currSketcherId) {
-		paintUtils.isAllowedToPaint = true;
-
-		// display the word
-		word.textContent = socketMessage.currWord;
-
-		// display painter utils div and add EL for clearing the canvas
-		painterUtilsDiv.classList.remove('hidden');
-		clearCanvasBtn.addEventListener('click', requestCanvasClear);
-	} else {
-		// show word length
-		word.textContent = `${socketMessage.currWord.length} characters`;
-
-		// paintUtils.isAllowedToPaint = false;
-		// display painter utils div and remove EL
-		// painterUtilsDiv.classList.add('hidden');
-		// clearCanvasBtn.removeEventListener('click', requestCanvasClear);
-	}
-
-	return wordExpiryTimerId;
-}
+	sendViaSocket(socketMsg);
+});

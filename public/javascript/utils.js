@@ -1,16 +1,17 @@
 'use strict';
 
-// utils for painting on canvas
-const paintUtils = {
-	coords: { x: 0, y: 0 },
-	color: `#${clientColor}`,
-	isPainting: false,
-	hasGameStarted: false,
-	isAllowedToPaint: false,
-};
-
 function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getDomain() {
+	// extract domain from url
+	const url = window.location.href;
+	const fi = url.indexOf('/');
+	const li = url.lastIndexOf('/');
+	const domain = url.slice(fi + 2, li);
+
+	return domain;
 }
 
 function getSecondsLeftFrom(futureTime) {
@@ -23,53 +24,14 @@ function clearAllIntervals(...ids) {
 	ids.forEach(i => clearInterval(i));
 }
 
-function displayScores(socketMessage) {
-	const dataArr = JSON.parse(socketMessage.content);
-
-	let html = `<div> <table>
-	<tr>
-		<th>Name</th>
-		<th>Score</th>
-	</tr>`;
-	dataArr.forEach(
-		item => (html += `<tr><td>${item.name}</td><td>${item.score}</td></tr>`)
+function gameStartTimer() {
+	// start game countdown to show user how much time is left for game to start
+	return setInterval(
+		() =>
+			(document.querySelector('.loading').textContent =
+				getSecondsLeftFrom(gameStartTime)),
+		1000
 	);
-	html += `</table> </div>`;
-
-	overlay.innerHTML = html;
-	displayOverlay();
-
-	clearAllIntervals(wordExpiryTimerIdG);
-}
-
-function disableSketching(socketMessage) {
-	if (clientId !== socketMessage.currSketcherId) return;
-
-	const painterUtilsDiv = document.querySelector('.painter-utils');
-	const clearCanvasBtn = document.querySelector('.clear-canvas');
-
-	paintUtils.isAllowedToPaint = false;
-
-	// display painter utils div and remove EL
-	painterUtilsDiv.classList.add('hidden');
-	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
-}
-
-// render clients
-
-function renderClients(allClients) {
-	// called when the socket conn receives a message from server as type 6
-
-	if (allClients.length === 0) return;
-
-	const membersDiv = document.querySelector('.members');
-	membersDiv.innerHTML = '';
-
-	// parse array of objects into json
-	allClients = JSON.parse(allClients);
-
-	// render
-	allClients.forEach((n, i) => membersDiv.appendChild(getClientNameDiv(n, i)));
 }
 
 function getClientNameDiv(clientInfo, iteration) {
@@ -104,31 +66,6 @@ function getClientNameDiv(clientInfo, iteration) {
 	return clientNameDiv;
 }
 
-//  chat
-
-function appendChatMsgToDOM(msg, formatColor) {
-	// adds the msg into the DOM
-
-	if (msg.length === 0 || msg === '') return;
-
-	const messagesDiv = document.querySelector('.messages');
-
-	const msgDiv = document.createElement('div');
-	msgDiv.classList.add('message');
-
-	const text = document.createElement('span');
-	text.textContent = msg;
-	text.style.color = formatColor || '#000';
-
-	msgDiv.appendChild(text);
-	messagesDiv.appendChild(msgDiv);
-
-	msgDiv.scrollIntoView();
-
-	document.querySelector('.msg').value = '';
-	document.querySelector('.input-wrapper span').textContent = 0;
-}
-
 function sendChatMsgBtnEL(e) {
 	// event listener to send chat message
 
@@ -151,50 +88,6 @@ function sendChatMsgBtnEL(e) {
 	sendViaSocket(socketMsg);
 }
 
-function renderRoundDetails(socketMessage) {
-	document.querySelector(
-		'.round span'
-	).textContent = `Round: ${socketMessage.currRound}`;
-
-	overlay.innerHTML = `<div>Round: ${socketMessage.currRound}</div>`;
-	displayOverlay();
-}
-
-function showWordToSelect(socketMessage) {
-	if (clientId === socketMessage.currSketcherId) {
-		const words = JSON.parse(socketMessage.content);
-
-		const html = `<div>
-		<p>Choose a word to draw</p>
-		<span class="word-option" id="0">${words[0]}</span>
-		<span class="word-option" id="1">${words[1]}</span>
-		<span class="word-option" id="2">${words[2]}</span>
-		</div>`;
-
-		overlay.innerHTML = html;
-		displayOverlay();
-
-		overlay.querySelector('div').addEventListener('click', function (e) {
-			const chosenWord = e.target.textContent.trim();
-			if (!words.includes(chosenWord)) return;
-
-			const socketMsg = {
-				type: 34,
-				typeStr: 'chosen_word',
-				content: e.target.textContent.trim(),
-				clientName,
-				clientId,
-				poolId,
-			};
-
-			sendViaSocket(socketMsg);
-		});
-	} else {
-		overlay.innerHTML = `<div>${socketMessage.currSketcherName} is choosing a word!</div>`;
-		displayOverlay();
-	}
-}
-
 function displayOverlay() {
 	overlay.style.display = 'flex';
 }
@@ -202,16 +95,3 @@ function displayOverlay() {
 function hideOverlay() {
 	overlay.style.display = 'none';
 }
-
-document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
-
-// show number of characters typed in chat box
-document.querySelector('.msg').addEventListener('input', function (e) {
-	document.querySelector('.input-wrapper span').textContent =
-		e.target.value.length;
-});
-
-// copy joining link
-document
-	.querySelector('.joining-link')
-	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
