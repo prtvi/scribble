@@ -72,7 +72,7 @@ function requestCanvasClear() {
 	// broadcast clear canvas
 	const socketMsg = {
 		type: 5,
-		typeStr: 'clear_canvas',
+		typeStr: messageTypeMap.get(5),
 		clientId,
 		clientName,
 		poolId,
@@ -87,7 +87,7 @@ function sendImgData() {
 	// called by paint function
 	const socketMsg = {
 		type: 4,
-		typeStr: 'canvas_data',
+		typeStr: messageTypeMap.get(4),
 		content: String(canvas.toDataURL('img/png')),
 		clientName,
 		clientId,

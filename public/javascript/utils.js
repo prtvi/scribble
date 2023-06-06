@@ -77,7 +77,7 @@ function sendChatMsgBtnEL(e) {
 	// create string response object
 	const socketMsg = {
 		type: 3,
-		typeStr: 'text_msg',
+		typeStr: messageTypeMap.get(3),
 		content: msg,
 		clientName,
 		clientId,
@@ -93,5 +93,38 @@ function displayOverlay() {
 }
 
 function hideOverlay() {
+	overlay.innerHTML = '';
 	overlay.style.display = 'none';
+}
+
+//
+//
+//
+//
+//
+
+// event listeners
+
+function copyJoiningLinkEL() {
+	navigator.clipboard.writeText(joiningLink);
+}
+
+function hideAndRemoveElForJoiningLink() {
+	document
+		.querySelector('.joining-link')
+		.removeEventListener('click', copyJoiningLinkEL);
+
+	document.querySelector('.joining-link-div').classList.add('hidden');
+}
+
+function startGameEl() {
+	const socketMsg = {
+		type: 7,
+		typeStr: messageTypeMap.get(7),
+		clientId,
+		clientName,
+		poolId,
+	};
+
+	sendViaSocket(socketMsg);
 }

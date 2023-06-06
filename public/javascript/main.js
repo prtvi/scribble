@@ -17,15 +17,19 @@ const socket = initSocket();
 const startGameTimerId = gameStartTimer();
 
 let wordExpiryTimerIdG;
+let messageTypeMap;
 
 // chat
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
 
 // show number of characters typed in chat box
-document.querySelector('.msg').addEventListener('input', function (e) {
-	document.querySelector('.input-wrapper span').textContent =
-		e.target.value.length;
-});
+const lenIndicator = document.querySelector('.input-wrapper span');
+document
+	.querySelector('.msg')
+	.addEventListener(
+		'input',
+		e => (lenIndicator.textContent = e.target.value.length)
+	);
 
 // event listeners for drawing
 window.addEventListener('load', () => {
@@ -37,17 +41,9 @@ window.addEventListener('load', () => {
 // copy joining link
 document
 	.querySelector('.joining-link')
-	.addEventListener('click', () => navigator.clipboard.writeText(joiningLink));
+	.addEventListener('click', copyJoiningLinkEL);
 
 // add event listener to start game button to start game
-document.querySelector('.start-game-btn').addEventListener('click', () => {
-	const socketMsg = {
-		type: 7,
-		typeStr: 'start_game',
-		clientId,
-		clientName,
-		poolId,
-	};
-
-	sendViaSocket(socketMsg);
-});
+document
+	.querySelector('.start-game-btn')
+	.addEventListener('click', startGameEl);

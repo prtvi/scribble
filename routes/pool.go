@@ -39,8 +39,8 @@ func (pool *Pool) startGameAndBroadcast() {
 	// flag and broadcast the starting of the game
 	pool.HasGameStarted = true
 	pool.BroadcastMsg(model.SocketMessage{
-		Type:    7,
-		TypeStr: messageTypeMap[7],
+		Type:    70,
+		TypeStr: messageTypeMap[70],
 		Success: true,
 	})
 }
@@ -101,12 +101,16 @@ func (pool *Pool) flagAllClientsAsNotGuessed() {
 	}
 }
 
+func printSocketMessage(m model.SocketMessage) {
+	utils.Cp("cyan", "msg type:", utils.Cs("yellow", fmt.Sprintf("%d", m.Type)), utils.Cs("reset", messageTypeMap[m.Type], utils.Cs("cyan", "from:"), m.ClientName))
+}
+
 func (pool *Pool) GetColorForClient() string {
 	return pool.ColorList[0]
 }
 
 func (pool *Pool) BroadcastMsg(message model.SocketMessage) {
-	utils.Cp("cyan", "Broadcasting type:", utils.Cs("yellow", fmt.Sprintf("%d:", message.Type)), utils.Cs("reset", messageTypeMap[message.Type], utils.Cs("blue", "from:"), message.ClientName))
+	printSocketMessage(message)
 
 	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
@@ -223,6 +227,14 @@ func (pool *Pool) Start() {
 			// on client register, append the client to Pool.Clients slice
 			pool.appendClientToList(client)
 
+			// send the messageTypeMap to clients
+			byteInfo, _ := json.Marshal(messageTypeMap)
+			pool.BroadcastMsg(model.SocketMessage{
+				Type:    10,
+				TypeStr: messageTypeMap[10],
+				Content: string(byteInfo),
+			})
+
 			// broadcast the joining of client
 			pool.BroadcastMsg(model.SocketMessage{
 				Type:       1,
@@ -285,13 +297,15 @@ func (pool *Pool) Start() {
 				pool.BroadcastMsg(message)
 
 			case 34:
+				printSocketMessage(message)
 				pool.CurrWord = message.Content // client choosing word
 
 			case 4, 5:
-				message.CurrSketcherId = pool.CurrSketcher.ID
+				message.CurrSketcherId = pool.CurrSketcher.ID // to disable redrawing on sketcher's canvas
 				pool.BroadcastMsg(message)
 
 			case 7:
+				printSocketMessage(message)
 				pool.StartGameRequest()
 
 			default:

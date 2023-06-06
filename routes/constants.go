@@ -17,19 +17,26 @@ var (
 var HUB = map[string]*Pool{}
 
 var messageTypeMap = map[int]string{
-	1:  "client_connect",    // server b=> clients
-	2:  "client_disconnect", // server b=> clients
-	3:  "text_msg",          // client b=> clients
-	31: "correct_guess",     // server b=> clients
-	32: "reveal_word",       // server b=> clients
-	33: "choose_word",       // server b=> clients
-	34: "chosen_word",       // client  => server
-	4:  "canvas_data",       // client b=> clients
-	5:  "clear_canvas",      // client b=> clients
-	6:  "client_info",       // server b=> clients --at regular intervals
-	7:  "start_game",        // client  => server  --to start the game
-	71: "round_num",         // server b=> clients
-	8:  "word_assigned",     // server b=> clients
-	81: "turn_over",         // server b=> clients
-	9:  "end_game",          // server b=> clients
+	// server b=> clients
+	1:  "sc___client_connect",
+	2:  "sc___client_disconnect",
+	31: "sc___correct_guess",
+	32: "sc___reveal_word",
+	33: "sc___choose_word",
+	6:  "sc___client_info",
+	70: "sc___game_started",
+	71: "sc___round_num",
+	8:  "sc___word_assigned",
+	81: "sc___turn_over",
+	9:  "sc___end_game",
+	10: "sc___get_this_map",
+
+	// client => server
+	34: "cs___chosen_word",
+	7:  "cs___req_start_game",
+
+	// client => server b=> clients
+	3: "csc___text_msg",
+	4: "csc___canvas_data",
+	5: "csc___clear_canvas",
 }

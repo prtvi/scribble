@@ -42,7 +42,7 @@ function showWordToChoose(socketMessage) {
 
 			const socketMsg = {
 				type: 34,
-				typeStr: 'chosen_word',
+				typeStr: messageTypeMap.get(34),
 				content: chosenWord,
 				clientName,
 				clientId,
@@ -101,9 +101,13 @@ function startGame(socketMessage) {
 	paintUtils.hasGameStarted = true;
 	clearAllIntervals(startGameTimerId);
 
+	document
+		.querySelector('.start-game-btn')
+		.removeEventListener('click', startGameEl);
+
 	// hide the div and toggle paintUtils.has Game Started
 	hideOverlay();
-	document.querySelector('.joining-link-div').classList.add('hidden');
+	hideAndRemoveElForJoiningLink();
 }
 
 // 71
@@ -189,4 +193,13 @@ function displayScores(socketMessage) {
 	displayOverlay();
 
 	clearAllIntervals(wordExpiryTimerIdG);
+}
+
+// 10
+function makeMessageTypeMapGlobal(socketMessage) {
+	const m = JSON.parse(socketMessage.content);
+	const keys = Object.keys(m);
+
+	messageTypeMap = new Map();
+	keys.forEach(k => messageTypeMap.set(Number(k), m[k]));
 }

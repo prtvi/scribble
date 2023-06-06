@@ -74,7 +74,7 @@ function socketOnMessage(message) {
 			renderClients(socketMessage.content);
 			break;
 
-		case 7:
+		case 70:
 			startGame(socketMessage);
 			break;
 
@@ -92,6 +92,10 @@ function socketOnMessage(message) {
 
 		case 9:
 			displayScores(socketMessage);
+			break;
+
+		case 10:
+			makeMessageTypeMapGlobal(socketMessage);
 			break;
 
 		default:
