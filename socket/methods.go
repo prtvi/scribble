@@ -1,4 +1,4 @@
-package routes
+package socket
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package routes
+package socket
 
 import (
 	model "scribble/model"

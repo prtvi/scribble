@@ -1,7 +1,7 @@
 package main
 
 import (
-	routes "scribble/routes"
+	socket "scribble/socket"
 	utils "scribble/utils"
 
 	"github.com/labstack/echo/v4"
@@ -12,21 +12,21 @@ func main() {
 	e.Static("/public", "public")
 	e.Renderer = utils.InitTemplates()
 
-	go routes.Maintainer()
+	go socket.Maintainer()
 
-	routes.DebugMode()
+	socket.DebugMode()
 
-	ee := e.Group("", routes.Logger)
+	ee := e.Group("", socket.Logger)
 
-	ee.GET("/", routes.Welcome)
+	ee.GET("/", socket.Welcome)
 
-	ee.GET("/create-pool", routes.CreatePool)
-	ee.POST("/create-pool", routes.CreatePoolLink)
+	ee.GET("/create-pool", socket.CreatePool)
+	ee.POST("/create-pool", socket.CreatePoolLink)
 
-	ee.GET("/app", routes.App)
-	ee.POST("/app", routes.RegisterToPool)
+	ee.GET("/app", socket.App)
+	ee.POST("/app", socket.RegisterToPool)
 
-	ee.GET("/ws", routes.HandlerWsConnection)
+	ee.GET("/ws", socket.HandlerWsConnection)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
