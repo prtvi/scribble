@@ -170,14 +170,17 @@ func (pool *Pool) StartGameRequest() {
 	go pool.BeginGameFlow()
 }
 
-func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
+func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 	// update score for the client that guesses the word right, return true if correctly guessed
+
+	var correctGuess, wordExistsInMessage bool
 
 	// when the game has not begun, the curr sketcher will be nil
 	if pool.CurrSketcher == nil {
-		return false
+		return message
 	}
 
+	// get the guesser client
 	var guesserClient *Client = nil
 	for _, c := range pool.Clients {
 		// init guesserClient only if the guesser is not the sketcher
@@ -193,17 +196,37 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) bool {
 	if guesserClient != nil &&
 		strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) &&
 		!guesserClient.HasGuessed {
+
+		correctGuess = true
+
 		// increment score and flag as guessed
-		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
 		guesserClient.HasGuessed = true
+		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
 
 		// broadcast client info list to update score on UI immediately
 		pool.BroadcastMsg(pool.getClientInfoList())
-
-		return true
 	}
 
-	return false
+	// check if the text message contains the word
+	if strings.Contains(strings.ToLower(message.Content), strings.ToLower(pool.CurrWord)) {
+		wordExistsInMessage = true
+	}
+
+	// if correct guess then modify the message
+	if correctGuess {
+		message.Type = 31
+		message.TypeStr = messageTypeMap[31]
+		message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
+	}
+
+	// if word exists in the message
+	if wordExistsInMessage {
+		message.Type = 31
+		message.TypeStr = messageTypeMap[31]
+		message.Content = fmt.Sprintf("Naughty huh 😏 @%s", message.ClientName)
+	}
+
+	return message
 }
 
 func (pool *Pool) EndGame() {
@@ -287,18 +310,8 @@ func (pool *Pool) Start() {
 
 			switch message.Type {
 			case 3:
-				correctGuess := pool.UpdateScore(message)
-				if correctGuess {
-					message.Type = 31
-					message.TypeStr = messageTypeMap[31]
-					message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
-				}
-
+				message := pool.UpdateScore(message)
 				pool.BroadcastMsg(message)
-
-			case 34:
-				printSocketMessage(message)
-				pool.CurrWord = message.Content // client choosing word
 
 			case 4, 5:
 				message.CurrSketcherId = pool.CurrSketcher.ID // to disable redrawing on sketcher's canvas
@@ -307,6 +320,10 @@ func (pool *Pool) Start() {
 			case 7:
 				printSocketMessage(message)
 				pool.StartGameRequest()
+
+			case 34:
+				printSocketMessage(message)
+				pool.CurrWord = message.Content // client choosing word
 
 			default:
 				break
