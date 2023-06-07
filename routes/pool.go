@@ -1,9 +1,7 @@
 package routes
 
 import (
-	"encoding/json"
 	"fmt"
-	model "scribble/model"
 	utils "scribble/utils"
 	"time"
 )
@@ -17,23 +15,13 @@ func (pool *Pool) Start() {
 			pool.appendClientToList(client)
 
 			// send the messageTypeMap to clients
-			byteInfo, _ := json.Marshal(messageTypeMap)
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:    10,
-				TypeStr: messageTypeMap[10],
-				Content: string(byteInfo),
-			})
+			pool.broadcastMessageTypeMap()
 
 			// broadcast the joining of client
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:       1,
-				TypeStr:    messageTypeMap[1],
-				ClientId:   client.ID,
-				ClientName: client.Name,
-			})
+			pool.broadcastClientRegister(client.ID, client.Name)
 
 			// send client info list once client joins
-			pool.BroadcastMsg(pool.getClientInfoList())
+			pool.broadcastClientInfoList()
 
 			// start broadcasting client info list on first client join
 			if len(pool.Clients) == 1 &&
@@ -44,7 +32,7 @@ func (pool *Pool) Start() {
 				utils.Cp("yellowBg", "Broadcasting client info start!")
 
 				// begin braodcasting client info at regular intervals
-				go pool.BeginBroadcastClientInfoMessage()
+				go pool.BeginBroadcastClientInfo()
 
 				// begin start game countdown
 				go pool.StartGameCountdown()
@@ -59,12 +47,7 @@ func (pool *Pool) Start() {
 			pool.removeClientFromList(client)
 
 			// broadcast the leaving of client
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:       2,
-				TypeStr:    messageTypeMap[2],
-				ClientId:   client.ID,
-				ClientName: client.Name,
-			})
+			pool.broadcastClientUnregister(client.ID, client.Name)
 
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
@@ -77,11 +60,11 @@ func (pool *Pool) Start() {
 			switch message.Type {
 			case 3:
 				message := pool.UpdateScore(message)
-				pool.BroadcastMsg(message)
+				pool.broadcast(message)
 
 			case 4, 5:
 				message.CurrSketcherId = pool.CurrSketcher.ID // to disable redrawing on sketcher's canvas
-				pool.BroadcastMsg(message)
+				pool.broadcast(message)
 
 			case 7:
 				PrintSocketMessage(message)
@@ -106,11 +89,7 @@ func (pool *Pool) BeginGameFlow() {
 		pool.CurrRound = i + 1
 
 		// broadcast round number
-		pool.BroadcastMsg(model.SocketMessage{
-			Type:      71,
-			TypeStr:   messageTypeMap[71],
-			CurrRound: pool.CurrRound,
-		})
+		pool.broadcastRoundNumber()
 
 		time.Sleep(WaitAfterRoundStarts)
 
@@ -118,10 +97,7 @@ func (pool *Pool) BeginGameFlow() {
 		for _, c := range pool.Clients {
 
 			// broadcast clear canvas event
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:    5,
-				TypeStr: messageTypeMap[5],
-			})
+			pool.broadcastClearCanvasEvent()
 
 			// flag all clients as not guessed
 			pool.flagAllClientsAsNotGuessed()
@@ -132,28 +108,10 @@ func (pool *Pool) BeginGameFlow() {
 
 			// create a list of words for client to choose
 			words := utils.Get3RandomWords(utils.WORDS)
-
-			byteInfo, _ := json.Marshal(words)
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:             33,
-				TypeStr:          messageTypeMap[33],
-				Content:          string(byteInfo),
-				CurrSketcherId:   pool.CurrSketcher.ID,
-				CurrSketcherName: pool.CurrSketcher.Name,
-			})
+			pool.broadcast3WordsList(words)
 
 			// start a timeout for assigning word if not chosen by client
-			go func() {
-				time.Sleep(TimeoutForChoosingWord)
-
-				if pool.CurrWord == "" {
-					fmt.Println("auto assigned")
-					pool.CurrWord = utils.GetRandomWord(words)
-					return
-				}
-
-				fmt.Println("exiting timeout wo auto assignment")
-			}()
+			go pool.wordChooseCountdown(words)
 
 			// run an infinite loop until pool.CurrWord is initialised by sketcher client, initialised in pool.Start func, TODO: create a timeout instead
 			for pool.CurrWord == "" {
@@ -164,30 +122,16 @@ func (pool *Pool) BeginGameFlow() {
 
 			// broadcast current word, current sketcher and other details to all clients
 			// TODO: send the whole thing to client who's sketching, send minimal details to rest
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:              8,
-				TypeStr:           messageTypeMap[8],
-				CurrSketcherId:    pool.CurrSketcher.ID,
-				CurrWord:          pool.CurrWord,
-				CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
-			})
+			pool.broadcastCurrentWordDetails()
 
 			// sleep until the word expires
 			time.Sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
 			// broadcast turn_over
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:           81,
-				TypeStr:        messageTypeMap[81],
-				CurrSketcherId: pool.CurrSketcher.ID,
-			})
+			pool.broadcastTurnOver()
 
 			// reveal the word
-			pool.BroadcastMsg(model.SocketMessage{
-				Type:    32,
-				TypeStr: messageTypeMap[32],
-				Content: fmt.Sprintf("%s was the correct word!", pool.CurrWord),
-			})
+			pool.broadcastWordReveal()
 
 			pool.CurrWord = ""
 			pool.CurrSketcher = nil

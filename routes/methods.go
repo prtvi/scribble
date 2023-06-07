@@ -9,16 +9,6 @@ import (
 	"time"
 )
 
-func (pool *Pool) startGameAndBroadcast() {
-	// flag and broadcast the starting of the game
-	pool.HasGameStarted = true
-	pool.BroadcastMsg(model.SocketMessage{
-		Type:    70,
-		TypeStr: messageTypeMap[70],
-		Success: true,
-	})
-}
-
 func (pool *Pool) getClientInfoList() model.SocketMessage {
 	// returns client info list embedded in model.SocketMessage
 
@@ -79,14 +69,50 @@ func (pool *Pool) getColorForClient() string {
 	return pool.ColorList[0]
 }
 
+func (pool *Pool) wordChooseCountdown(words []string) {
+	time.Sleep(TimeoutForChoosingWord)
+
+	if pool.CurrWord == "" {
+		fmt.Println("auto assigned")
+		pool.CurrWord = utils.GetRandomWord(words)
+		return
+	}
+
+	fmt.Println("exiting timeout wo auto assignment")
+}
+
+func (pool *Pool) startGameAndBroadcast() {
+	// flag and broadcast the starting of the game
+	pool.HasGameStarted = true
+	pool.broadcast(model.SocketMessage{
+		Type:    70,
+		TypeStr: messageTypeMap[70],
+		Success: true,
+	})
+}
+
 // methods called in Start or BeginGameFlow funcs
+
+func (pool *Pool) BeginBroadcastClientInfo() {
+	// to be run as a go routine
+	// starts an infinite loop to broadcast client info after every regular interval
+	for {
+		time.Sleep(RenderClientsEvery)
+		pool.broadcastClientInfoList()
+
+		// stop broadcasting when game ends
+		if pool.HasGameEnded || len(pool.Clients) == 0 {
+			utils.Cp("yellowBg", "Stopped broadcasting client info")
+			break
+		}
+	}
+}
 
 func (pool *Pool) StartGameCountdown() {
 	// as soon as the first player/client joins, start this countdown to start the game, after this timeout, the game begin message will broadcast
 
 	// sleep until its the game starting time
-	diff := pool.GameStartTime.Sub(time.Now())
-	time.Sleep(diff)
+	time.Sleep(pool.GameStartTime.Sub(time.Now()))
 
 	// if the game has already started by the client using the button then exit the countdown
 	if pool.HasGameStarted {
@@ -146,7 +172,7 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
 
 		// broadcast client info list to update score on UI immediately
-		pool.BroadcastMsg(pool.getClientInfoList())
+		pool.broadcastClientInfoList()
 	}
 
 	// check if the text message contains the word
@@ -177,7 +203,7 @@ func (pool *Pool) EndGame() {
 	utils.Cp("yellowBg", "All players done playing!")
 
 	pool.HasGameEnded = true
-	pool.BroadcastMsg(model.SocketMessage{
+	pool.broadcast(model.SocketMessage{
 		Type:    9,
 		TypeStr: messageTypeMap[9],
 		Content: pool.getClientInfoList().Content,
