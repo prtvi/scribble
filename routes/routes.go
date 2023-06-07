@@ -135,7 +135,7 @@ func RegisterToPool(c echo.Context) error {
 
 	// generate client id and color
 	clientId := utils.GenerateUUID()[0:8]
-	clientColor := pool.GetColorForClient()
+	clientColor := pool.getColorForClient()
 
 	// isFirstJoinee := (len(pool.Clients) == 0)
 

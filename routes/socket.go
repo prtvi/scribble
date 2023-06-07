@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	model "scribble/model"
-	utils "scribble/utils"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -79,47 +77,4 @@ func (c *Client) Read() {
 		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- clientMsg
 	}
-}
-
-func Maintainer() {
-	// clears the pools in which the game has ended every 10 mins
-
-	for {
-		time.Sleep(time.Minute * 10) // TODO - to be tested
-
-		for poolId, pool := range HUB {
-			if pool != nil && pool.HasGameEnded {
-				utils.Cp("yellowBg", "Removing pool from HUB, poolId:", poolId)
-				delete(HUB, poolId)
-
-				fmt.Println("Size of HUB:", len(HUB))
-			}
-
-			if now := time.Now(); now.Sub(pool.CreatedTime) > time.Duration(time.Minute*10) {
-				utils.Cp("yellowBg", "Removing pool from HUB after game not started for 10 mins, poolId:", poolId)
-				delete(HUB, poolId)
-
-				fmt.Println("Size of HUB:", len(HUB))
-			}
-		}
-	}
-}
-
-func DebugMode() {
-	GameStartDurationInSeconds = time.Duration(time.Second * 500)
-	TimeForEachWordInSeconds = time.Duration(time.Second * 30)
-	RenderClientsEvery = time.Duration(time.Second * 10)
-	ScoreForCorrectGuess = 25
-	NumberOfRounds = 3
-
-	poolId := "debug"
-	pool := NewPool(poolId, 4)
-
-	HUB[poolId] = pool
-	go pool.Start()
-
-	link := "/app?join=" + poolId
-	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link)
-
-	utils.Cp("greenBg", "----------- DEBUG MODE -----------")
 }
