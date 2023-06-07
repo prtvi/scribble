@@ -23,17 +23,17 @@ func InitTemplates() *Template {
 
 	tmpls["app"] = template.Must(template.ParseFiles(
 		"public/views/app.html",
-		"public/views/templates/header.html",
+		"public/views/partials/header.html",
 	))
 
-	tmpls["createPool"] = template.Must(template.ParseFiles(
-		"public/views/createPool.html",
-		"public/views/templates/header.html",
+	tmpls["createRoom"] = template.Must(template.ParseFiles(
+		"public/views/createRoom.html",
+		"public/views/partials/header.html",
 	))
 
 	tmpls["welcome"] = template.Must(template.ParseFiles(
 		"public/views/welcome.html",
-		"public/views/templates/header.html",
+		"public/views/partials/header.html",
 	))
 
 	return &Template{

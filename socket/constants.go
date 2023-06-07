@@ -7,6 +7,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// map of {poolId: pool}
+var HUB = map[string]*Pool{}
+
+// to handle socket connections
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -23,9 +27,6 @@ var (
 	ScoreForCorrectGuess       = 25
 	NumberOfRounds             = 3
 )
-
-// map of {poolId: pool}
-var HUB = map[string]*Pool{}
 
 var messageTypeMap = map[int]string{
 	// server b=> clients

@@ -20,8 +20,8 @@ func main() {
 
 	ee.GET("/", socket.Welcome)
 
-	ee.GET("/create-pool", socket.CreatePool)
-	ee.POST("/create-pool", socket.CreatePoolLink)
+	ee.GET("/create-room", socket.CreateRoom)
+	ee.POST("/create-room", socket.CreateRoomLink)
 
 	ee.GET("/app", socket.App)
 	ee.POST("/app", socket.RegisterToPool)

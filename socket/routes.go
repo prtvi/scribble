@@ -34,7 +34,7 @@ func Welcome(c echo.Context) error {
 	return c.Render(http.StatusOK, "welcome", nil)
 }
 
-// GET /ws?poolId=234bkj&clientId=123123&clientName=joy
+// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&clientColor=2def45
 func HandlerWsConnection(c echo.Context) error {
 	// handle socket connections for the pools
 
@@ -73,17 +73,17 @@ func HandlerWsConnection(c echo.Context) error {
 
 // -----------------------------------------------------------------------------
 
-// GET /create-pool
-func CreatePool(c echo.Context) error {
+// GET /create-room
+func CreateRoom(c echo.Context) error {
 	// render a form to create a new pool
-	return c.Render(http.StatusOK, "createPool", map[string]any{
+	return c.Render(http.StatusOK, "createRoom", map[string]any{
 		"RoomCreated": false,
 		"Link":        "",
 	})
 }
 
-// POST /create-pool
-func CreatePoolLink(c echo.Context) error {
+// POST /create-room
+func CreateRoomLink(c echo.Context) error {
 	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
 
 	// get the pool capacity from form input
@@ -105,7 +105,7 @@ func CreatePoolLink(c echo.Context) error {
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
 
 	// send the link for the same
-	return c.Render(http.StatusOK, "createPool", map[string]any{
+	return c.Render(http.StatusOK, "createRoom", map[string]any{
 		"RoomCreated": true,
 		"Link":        link,
 	})
