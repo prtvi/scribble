@@ -1,6 +1,17 @@
 package socket
 
-import "time"
+import (
+	"net/http"
+	"time"
+
+	"github.com/gorilla/websocket"
+)
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin:     func(r *http.Request) bool { return true },
+}
 
 var (
 	GameStartDurationInSeconds = time.Duration(time.Second * 120)

@@ -40,9 +40,75 @@ func HandlerWsConnection(c echo.Context) error {
 
 	// get the poolId from query params
 	poolId := c.QueryParam("poolId")
+	clientId := c.QueryParam("clientId")
+	clientName := c.QueryParam("clientName")
+	clientColor := c.QueryParam("clientColor")
 
-	// register connection
-	return ServeWs(HUB[poolId], c.Response().Writer, c.Request())
+	// register the socket connection from client
+	conn, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
+	if err != nil {
+		fmt.Fprintf(c.Response().Writer, "%+v\n", err)
+	}
+
+	pool := HUB[poolId]
+
+	// create a new client to append to Pool.Clients map
+	client := &Client{
+		ID:          clientId,
+		Name:        clientName,
+		Color:       clientColor,
+		HasSketched: false,
+		HasGuessed:  false,
+		Score:       0,
+		Conn:        conn,
+		Pool:        pool,
+	}
+
+	// register and notify other clients
+	pool.Register <- client
+	client.Read()
+
+	return nil
+}
+
+// -----------------------------------------------------------------------------
+
+// GET /create-pool
+func CreatePool(c echo.Context) error {
+	// render a form to create a new pool
+	return c.Render(http.StatusOK, "createPool", map[string]any{
+		"RoomCreated": false,
+		"Link":        "",
+	})
+}
+
+// POST /create-pool
+func CreatePoolLink(c echo.Context) error {
+	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
+
+	// get the pool capacity from form input
+	capacity, _ := strconv.Atoi(c.FormValue("capacity"))
+	utils.Cp("yellow", "Pool capacity:", utils.Cs("white", c.FormValue("capacity")))
+
+	// create a new pool with an uuid
+	poolId := utils.GenerateUUID()
+	pool := NewPool(poolId, capacity)
+
+	// append to global Hub map, and start listening to pool connections
+	HUB[poolId] = pool
+	go pool.Start()
+
+	utils.Cp("blue", "HUB size:", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
+
+	// generate link to join the pool
+	link := "/app?join=" + poolId
+	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
+
+	// send the link for the same
+	return c.Render(http.StatusOK, "createPool", map[string]any{
+		"RoomCreated": true,
+		"Link":        link,
+	})
 }
 
 // -----------------------------------------------------------------------------
@@ -162,45 +228,5 @@ func RegisterToPool(c echo.Context) error {
 		"ClientColor":   clientColor,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
 		// "IsFirstJoinee": isFirstJoinee,
-	})
-}
-
-// -----------------------------------------------------------------------------
-
-// GET /create-pool
-func CreatePool(c echo.Context) error {
-	// render a form to create a new pool
-	return c.Render(http.StatusOK, "createPool", map[string]any{
-		"RoomCreated": false,
-		"Link":        "",
-	})
-}
-
-// POST /create-pool
-func CreatePoolLink(c echo.Context) error {
-	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
-
-	// get the pool capacity from form input
-	capacity, _ := strconv.Atoi(c.FormValue("capacity"))
-	utils.Cp("yellow", "Pool capacity:", utils.Cs("white", c.FormValue("capacity")))
-
-	// create a new pool with an uuid
-	poolId := utils.GenerateUUID()
-	pool := NewPool(poolId, capacity)
-
-	// append to global Hub map, and start listening to pool connections
-	HUB[poolId] = pool
-	go pool.Start()
-
-	utils.Cp("blue", "HUB size:", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
-
-	// generate link to join the pool
-	link := "/app?join=" + poolId
-	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
-
-	// send the link for the same
-	return c.Render(http.StatusOK, "createPool", map[string]any{
-		"RoomCreated": true,
-		"Link":        link,
 	})
 }
