@@ -13,7 +13,7 @@ function appendChatMsgToDOM(msg, formatColor) {
 
 	const text = document.createElement('span');
 	text.textContent = msg;
-	text.style.color = formatColor || '#000';
+	text.style.color = formatColor || '#1d1d1f'; // f5f5f7
 
 	msgDiv.appendChild(text);
 	messagesDiv.appendChild(msgDiv);

@@ -11,16 +11,10 @@ func (pool *Pool) Start() {
 	for {
 		select {
 		case client := <-pool.Register:
-			// on client register, append the client to Pool.Clients slice
+			// on client register, append the client to Pool.Clients slice, broadcast messageTypeMap, joining of the client and client info list
 			pool.appendClientToList(client)
-
-			// send the messageTypeMap to clients
 			pool.broadcastMessageTypeMap()
-
-			// broadcast the joining of client
 			pool.broadcastClientRegister(client.ID, client.Name)
-
-			// send client info list once client joins
 			pool.broadcastClientInfoList()
 
 			// start broadcasting client info list on first client join
@@ -28,13 +22,9 @@ func (pool *Pool) Start() {
 				!pool.HasClientInfoBroadcastStarted &&
 				!pool.HasGameStarted {
 
+				// flag the client info broadcast start, run two sep goroutines to begin broadcasting client info at regular intervals and start game countdown
 				pool.HasClientInfoBroadcastStarted = true
-				utils.Cp("yellowBg", "Broadcasting client info start!")
-
-				// begin braodcasting client info at regular intervals
 				go pool.BeginBroadcastClientInfo()
-
-				// begin start game countdown
 				go pool.StartGameCountdown()
 			}
 
@@ -43,10 +33,8 @@ func (pool *Pool) Start() {
 			break
 
 		case client := <-pool.Unregister:
-			// on client disconnect, delete the client from Pool.Client slice
+			// on client disconnect, delete the client from Pool.Client slice and broadcast the unregister
 			pool.removeClientFromList(client)
-
-			// broadcast the leaving of client
 			pool.broadcastClientUnregister(client.ID, client.Name)
 
 			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
@@ -88,54 +76,26 @@ func (pool *Pool) BeginGameFlow() {
 	for i := 0; i < NumberOfRounds; i++ {
 		pool.CurrRound = i + 1
 
-		// broadcast round number
+		// broadcast round number and wait
 		pool.broadcastRoundNumber()
-
 		time.Sleep(WaitAfterRoundStarts)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
-
-			// broadcast clear canvas event
+			// broadcast clear canvas event, flag all clients as not guessed
 			pool.broadcastClearCanvasEvent()
-
-			// flag all clients as not guessed
 			pool.flagAllClientsAsNotGuessed()
 
-			// select the client
-			pool.CurrSketcher = c
-			c.HasSketched = true
-
-			// create a list of words for client to choose
-			words := utils.Get3RandomWords(utils.WORDS)
-			pool.broadcast3WordsList(words)
-
-			// start a timeout for assigning word if not chosen by client
-			go pool.wordChooseCountdown(words)
-
-			// run an infinite loop until pool.CurrWord is initialised by sketcher client, initialised in pool.Start func, TODO: create a timeout instead
-			for pool.CurrWord == "" {
-			}
-
-			// add the word expiry
-			pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
-
-			// broadcast current word, current sketcher and other details to all clients
-			// TODO: send the whole thing to client who's sketching, send minimal details to rest
-			pool.broadcastCurrentWordDetails()
-
-			// sleep until the word expires
+			// begin client drawing flow and sleep until the word expires
+			pool.clientWordAssignmentFlow(c)
 			time.Sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
-			// broadcast turn_over
+			// broadcast turn_over, reveal the word and clear canvas
 			pool.broadcastTurnOver()
-
-			// reveal the word
 			pool.broadcastWordReveal()
-
-			// broadcast clear canvas event
 			pool.broadcastClearCanvasEvent()
 
+			// clear the current word, sketcher
 			pool.CurrWord = ""
 			pool.CurrSketcher = nil
 

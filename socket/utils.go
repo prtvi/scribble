@@ -45,6 +45,7 @@ func Maintainer() {
 		time.Sleep(DeletePoolAfterGameEndsDuration) // TODO - to be tested
 
 		for poolId, pool := range HUB {
+			// if pool exists and game has ended
 			if pool != nil && pool.HasGameEnded {
 				utils.Cp("yellowBg", "Removing pool from HUB, poolId:", poolId)
 				delete(HUB, poolId)
@@ -52,8 +53,9 @@ func Maintainer() {
 				fmt.Println("Size of HUB:", len(HUB))
 			}
 
-			if now := time.Now(); now.Sub(pool.CreatedTime) > time.Duration(RemovePoolAfterGameNotStarted) {
-				utils.Cp("yellowBg", "Removing pool from HUB after game not started for RemovePoolAfterGameNotStarted mins, poolId:", poolId)
+			// if pool exists and game hasn't started for RemovePoolAfterGameNotStarted duration
+			if now := time.Now(); now.Sub(pool.CreatedTime) > RemovePoolAfterGameNotStarted {
+				utils.Cp("yellowBg", "Removing pool from HUB after game not started for RemovePoolAfterGameNotStarted duration, poolId:", poolId)
 				delete(HUB, poolId)
 
 				fmt.Println("Size of HUB:", len(HUB))
@@ -77,9 +79,9 @@ func DebugMode() {
 
 	poolId := "debug"
 	pool := NewPool(poolId, 4)
+	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+poolId)
 
 	HUB[poolId] = pool
-	go pool.Start()
 
-	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+poolId)
+	go pool.Start()
 }

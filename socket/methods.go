@@ -114,11 +114,37 @@ func (pool *Pool) startGameAndBroadcast() {
 	})
 }
 
+func (pool *Pool) clientWordAssignmentFlow(client *Client) {
+	// select the client
+	pool.CurrSketcher = client
+	client.HasSketched = true
+
+	// create a list of words for client to choose
+	words := utils.Get3RandomWords(utils.WORDS)
+	pool.broadcast3WordsList(words)
+
+	// start a timeout for assigning word if not chosen by client
+	go pool.wordChooseCountdown(words)
+
+	// run an infinite loop until pool.CurrWord is initialised by sketcher client, initialised in pool.Start func
+	for pool.CurrWord == "" {
+	}
+
+	// add the word expiry
+	pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
+
+	// broadcast current word, current sketcher and other details to all clients
+	// TODO: send the whole thing to client who's sketching, send minimal details to rest
+	pool.broadcastCurrentWordDetails()
+}
+
 // methods called in Start or BeginGameFlow funcs
 
 func (pool *Pool) BeginBroadcastClientInfo() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
+	utils.Cp("yellowBg", "Broadcasting client info start!")
+
 	for {
 		time.Sleep(RenderClientsEvery)
 		pool.broadcastClientInfoList()
