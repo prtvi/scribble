@@ -133,6 +133,9 @@ func (pool *Pool) BeginGameFlow() {
 			// reveal the word
 			pool.broadcastWordReveal()
 
+			// broadcast clear canvas event
+			pool.broadcastClearCanvasEvent()
+
 			pool.CurrWord = ""
 			pool.CurrSketcher = nil
 

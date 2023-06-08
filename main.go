@@ -8,13 +8,14 @@ import (
 )
 
 func main() {
-	e := echo.New()
-	e.Static("/public", "public")
-	e.Renderer = utils.InitTemplates()
+	utils.LoadEnv()
+	socket.DebugMode()
 
 	go socket.Maintainer()
 
-	socket.DebugMode()
+	e := echo.New()
+	e.Static("/public", "public")
+	e.Renderer = utils.InitTemplates()
 
 	ee := e.Group("", socket.Logger)
 

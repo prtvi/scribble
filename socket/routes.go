@@ -38,7 +38,7 @@ func Welcome(c echo.Context) error {
 func HandlerWsConnection(c echo.Context) error {
 	// handle socket connections for the pools
 
-	// get the poolId from query params
+	// get the query params
 	poolId := c.QueryParam("poolId")
 	clientId := c.QueryParam("clientId")
 	clientName := c.QueryParam("clientName")

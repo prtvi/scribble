@@ -2,6 +2,7 @@ package socket
 
 import (
 	"fmt"
+	"os"
 	model "scribble/model"
 	utils "scribble/utils"
 	"time"
@@ -20,7 +21,7 @@ func NewPool(uuid string, capacity int) *Pool {
 		ID:                            uuid,
 		JoiningLink:                   "",
 		Capacity:                      capacity,
-		CurrRound:                     1,
+		CurrRound:                     0,
 		Register:                      make(chan *Client),
 		Unregister:                    make(chan *Client),
 		Clients:                       make([]*Client, 0),
@@ -41,7 +42,7 @@ func Maintainer() {
 	// clears the pools in which the game has ended every 10 mins
 
 	for {
-		time.Sleep(time.Minute * 10) // TODO - to be tested
+		time.Sleep(DeletePoolAfterGameEndsDuration) // TODO - to be tested
 
 		for poolId, pool := range HUB {
 			if pool != nil && pool.HasGameEnded {
@@ -51,8 +52,8 @@ func Maintainer() {
 				fmt.Println("Size of HUB:", len(HUB))
 			}
 
-			if now := time.Now(); now.Sub(pool.CreatedTime) > time.Duration(time.Minute*10) {
-				utils.Cp("yellowBg", "Removing pool from HUB after game not started for 10 mins, poolId:", poolId)
+			if now := time.Now(); now.Sub(pool.CreatedTime) > time.Duration(RemovePoolAfterGameNotStarted) {
+				utils.Cp("yellowBg", "Removing pool from HUB after game not started for RemovePoolAfterGameNotStarted mins, poolId:", poolId)
 				delete(HUB, poolId)
 
 				fmt.Println("Size of HUB:", len(HUB))
@@ -62,11 +63,17 @@ func Maintainer() {
 }
 
 func DebugMode() {
+	env := os.Getenv("ENV")
+	if env == "" || env == "PROD" {
+		return
+	}
+
+	DEBUG = true
+	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
+
 	GameStartDurationInSeconds = time.Duration(time.Second * 500)
 	TimeForEachWordInSeconds = time.Duration(time.Second * 30)
 	RenderClientsEvery = time.Duration(time.Second * 10)
-	ScoreForCorrectGuess = 25
-	NumberOfRounds = 3
 
 	poolId := "debug"
 	pool := NewPool(poolId, 4)
@@ -74,8 +81,5 @@ func DebugMode() {
 	HUB[poolId] = pool
 	go pool.Start()
 
-	link := "/app?join=" + poolId
-	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link)
-
-	utils.Cp("greenBg", "----------- DEBUG MODE -----------")
+	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+poolId)
 }
