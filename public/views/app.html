@@ -22,13 +22,21 @@
 						type="text"
 						name="clientName"
 						id="clientName"
-						value="p{{ .CurrentSize }}"
 						required
 						autofocus
 					/>
 
 					<button class="btn" type="submit">Join</button>
 				</form>
+
+				{{ if .DEBUG }}
+
+				<script>
+					document.querySelector('#clientName').value =
+						'doodler {{ .CurrentSize }}';
+				</script>
+
+				{{ end }}
 			</div>
 
 			{{ end }}
@@ -103,7 +111,6 @@
 					const clientName = '{{ .ClientName }}';
 					const clientColor = '{{ .ClientColor }}';
 					const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
-
 					const joiningLink = '{{ .JoiningLink }}';
 				</script>
 

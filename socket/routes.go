@@ -79,6 +79,8 @@ func CreateRoom(c echo.Context) error {
 	return c.Render(http.StatusOK, "createRoom", map[string]any{
 		"RoomCreated": false,
 		"Link":        "",
+
+		"DEBUG": DEBUG,
 	})
 }
 
@@ -108,6 +110,8 @@ func CreateRoomLink(c echo.Context) error {
 	return c.Render(http.StatusOK, "createRoom", map[string]any{
 		"RoomCreated": true,
 		"Link":        link,
+
+		"DEBUG": DEBUG,
 	})
 }
 
@@ -126,6 +130,8 @@ func App(c echo.Context) error {
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
 			"Message":        "Hi there, are you lost?!",
+
+			"DEBUG": DEBUG,
 		})
 	}
 
@@ -137,6 +143,8 @@ func App(c echo.Context) error {
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
 			"Message":        "Pool expired or non-existent!",
+
+			"DEBUG": DEBUG,
 		})
 	}
 
@@ -146,6 +154,8 @@ func App(c echo.Context) error {
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
 			"Message":        "Sorry! The game has already started! 🥹",
+
+			"DEBUG": DEBUG,
 		})
 	}
 
@@ -159,6 +169,8 @@ func App(c echo.Context) error {
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
 			"Message":        "Your party is full!",
+
+			"DEBUG": DEBUG,
 		})
 	}
 
@@ -170,6 +182,8 @@ func App(c echo.Context) error {
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
 		"PoolId": poolId,
+
+		"DEBUG": DEBUG,
 	})
 }
 
@@ -203,8 +217,6 @@ func RegisterToPool(c echo.Context) error {
 	clientId := utils.GenerateUUID()[0:8]
 	clientColor := pool.getColorForClient()
 
-	// isFirstJoinee := (len(pool.Clients) == 0)
-
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered
 	return c.Render(http.StatusOK, "app", map[string]any{
@@ -227,6 +239,5 @@ func RegisterToPool(c echo.Context) error {
 		"ClientName":    clientName,
 		"ClientColor":   clientColor,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
-		// "IsFirstJoinee": isFirstJoinee,
 	})
 }
