@@ -28,7 +28,7 @@ func (pool *Pool) Start() {
 				go pool.StartGameCountdown()
 			}
 
-			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
+			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
 
 			break
 
@@ -37,7 +37,7 @@ func (pool *Pool) Start() {
 			pool.removeClientFromList(client)
 			pool.broadcastClientUnregister(client.ID, client.Name)
 
-			utils.Cp("yellow", "Size of connection pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
+			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
 
 			break
 

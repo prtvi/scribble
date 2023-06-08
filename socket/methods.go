@@ -96,12 +96,9 @@ func (pool *Pool) wordChooseCountdown(words []string) {
 	time.Sleep(TimeoutForChoosingWord)
 
 	if pool.CurrWord == "" {
-		fmt.Println("auto assigned")
 		pool.CurrWord = utils.GetRandomWord(words)
 		return
 	}
-
-	fmt.Println("exiting timeout wo auto assignment")
 }
 
 func (pool *Pool) startGameAndBroadcast() {
@@ -143,7 +140,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 func (pool *Pool) BeginBroadcastClientInfo() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
-	utils.Cp("yellowBg", "Broadcasting client info start!")
+	utils.Cp("yellow", "Broadcasting client info start!")
 
 	for {
 		time.Sleep(RenderClientsEvery)
@@ -151,7 +148,7 @@ func (pool *Pool) BeginBroadcastClientInfo() {
 
 		// stop broadcasting when game ends
 		if pool.HasGameEnded || len(pool.Clients) == 0 {
-			utils.Cp("yellowBg", "Stopped broadcasting client info")
+			utils.Cp("yellow", "Stopped broadcasting client info")
 			break
 		}
 	}
@@ -165,7 +162,6 @@ func (pool *Pool) StartGameCountdown() {
 
 	// if the game has already started by the client using the button then exit the countdown
 	if pool.HasGameStarted {
-		fmt.Println("game started using button so exiting countdown")
 		return
 	}
 
@@ -234,13 +230,15 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 		message.Type = 31
 		message.TypeStr = messageTypeMap[31]
 		message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
+
+		return message
 	}
 
 	// if word exists in the message
 	if wordExistsInMessage {
 		message.Type = 31
 		message.TypeStr = messageTypeMap[31]
-		message.Content = fmt.Sprintf("Naughty huh 😏 @%s", message.ClientName)
+		message.Content = fmt.Sprintf("Naughty 😏 @%s", message.ClientName)
 	}
 
 	return message

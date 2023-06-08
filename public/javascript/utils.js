@@ -90,11 +90,19 @@ function sendChatMsgBtnEL(e) {
 
 function displayOverlay() {
 	overlay.style.display = 'flex';
+
+	// disable scroll on overlay display
+	document.documentElement.style.overflow = 'hidden';
+	document.body.scroll = 'no';
 }
 
 function hideOverlay() {
 	overlay.innerHTML = '';
 	overlay.style.display = 'none';
+
+	// enable scroll on overlay display
+	document.documentElement.style.overflow = 'scroll';
+	document.body.scroll = 'yes';
 }
 
 //

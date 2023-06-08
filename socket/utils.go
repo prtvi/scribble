@@ -9,7 +9,26 @@ import (
 )
 
 func PrintSocketMessage(m model.SocketMessage) {
-	utils.Cp("cyan", "msg type:", utils.Cs("yellow", fmt.Sprintf("%d", m.Type)), utils.Cs("reset", messageTypeMap[m.Type], utils.Cs("cyan", "from:"), m.ClientName))
+	from := m.ClientName
+	if from == "" {
+		from = "server"
+	}
+
+	var msgTypeColor string
+
+	switch m.Type {
+	case 1, 2, 3, 4, 5:
+		msgTypeColor = "blue"
+	case 7, 34:
+		msgTypeColor = "purple"
+	default:
+		msgTypeColor = "green"
+	}
+
+	utils.Cp("cyan",
+		"from:", utils.Cs(msgTypeColor, fmt.Sprintf("%-15s ", from)),
+		utils.Cs("cyan", "msg type: "), utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
+		utils.Cs(msgTypeColor, messageTypeMap[m.Type]))
 }
 
 func NewPool(uuid string, capacity int) *Pool {

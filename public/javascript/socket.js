@@ -66,7 +66,7 @@ function socketOnMessage(message) {
 			displayImgOnCanvas(socketMessage);
 			break;
 
-		case 5:
+		case (5, 51):
 			clearCanvas();
 			break;
 

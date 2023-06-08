@@ -63,8 +63,8 @@ func (pool *Pool) broadcastRoundNumber() {
 
 func (pool *Pool) broadcastClearCanvasEvent() {
 	pool.broadcast(model.SocketMessage{
-		Type:    5,
-		TypeStr: messageTypeMap[5],
+		Type:    51,
+		TypeStr: messageTypeMap[51],
 	})
 }
 

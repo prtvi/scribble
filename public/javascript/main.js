@@ -19,6 +19,12 @@ const startGameTimerId = gameStartTimer();
 let wordExpiryTimerIdG;
 let messageTypeMap;
 
+// if overlay is active, disable scroll
+if (overlay.style.display !== 'none') {
+	document.documentElement.style.overflow = 'hidden';
+	document.body.scroll = 'no';
+}
+
 // chat
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
 
