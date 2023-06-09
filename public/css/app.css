@@ -6,6 +6,8 @@
 	margin: 0 auto;
 }
 
+/*  */
+
 .status-bar {
 	height: var(--status-bar-h);
 	padding: 5px;
@@ -15,9 +17,15 @@
 	background-color: pink;
 }
 
-.status-bar > div {
+.status-bar > div:not(:last-child) {
 	font-size: var(--fs-2);
 	vertical-align: middle;
+	width: fit-content;
+	height: inherit;
+	padding-left: 6px;
+	padding-right: 6px;
+	border-radius: 50px;
+	box-shadow: 2px 5px 9px #888888;
 }
 
 .status-bar > div span {
@@ -25,22 +33,27 @@
 }
 
 .round {
+	background-color: salmon;
+}
+
+.word {
+	background-color: orange;
+}
+
+.time-left-for-word {
 	background-color: lime;
-	width: fit-content;
-	height: inherit;
-	padding-left: 6px;
-	padding-right: 6px;
-	border-radius: 50px;
 }
 
 .joining-link-div {
-	transform: scale(0.75);
+	transform: scale(0.9);
 }
 
 .btn.joining-link {
 	margin: 0;
 	padding: 4px;
 }
+
+/*  */
 
 .canvas-container {
 	text-align: center;
@@ -50,6 +63,7 @@ canvas {
 	margin: 2px;
 	margin-top: 5px;
 	background-color: white;
+	cursor: pointer;
 }
 
 #overlay {
@@ -73,10 +87,21 @@ canvas {
 	margin: 0 auto;
 }
 
+.overlay-p {
+	font-size: 14px;
+	margin-bottom: 15px;
+}
+
 .word-option {
-	padding: 4px;
-	background-color: black;
-	margin: 3px;
+	padding: 8px;
+	background-color: rgb(50, 50, 50);
+	border-radius: 5px;
+	margin: 5px;
+	border: 1px solid grey;
+}
+
+.word-option:hover {
+	border: 1px solid var(--white);
 }
 
 .painter-utils {

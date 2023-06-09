@@ -29,7 +29,7 @@ function showWordToChoose(socketMessage) {
 	if (clientId === socketMessage.currSketcherId) {
 		const words = JSON.parse(socketMessage.content);
 
-		let html = `<div><p>Choose a word to draw</p>`;
+		let html = `<div><p class="overlay-p">Choose a word to draw</p>`;
 		words.forEach(w => (html += `<span class="word-option">${w}</span>`));
 		html += `</div>`;
 
@@ -52,7 +52,7 @@ function showWordToChoose(socketMessage) {
 			sendViaSocket(socketMsg);
 		});
 	} else {
-		overlay.innerHTML = `<div>${socketMessage.currSketcherName} is choosing a word!</div>`;
+		overlay.innerHTML = `<div><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`;
 		displayOverlay();
 	}
 }
@@ -110,7 +110,7 @@ function startGame(socketMessage) {
 	hideAndRemoveElForJoiningLink();
 
 	// display game started overlay
-	overlay.innerHTML = `<div>Game started</div>`;
+	overlay.innerHTML = `<div><p class="overlay-p">Game started</p></div>`;
 	displayOverlay();
 
 	document.querySelector('.time-left-for-word span').textContent =
@@ -123,7 +123,7 @@ function renderRoundDetails(socketMessage) {
 		'.round span'
 	).textContent = `Round: ${socketMessage.currRound}`;
 
-	overlay.innerHTML = `<div>Round: ${socketMessage.currRound}</div>`;
+	overlay.innerHTML = `<div><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`;
 	displayOverlay();
 }
 
@@ -142,6 +142,7 @@ function beginClientSketchingFlow(socketMessage) {
 
 	const wordDiv = document.querySelector('.word');
 	wordDiv.classList.remove('hidden');
+	const wordSpan = wordDiv.querySelector('span');
 
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.clear-canvas');
@@ -151,14 +152,14 @@ function beginClientSketchingFlow(socketMessage) {
 		paintUtils.isAllowedToPaint = true;
 
 		// display the word
-		wordDiv.innerHTML = `<span>${socketMessage.currWord}</span>`;
+		wordSpan.textContent = socketMessage.currWord;
 
 		// display painter utils div and add EL for clearing the canvas
 		painterUtilsDiv.classList.remove('hidden');
 		clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	} else {
 		// show word length
-		wordDiv.innerHTML = `${socketMessage.currWord.length} characters`;
+		wordSpan.textContent = socketMessage.currWord.length;
 	}
 }
 
@@ -180,7 +181,9 @@ function disableSketching(socketMessage) {
 function displayScores(socketMessage) {
 	const dataArr = JSON.parse(socketMessage.content);
 
-	let html = `<div> <table>
+	let html = `<div>
+	<p class="overlay-p">Game over!</p>
+	<table>
 	<tr>
 		<th>Name</th>
 		<th>Score</th>

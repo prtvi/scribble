@@ -106,8 +106,6 @@ function hideOverlay() {
 }
 
 function runTimer(timerElement, timeoutAt) {
-	// let timeLeft = getSecondsLeftFrom(timeoutAt);
-
 	const countdownTimer = setInterval(function () {
 		const secondsLeft = getSecondsLeftFrom(timeoutAt);
 		if (secondsLeft >= 0) timerElement.textContent = secondsLeft;

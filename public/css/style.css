@@ -47,10 +47,21 @@
 .btn {
 	width: fit-content;
 	height: fit-content;
-	padding: 5px;
+	background-color: rgb(49, 49, 49);
+	color: var(--white);
+	padding: 6px;
 	font-size: 12px;
-	border-radius: 15px;
+	border-radius: 12px;
 	cursor: pointer;
+	border: 1px solid rgb(100, 100, 100);
+}
+
+.btn:hover {
+	border: 1px solid rgb(187, 187, 187);
+}
+
+.btn:active {
+	transform: translateY(1px);
 }
 
 .form-label {
