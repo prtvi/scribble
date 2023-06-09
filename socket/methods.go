@@ -129,10 +129,6 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 
 	// add the word expiry
 	pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
-
-	// broadcast current word, current sketcher and other details to all clients
-	// TODO: send the whole thing to client who's sketching, send minimal details to rest
-	pool.broadcastCurrentWordDetails()
 }
 
 // methods called in Start or BeginGameFlow funcs

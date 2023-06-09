@@ -91,23 +91,30 @@ function renderClients(allClients) {
 	allClients.forEach((n, i) => membersDiv.appendChild(getClientNameDiv(n, i)));
 }
 
-// 7
+// 70
 function startGame(socketMessage) {
 	// called when socket receives message from server with type as 6
 	if (!socketMessage.success) return;
 
 	console.log('game started by server');
 
+	// flag game started
 	paintUtils.hasGameStarted = true;
 	clearAllIntervals(startGameTimerId);
 
+	// remove event listeners
 	document
 		.querySelector('.start-game-btn')
 		.removeEventListener('click', startGameEl);
 
-	// hide the div and toggle paintUtils.has Game Started
-	hideOverlay();
 	hideAndRemoveElForJoiningLink();
+
+	// display game started overlay
+	overlay.innerHTML = `<div>Game started</div>`;
+	displayOverlay();
+
+	document.querySelector('.time-left-for-word span').textContent =
+		'Game started';
 }
 
 // 71
@@ -129,17 +136,13 @@ function beginClientSketchingFlow(socketMessage) {
 		socketMessage.currWordExpiresAt
 	).getTime();
 
-	// start timer for the word expiry
-	const wordExpiryTimerId = setInterval(() => {
-		const timeLeftDiv = document.querySelector('.time-left-for-word span');
+	const timeLeftSpan = document.querySelector('.time-left-for-word span');
+	timeLeftSpan.textContent = timeForEachWord;
+	runTimer(timeLeftSpan, currentWordExpiresAt);
 
-		const secondsLeft = getSecondsLeftFrom(currentWordExpiresAt);
-		timeLeftDiv.textContent = `Time: ${secondsLeft} seconds`;
+	const wordDiv = document.querySelector('.word');
+	wordDiv.classList.remove('hidden');
 
-		if (secondsLeft <= 0) clearAllIntervals(wordExpiryTimerId);
-	}, 1000);
-
-	const word = document.querySelector('.word span');
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.clear-canvas');
 
@@ -148,17 +151,15 @@ function beginClientSketchingFlow(socketMessage) {
 		paintUtils.isAllowedToPaint = true;
 
 		// display the word
-		word.textContent = socketMessage.currWord;
+		wordDiv.innerHTML = `<span>${socketMessage.currWord}</span>`;
 
 		// display painter utils div and add EL for clearing the canvas
 		painterUtilsDiv.classList.remove('hidden');
 		clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	} else {
 		// show word length
-		word.textContent = `${socketMessage.currWord.length} characters`;
+		wordDiv.innerHTML = `${socketMessage.currWord.length} characters`;
 	}
-
-	return wordExpiryTimerId;
 }
 
 // 81
@@ -191,15 +192,17 @@ function displayScores(socketMessage) {
 
 	overlay.innerHTML = html;
 	displayOverlay();
-
-	clearAllIntervals(wordExpiryTimerIdG);
 }
 
 // 10
 function makeMessageTypeMapGlobal(socketMessage) {
-	const m = JSON.parse(socketMessage.content);
-	const keys = Object.keys(m);
+	const content = JSON.parse(socketMessage.content);
 
+	timeForEachWord = content.timeForEachWord;
+
+	const m = content.messageTypeMap;
+	const keys = Object.keys(m);
 	messageTypeMap = new Map();
+
 	keys.forEach(k => messageTypeMap.set(Number(k), m[k]));
 }

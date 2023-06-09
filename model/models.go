@@ -34,3 +34,8 @@ type ClientInfo struct {
 	Color string `json:"color"`
 	Score int    `json:"score"`
 }
+
+type SharedConfig struct {
+	MessageTypeMap  map[int]string `json:"messageTypeMap"`
+	TimeForEachWord int            `json:"timeForEachWord"`
+}

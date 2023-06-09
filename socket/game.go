@@ -13,7 +13,7 @@ func (pool *Pool) Start() {
 		case client := <-pool.Register:
 			// on client register, append the client to Pool.Clients slice, broadcast messageTypeMap, joining of the client and client info list
 			pool.appendClientToList(client)
-			pool.broadcastMessageTypeMap()
+			pool.broadcastConfigs()
 			pool.broadcastClientRegister(client.ID, client.Name)
 			pool.broadcastClientInfoList()
 
@@ -72,6 +72,9 @@ func (pool *Pool) Start() {
 func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
+	// wait for the "game started" overlay
+	time.Sleep(time.Duration(time.Second * 2))
+
 	// loop over the number of rounds
 	for i := 0; i < NumberOfRounds; i++ {
 		pool.CurrRound = i + 1
@@ -87,7 +90,10 @@ func (pool *Pool) BeginGameFlow() {
 			pool.flagAllClientsAsNotGuessed()
 
 			// begin client drawing flow and sleep until the word expires
+			// broadcast current word, current sketcher and other details to all clients
+			// TODO: send the whole thing to client who's sketching, send minimal details to rest
 			pool.clientWordAssignmentFlow(c)
+			pool.broadcastCurrentWordDetails()
 			time.Sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
 			// broadcast turn_over, reveal the word and clear canvas

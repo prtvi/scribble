@@ -22,8 +22,13 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 	}
 }
 
-func (pool *Pool) broadcastMessageTypeMap() {
-	byteInfo, _ := json.Marshal(messageTypeMap)
+func (pool *Pool) broadcastConfigs() {
+	cfg := model.SharedConfig{
+		MessageTypeMap:  messageTypeMap,
+		TimeForEachWord: utils.DurationToSeconds(TimeForEachWordInSeconds),
+	}
+
+	byteInfo, _ := json.Marshal(cfg)
 	pool.broadcast(model.SocketMessage{
 		Type:    10,
 		TypeStr: messageTypeMap[10],

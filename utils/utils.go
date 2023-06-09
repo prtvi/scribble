@@ -63,6 +63,10 @@ func LoadEnv() {
 	}
 }
 
+func DurationToSeconds(t time.Duration) int {
+	return int(t.Seconds())
+}
+
 var reset string = "\033[0m"
 var colorMap map[string]string = map[string]string{
 	"reset": reset,

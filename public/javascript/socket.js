@@ -66,7 +66,11 @@ function socketOnMessage(message) {
 			displayImgOnCanvas(socketMessage);
 			break;
 
-		case (5, 51):
+		case 5:
+			clearCanvas();
+			break;
+
+		case 51:
 			clearCanvas();
 			break;
 
@@ -83,7 +87,7 @@ function socketOnMessage(message) {
 			break;
 
 		case 8:
-			wordExpiryTimerIdG = beginClientSketchingFlow(socketMessage);
+			beginClientSketchingFlow(socketMessage);
 			break;
 
 		case 81:
@@ -106,7 +110,7 @@ function socketOnMessage(message) {
 function socketOnClose() {
 	// on socket conn close, stop all timer or intervals
 	console.log('Socket connection closed, stopping timers and timeouts!');
-	clearAllIntervals(wordExpiryTimerIdG, startGameTimerId);
+	clearAllIntervals(startGameTimerId);
 }
 
 function sendViaSocket(socketMsg) {
@@ -124,6 +128,6 @@ function sendViaSocket(socketMsg) {
 			socket.readyState
 		);
 
-		clearAllIntervals(wordExpiryTimerIdG, startGameTimerId);
+		clearAllIntervals(startGameTimerId);
 	}
 }

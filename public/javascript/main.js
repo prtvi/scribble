@@ -16,8 +16,8 @@ const paintUtils = {
 const socket = initSocket();
 const startGameTimerId = gameStartTimer();
 
-let wordExpiryTimerIdG;
 let messageTypeMap;
+let timeForEachWord;
 
 // if overlay is active, disable scroll
 if (overlay.style.display !== 'none') {
