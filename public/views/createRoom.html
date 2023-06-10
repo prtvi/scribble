@@ -7,54 +7,62 @@
 	<body>
 		<main class="main">
 			<div class="content">
-				<div class="title"><h1>Scribble</h1></div>
+				<div class="content-container">
+					<div class="title"><h1>Scribble</h1></div>
 
-				<div class="subtext">
-					<p>Create a private room</p>
+					<div class="subtext">
+						<p>Create a private room</p>
+					</div>
+
+					<div class="form-container">
+						<form action="/create-room" method="post">
+							<label class="form-label" for="capacity">Room size:</label>
+							<input
+								type="number"
+								name="capacity"
+								id="capacity"
+								min="2"
+								max="10"
+								required
+							/>
+							<button class="btn form-btn" type="submit">
+								Create a private room
+							</button>
+						</form>
+					</div>
+
+					{{ if .RoomCreated }}
+
+					<div class="room-created-container">
+						<a href="{{ .Link }}" class="copy-link"
+							><button class="btn">Click here to join</button></a
+						>
+
+						<button class="btn copy-link-btn">Copy link</button>
+
+						<script>
+							const aTag = document.querySelector('.copy-link');
+							document
+								.querySelector('.copy-link-btn')
+								.addEventListener('click', () =>
+									navigator.clipboard.writeText(aTag.href)
+								);
+
+							document.querySelector('.form-btn').disabled = true;
+						</script>
+					</div>
+
+					{{ end }}
+
+					<!-- run the below script only in debug mode -->
+					{{ if .DEBUG }}
+
+					<script>
+						document.querySelector('#capacity').value = 4;
+					</script>
+
+					{{ end }}
 				</div>
-
-				<form action="/create-room" method="post">
-					<label class="form-label" for="capacity">Room size:</label>
-					<input
-						type="number"
-						name="capacity"
-						id="capacity"
-						min="2"
-						max="10"
-						required
-					/>
-					<button class="btn form-btn" type="submit">Create a new room</button>
-				</form>
-
-				{{ if .RoomCreated }}
-
-				<a href="{{ .Link }}" class="copy-link"
-					><button class="btn">Click here to join</button></a
-				>
-
-				<button class="btn copy-link-btn">Copy link</button>
-
-				<script>
-					const aTag = document.querySelector('.copy-link');
-					document
-						.querySelector('.copy-link-btn')
-						.addEventListener('click', () =>
-							navigator.clipboard.writeText(aTag.href)
-						);
-
-					document.querySelector('.form-btn').disabled = true;
-				</script>
-
-				{{ end }}
-
-				<!-- run the below script only in debug mode -->
-				{{ if .DEBUG }}
-
-				<script>
-					document.querySelector('#capacity').value = 4;
-				</script>
-
-				{{ end }}
 			</div>
 		</main>
 	</body>

@@ -70,7 +70,7 @@ function sendChatMsgBtnEL(e) {
 	// event listener to send chat message
 
 	e.preventDefault();
-	const msg = document.querySelector('.msg').value;
+	const msg = document.querySelector('.msg').value.trim();
 
 	if (msg.length === 0 || msg === '') return;
 

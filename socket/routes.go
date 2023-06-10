@@ -170,8 +170,9 @@ func App(c echo.Context) error {
 	// else if every check, checks out then render "RegisterToPool" form
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"RegisterToPool": true,
-		"CurrentSize":    len(pool.Clients),
 		"ConnectSocket":  false,
+		"CurrentSize":    len(pool.Clients),
+		"Message":        "",
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
 		"PoolId": poolId,
@@ -224,7 +225,6 @@ func RegisterToPool(c echo.Context) error {
 
 		// for rendering title on browser
 		"ClientNameExists": true,
-		"AddAppCss":        true,
 
 		// init as js vars
 		"PoolId":        poolId,

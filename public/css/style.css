@@ -27,12 +27,26 @@
 }
 
 .content {
+	display: flex;
+	justify-content: center;
+	vertical-align: middle;
+	align-items: center;
+	/* above code to vertically align item */
 	text-align: center;
-	margin: 0;
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	padding: 15px;
+	width: 80%;
+	height: 250px;
+	max-height: 300px;
+	background-color: white;
+	border-radius: 10px;
+	box-shadow: 5px 10px 18px #888888;
+	z-index: 1;
 }
 
 .title {
@@ -65,19 +79,29 @@
 }
 
 .form-label {
-	font-weight: var(--fw-200);
+	font-weight: var(--fw-300);
 	font-size: 15px;
 }
 
+.form-btn {
+	margin-top: 10px;
+}
+
+.form-btn:disabled {
+	background-color: gray;
+	transform: none;
+}
+
+.room-created-container {
+	margin-top: 10px;
+}
+
+/* used in app.html */
 #clientName {
 	margin-top: 20px;
 	margin-bottom: 20px;
 	padding: 5px;
 	border-radius: 5px;
-}
-
-.form-btn {
-	margin-top: 10px;
 }
 
 .hidden {
