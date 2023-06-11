@@ -50,11 +50,12 @@
 
 .canvas-container {
 	text-align: center;
+	height: fit-content;
+	margin-top: 4px;
+	margin-bottom: 4px;
 }
 
 canvas {
-	margin: 2px;
-	margin-top: 5px;
 	background-color: white;
 	cursor: pointer;
 	border-radius: 3px;
@@ -188,6 +189,6 @@ canvas {
 }
 
 .chat-box .btn {
-	padding: 2px;
+	padding: 3px;
 	width: 50px;
 }

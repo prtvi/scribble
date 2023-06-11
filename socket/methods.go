@@ -182,8 +182,6 @@ func (pool *Pool) StartGameRequest() {
 func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 	// update score for the client that guesses the word right, return true if correctly guessed
 
-	var correctGuess, wordExistsInMessage bool
-
 	// when the game has not begun, the curr sketcher will be nil
 	if pool.CurrSketcher == nil {
 		return message
@@ -200,11 +198,16 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 		}
 	}
 
+	var correctGuess, wordExistsInMessage bool = false, false
+
 	// if the sketcher is the guesser, then the guesserClient will be nil, hence check if guesserClient is nil
 	// check if the word matches with the current word and check if the guesserClient hasn't already guessed
+	guessedLower := strings.ToLower(message.Content)
+	currWordLower := strings.ToLower(pool.CurrWord)
+
 	if guesserClient != nil &&
-		strings.ToLower(message.Content) == strings.ToLower(pool.CurrWord) &&
-		!guesserClient.HasGuessed {
+		!guesserClient.HasGuessed &&
+		guessedLower == currWordLower {
 
 		correctGuess = true
 
@@ -216,24 +219,22 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 		pool.broadcastClientInfoList()
 	}
 
-	// check if the text message contains the word
-	if strings.Contains(strings.ToLower(message.Content), strings.ToLower(pool.CurrWord)) {
-		wordExistsInMessage = true
-	}
-
 	// if correct guess then modify the message
 	if correctGuess {
 		message.Type = 31
 		message.TypeStr = messageTypeMap[31]
-
 		return message
+	}
+
+	// check if the text message contains the word
+	if strings.Contains(guessedLower, currWordLower) {
+		wordExistsInMessage = true
 	}
 
 	// if word exists in the message
 	if wordExistsInMessage {
-		message.Type = 31
-		message.TypeStr = messageTypeMap[31] // TODO: another event
-		message.Content = fmt.Sprintf("Naughty 😏 @%s", message.ClientName)
+		message.Type = 312
+		message.TypeStr = messageTypeMap[312]
 	}
 
 	return message

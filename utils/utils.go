@@ -13,7 +13,7 @@ import (
 
 var COLORS = []string{"36fdc3", "ff2200", "90c335", "d17161", "a16014", "2f38a0", "11ea10", "9e5df3", "87425b", "180dab", "91ff00", "00ffc8", "00fff2", "ff5100", "ffe100", "ddff00", "c8ff00", "ece8f8", "8fb803", "fac8d2", "9a2eaf", "c099a6", "fb1974", "cc4e0b", "8fb288", "4a2073", "9484e0", "0a2980", "399299", "e0f066", "159988", "309c0d", "2ce997", "bb0b39", "d5860f", "38204e", "583e3c", "f4f4f4", "1c542d", "8673a1"}
 
-var WORDS = []string{"mountain", "water", "ball", "bottle", "car", "tree", "clock", "shirt", "lollipop", "soap", "bag", "umbrella", "pillow", "Shoes", "headphones", "bulb", "fan", "fruit", "grass", "coffee", "phone"}
+var WORDS = []string{"mountain", "water", "ball", "bottle", "car", "tree", "clock", "shirt", "lollipop", "soap", "bag", "umbrella", "pillow", "shoes", "headphones", "bulb", "fan", "fruit", "grass", "coffee", "phone"}
 
 func GenerateUUID() string {
 	return uuid.New().String()

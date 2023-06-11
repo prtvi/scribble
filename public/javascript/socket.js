@@ -60,6 +60,10 @@ function socketOnMessage(message) {
 			);
 			break;
 
+		case 312:
+			appendChatMsgToDOM(`Naughty @${socketMessage.clientName}`, '#ff0000');
+			break;
+
 		case 32:
 			appendChatMsgToDOM(`The word was '${socketMessage.content}'`, '#ffa500');
 			break;

@@ -34,17 +34,18 @@ var (
 
 var messageTypeMap = map[int]string{
 	// server b=> clients - green
-	6:  "sc__client_info",
-	8:  "sc__word_assigned",
-	9:  "sc__end_game",
-	10: "sc__get_this_map",
-	31: "sc__correct_guess",
-	32: "sc__reveal_word",
-	33: "sc__choose_word",
-	51: "sc__clear_canvas",
-	70: "sc__game_started",
-	71: "sc__round_num",
-	81: "sc__turn_over",
+	6:   "sc__client_info",
+	8:   "sc__word_assigned",
+	9:   "sc__end_game",
+	10:  "sc__get_this_map",
+	31:  "sc__correct_guess",
+	312: "sc__word_in_msg",
+	32:  "sc__reveal_word",
+	33:  "sc__choose_word",
+	51:  "sc__clear_canvas",
+	70:  "sc__game_started",
+	71:  "sc__round_num",
+	81:  "sc__turn_over",
 
 	// client => server b=> clients - blue
 	1: "csc__client_connect",

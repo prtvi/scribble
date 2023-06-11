@@ -164,7 +164,7 @@ function beginClientSketchingFlow(socketMessage) {
 		clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	} else {
 		// show word length
-		wordSpan.textContent = socketMessage.currWord.length;
+		wordSpan.textContent = `${socketMessage.currWord.length} characters`;
 	}
 }
 

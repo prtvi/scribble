@@ -5,13 +5,14 @@ function initCanvasAndOverlay() {
 	const ctx = canvas.getContext('2d');
 
 	const { w, h } = getCanvasSize();
-
 	canvas.width = w;
 	canvas.height = h;
 
-	const overlay = document.querySelector('#overlay');
 	const cc = document.querySelector('.canvas-container');
+	cc.style.width = `${w}px`;
+	cc.style.height = `${h}px`;
 
+	const overlay = document.querySelector('#overlay');
 	overlay.style.top = `${cc.offsetTop}px`;
 	overlay.style.height = `${cc.offsetHeight}px`;
 
@@ -20,7 +21,7 @@ function initCanvasAndOverlay() {
 
 function getCanvasSize() {
 	const w = window.innerWidth;
-	const cw = w - 10;
+	const cw = w;
 	const ch = cw / 1.5;
 
 	return { w: cw, h: ch };
