@@ -6,19 +6,16 @@
 	margin: 0 auto;
 }
 
-/*  */
-
 .status-bar {
 	height: var(--status-bar-h);
 	padding: 5px;
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
-	background-color: pink;
+	background-color: var(--white);
 }
 
 .status-bar > div:not(:last-child) {
-	font-size: var(--fs-2);
 	vertical-align: middle;
 	width: fit-content;
 	height: inherit;
@@ -30,6 +27,7 @@
 
 .status-bar > div span {
 	line-height: var(--status-bar-h);
+	font-size: var(--fs-2);
 }
 
 .round {
@@ -48,11 +46,6 @@
 	transform: scale(0.9);
 }
 
-.btn.joining-link {
-	margin: 0;
-	padding: 4px;
-}
-
 /*  */
 
 .canvas-container {
@@ -64,6 +57,7 @@ canvas {
 	margin-top: 5px;
 	background-color: white;
 	cursor: pointer;
+	border-radius: 3px;
 }
 
 #overlay {
@@ -88,9 +82,11 @@ canvas {
 }
 
 .overlay-p {
-	font-size: 14px;
+	font-size: var(--fs-4);
 	margin-bottom: 15px;
 }
+
+/* overlay pseudo classes */
 
 .word-option {
 	padding: 8px;
@@ -104,6 +100,8 @@ canvas {
 	border: 1px solid var(--white);
 }
 
+/* overlay pseudo classes */
+
 .painter-utils {
 	position: absolute;
 	right: 5px;
@@ -112,21 +110,21 @@ canvas {
 }
 
 .mc-container {
-	background-color: rgb(213, 163, 163);
 	height: 250px;
 	display: flex;
 	justify-content: center;
 }
 
 .side {
-	width: 45%;
-	margin: 5px;
-	background-color: aqua;
+	width: 48%;
+	margin-left: 2px;
+	margin-right: 2px;
+	background-color: var(--white);
 	height: calc(inherit - 10px);
 	text-align: center;
 	vertical-align: middle;
-	padding: 5px;
 	overflow-y: auto;
+	border-radius: 3px;
 }
 
 .side .message:nth-child(even),
@@ -134,10 +132,11 @@ canvas {
 	background-color: #f2f2f2;
 }
 
+/* mc pseudo classes */
+
 .member {
-	background-color: rgb(244, 194, 129);
-	padding: 3px 5px 3px 5px;
-	margin-bottom: 5px;
+	background-color: rgb(240, 217, 188);
+	padding: 5px;
 	display: flex;
 	justify-content: space-between;
 }
@@ -147,23 +146,24 @@ canvas {
 }
 
 .member-name {
-	font-size: var(--fs-3);
+	font-size: var(--fs-2);
 }
 
 .member-score {
-	font-size: var(--fs-1);
+	font-size: var(--fs-0);
 }
 
 .message {
-	font-size: var(--fs-2);
-	background-color: rgb(245, 245, 151);
-	padding: 1px 5px 1px 5px;
-	margin-bottom: 5px;
+	font-size: var(--fs-1);
+	background-color: lightgrey;
+	padding: 4px;
 	text-align: left;
 }
 
+/* mc pseudo classes */
+
 .chat-box {
-	margin-top: 5px;
+	margin-top: 6px;
 	display: flex;
 	justify-content: center;
 	height: fit-content;

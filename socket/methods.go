@@ -225,7 +225,6 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 	if correctGuess {
 		message.Type = 31
 		message.TypeStr = messageTypeMap[31]
-		message.Content = fmt.Sprintf("%s guessed the word!", message.ClientName)
 
 		return message
 	}
@@ -233,7 +232,7 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 	// if word exists in the message
 	if wordExistsInMessage {
 		message.Type = 31
-		message.TypeStr = messageTypeMap[31]
+		message.TypeStr = messageTypeMap[31] // TODO: another event
 		message.Content = fmt.Sprintf("Naughty 😏 @%s", message.ClientName)
 	}
 

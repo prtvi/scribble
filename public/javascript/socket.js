@@ -29,33 +29,39 @@ function socketOnMessage(message) {
 			if (socketMessage.clientId === clientId)
 				// if the current clientId and the clientId from response match then
 				appendChatMsgToDOM(
-					`You joined the pool as ${socketMessage.clientName}!`,
+					`You joined the pool as <strong>${socketMessage.clientName}</strong>!`,
 					''
 				);
 			else
 				appendChatMsgToDOM(
-					`${socketMessage.clientName} has joined the pool!`,
+					`<strong>${socketMessage.clientName}</strong> has joined the pool!`,
 					''
 				);
 			break;
 
 		case 2:
-			appendChatMsgToDOM(`${socketMessage.clientName} has left the pool!`, '');
+			appendChatMsgToDOM(
+				`<strong>${socketMessage.clientName}</strong> has left the pool!`,
+				''
+			);
 			break;
 
 		case 3:
 			appendChatMsgToDOM(
-				`${socketMessage.clientName}: ${socketMessage.content}`,
+				`<strong>${socketMessage.clientName}</strong>: ${socketMessage.content}`,
 				''
 			);
 			break;
 
 		case 31:
-			appendChatMsgToDOM(socketMessage.content, '#00ff00');
+			appendChatMsgToDOM(
+				`${socketMessage.clientName} guessed the word!`,
+				'#00ff00'
+			);
 			break;
 
 		case 32:
-			appendChatMsgToDOM(socketMessage.content, '#ffa500');
+			appendChatMsgToDOM(`The word was '${socketMessage.content}'`, '#ffa500');
 			break;
 
 		case 33:
@@ -67,9 +73,6 @@ function socketOnMessage(message) {
 			break;
 
 		case 5:
-			clearCanvas();
-			break;
-
 		case 51:
 			clearCanvas();
 			break;

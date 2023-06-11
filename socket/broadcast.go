@@ -106,6 +106,6 @@ func (pool *Pool) broadcastWordReveal() {
 	pool.broadcast(model.SocketMessage{
 		Type:    32,
 		TypeStr: messageTypeMap[32],
-		Content: fmt.Sprintf("%s was the correct word!", pool.CurrWord),
+		Content: pool.CurrWord,
 	})
 }

@@ -8,17 +8,19 @@ function appendChatMsgToDOM(msg, formatColor) {
 
 	const messagesDiv = document.querySelector('.messages');
 
-	const msgDiv = document.createElement('div');
-	msgDiv.classList.add('message');
+	const newMsgDiv = document.createElement('div');
+	newMsgDiv.classList.add('message');
 
 	const text = document.createElement('span');
-	text.textContent = msg;
 	text.style.color = formatColor || '#1d1d1f'; // f5f5f7
 
-	msgDiv.appendChild(text);
-	messagesDiv.appendChild(msgDiv);
+	newMsgDiv.style.backgroundColor = `${formatColor}20`;
+	text.innerHTML = msg; // TODO: handle better
 
-	msgDiv.scrollIntoView();
+	newMsgDiv.appendChild(text);
+	messagesDiv.appendChild(newMsgDiv);
+
+	newMsgDiv.scrollIntoView();
 
 	document.querySelector('.msg').value = '';
 	document.querySelector('.input-wrapper span').textContent = 0;
@@ -119,8 +121,11 @@ function startGame(socketMessage) {
 
 // 71
 function renderRoundDetails(socketMessage) {
-	document.querySelector(
-		'.round span'
+	const roundDiv = document.querySelector('.round');
+	roundDiv.classList.remove('hidden');
+
+	roundDiv.querySelector(
+		'span'
 	).textContent = `Round: ${socketMessage.currRound}`;
 
 	overlay.innerHTML = `<div><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`;
