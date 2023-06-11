@@ -16,39 +16,55 @@
 
 					<div class="form-container">
 						<form action="/create-room" method="post">
-							<label class="form-label" for="capacity">Room size:</label>
-							<input
-								type="number"
-								name="capacity"
-								id="capacity"
-								min="2"
-								max="10"
-								required
-							/>
-							<button class="btn form-btn" type="submit">
-								Create a private room
-							</button>
+							<div class="form-content">
+								<div>
+									<label class="form-label" for="capacity">Room size:</label>
+									<input
+										type="number"
+										name="capacity"
+										id="capacity"
+										min="2"
+										max="10"
+										required
+									/>
+								</div>
+								<div>
+									<button class="btn create-form-btn" type="submit">
+										Create
+									</button>
+								</div>
+							</div>
 						</form>
 					</div>
 
 					{{ if .RoomCreated }}
 
 					<div class="room-created-container">
-						<a href="{{ .Link }}" class="copy-link"
-							><button class="btn">Click here to join</button></a
-						>
+						<div>
+							<a href="{{ .Link }}" class="copy-link"
+								><button class="btn">Click here to join</button></a
+							>
+						</div>
 
-						<button class="btn copy-link-btn">Copy link</button>
+						<div class="img-container">
+							<div title="Copy joining link">
+								<img
+									src="public/assets/copy.png"
+									alt="copy icon"
+									class="copy-link-icon"
+								/>
+							</div>
+						</div>
 
 						<script>
 							const aTag = document.querySelector('.copy-link');
 							document
-								.querySelector('.copy-link-btn')
+								.querySelector('.copy-link-icon')
 								.addEventListener('click', () =>
 									navigator.clipboard.writeText(aTag.href)
 								);
 
-							document.querySelector('.form-btn').disabled = true;
+							document.querySelector('.create-form-btn').disabled = true;
 						</script>
 					</div>
 
