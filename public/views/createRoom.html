@@ -57,6 +57,7 @@
 						</div>
 
 						<script>
+							// copy to clipboard
 							const aTag = document.querySelector('.copy-link');
 							document
 								.querySelector('.copy-link-icon')
@@ -64,7 +65,11 @@
 									navigator.clipboard.writeText(aTag.href)
 								);
 
+							// disable create btn
 							document.querySelector('.create-form-btn').disabled = true;
+
+							// populate capacity in input field
+							document.getElementById('capacity').value = '{{ .Capacity }}';
 						</script>
 					</div>
 

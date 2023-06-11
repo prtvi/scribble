@@ -40,8 +40,8 @@
 	border: 1px solid rgb(100, 100, 100);
 }
 
-.btn:hover {
-	border: 1px solid rgb(187, 187, 187);
+.btn:hover:not(:disabled) {
+	box-shadow: 2px 2px 10px #888888;
 }
 
 .btn:active {
@@ -133,7 +133,7 @@
 .room-created-container {
 	margin-top: 10px;
 	display: flex;
-	justify-content: space-evenly;
+	justify-content: center;
 	vertical-align: middle;
 	align-items: middle;
 }
@@ -141,6 +141,7 @@
 .img-container {
 	display: flex;
 	align-items: center;
+	margin-left: 10px;
 }
 
 .copy-link-icon {

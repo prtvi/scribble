@@ -104,6 +104,9 @@ func CreateRoomLink(c echo.Context) error {
 		"RoomCreated": true,
 		"Link":        link,
 
+		// show on submit, room size in input field
+		"Capacity": pool.Capacity,
+
 		"DEBUG": DEBUG,
 	})
 }
