@@ -179,6 +179,10 @@
 		width: 250px;
 	}
 
+	.form-content > div:first-child {
+		margin-right: 15px;
+	}
+
 	.form-label {
 		font-weight: var(--fw-400);
 		font-size: var(--fs-16);
@@ -187,5 +191,41 @@
 	.copy-link-icon {
 		width: 20px;
 		height: 20px;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	#clientName {
+		font-size: var(--fs-15);
+	}
+
+	.content {
+		height: 280px;
+	}
+
+	.title {
+		font-size: var(--fs-20);
+	}
+
+	.subtext {
+		font-size: var(--fs-18);
+		margin-bottom: 20px;
+	}
+
+	.form-content {
+		width: 300px;
+		justify-content: center;
+	}
+
+	.form-content > div:first-child {
+		margin-right: 20px;
+	}
+
+	.form-label {
+		font-size: var(--fs-17);
+	}
+
+	.room-created-container {
+		margin-top: 20px;
 	}
 }

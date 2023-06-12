@@ -179,7 +179,9 @@ canvas {
 	height: 25px;
 	width: 180px;
 	padding-right: 30px;
+	padding-left: 5px;
 	font-size: var(--fs-13);
+	border-radius: 8px;
 }
 
 .input-wrapper span {
@@ -257,5 +259,61 @@ canvas {
 	.chat-box .btn {
 		padding: 4px;
 		width: 65px;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	:root {
+		--status-bar-h: 42px;
+	}
+
+	.status-bar > div span {
+		font-size: var(--fs-15);
+	}
+
+	.overlay-p {
+		font-size: var(--fs-22);
+	}
+
+	.word-option {
+		font-size: var(--fs-19);
+	}
+
+	.member {
+		padding: 9px;
+	}
+
+	.member-num {
+		font-size: var(--fs-14);
+	}
+
+	.member-name {
+		font-size: var(--fs-16);
+	}
+
+	.member-score {
+		font-size: var(--fs-14);
+	}
+
+	.message {
+		font-size: var(--fs-14);
+		padding: 7px;
+	}
+
+	.chat-box input {
+		height: 35px;
+		width: 220px;
+		font-size: var(--fs-16);
+	}
+
+	.input-wrapper span {
+		right: 84px;
+		top: 7px;
+		font-size: var(--fs-14);
+	}
+
+	.chat-box .btn {
+		padding: 6px;
+		width: 70px;
 	}
 }
