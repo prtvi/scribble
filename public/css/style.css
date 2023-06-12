@@ -6,15 +6,23 @@
 	--fw-400: 400;
 	--fw-500: 500;
 
-	--fs-0: 10px;
-	--fs-1: 11px;
-	--fs-2: 12px;
-	--fs-3: 13px;
-	--fs-4: 14px;
-	--fs-5: 15px;
-	--fs-6: 16px;
-	--fs-7: 17px;
-	--fs-8: 18px;
+	--fs-8: 8px;
+	--fs-9: 9px;
+	--fs-10: 10px;
+	--fs-11: 11px;
+	--fs-12: 12px;
+	--fs-13: 13px;
+	--fs-14: 14px;
+	--fs-15: 15px;
+	--fs-16: 16px;
+	--fs-17: 17px;
+	--fs-18: 18px;
+	--fs-19: 19px;
+	--fs-20: 20px;
+	--fs-21: 21px;
+	--fs-22: 22px;
+	--fs-23: 23px;
+	--fs-24: 24px;
 
 	--black: #1d1d1f;
 	--white: #f5f5f7;
@@ -34,7 +42,7 @@
 	background-color: rgb(49, 49, 49);
 	color: var(--white);
 	padding: 6px;
-	font-size: var(--fs-2);
+	font-size: var(--fs-12);
 	border-radius: 12px;
 	cursor: pointer;
 	border: 1px solid rgb(100, 100, 100);
@@ -64,7 +72,6 @@
 	justify-content: center;
 	vertical-align: middle;
 	align-items: center;
-	/* above code to vertically align item */
 	text-align: center;
 	position: absolute;
 	left: 0;
@@ -84,14 +91,14 @@
 }
 
 .title {
-	font-size: var(--fs-4);
+	font-size: var(--fs-14);
 	font-weight: var(--fw-500);
 	margin-bottom: 15px;
 }
 
 .subtext {
 	font-weight: var(--fw-400);
-	font-size: var(--fs-4);
+	font-size: var(--fs-14);
 	margin-bottom: 15px;
 }
 
@@ -113,14 +120,14 @@
 
 .form-label {
 	font-weight: var(--fw-300);
-	font-size: var(--fs-4);
+	font-size: var(--fs-14);
 	margin-right: 10px;
 }
 
 .form-content input {
 	width: 30px;
 	height: 20px;
-	font-size: var(--fs-4);
+	font-size: var(--fs-14);
 }
 
 .create-form-btn:disabled {
@@ -155,21 +162,30 @@
 }
 
 @media screen and (min-width: 580px) {
+	.btn {
+		padding: 8px;
+		font-size: var(--fs-16);
+	}
+
 	.title {
-		font-size: var(--fs-8);
+		font-size: var(--fs-18);
 	}
 
 	.subtext {
-		font-size: var(--fs-6);
+		font-size: var(--fs-16);
+	}
+
+	.form-content {
+		width: 250px;
 	}
 
 	.form-label {
 		font-weight: var(--fw-400);
-		font-size: var(--fs-6);
+		font-size: var(--fs-16);
 	}
 
-	.btn {
-		padding: 8px;
-		font-size: var(--fs-6);
+	.copy-link-icon {
+		width: 20px;
+		height: 20px;
 	}
 }

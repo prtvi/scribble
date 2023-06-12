@@ -22,6 +22,7 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 	}
 }
 
+// 10
 func (pool *Pool) broadcastConfigs() {
 	cfg := model.SharedConfig{
 		MessageTypeMap:  messageTypeMap,
@@ -36,6 +37,7 @@ func (pool *Pool) broadcastConfigs() {
 	})
 }
 
+// 1
 func (pool *Pool) broadcastClientRegister(id, name string) {
 	pool.broadcast(model.SocketMessage{
 		Type:       1,
@@ -45,6 +47,7 @@ func (pool *Pool) broadcastClientRegister(id, name string) {
 	})
 }
 
+// 2
 func (pool *Pool) broadcastClientUnregister(id, name string) {
 	pool.broadcast(model.SocketMessage{
 		Type:       2,
@@ -54,10 +57,12 @@ func (pool *Pool) broadcastClientUnregister(id, name string) {
 	})
 }
 
+// 6
 func (pool *Pool) broadcastClientInfoList() {
 	pool.broadcast(pool.getClientInfoList())
 }
 
+// 71
 func (pool *Pool) broadcastRoundNumber() {
 	pool.broadcast(model.SocketMessage{
 		Type:      71,
@@ -66,6 +71,7 @@ func (pool *Pool) broadcastRoundNumber() {
 	})
 }
 
+// 51
 func (pool *Pool) broadcastClearCanvasEvent() {
 	pool.broadcast(model.SocketMessage{
 		Type:    51,
@@ -73,6 +79,7 @@ func (pool *Pool) broadcastClearCanvasEvent() {
 	})
 }
 
+// 33
 func (pool *Pool) broadcast3WordsList(words []string) {
 	byteInfo, _ := json.Marshal(words)
 	pool.broadcast(model.SocketMessage{
@@ -84,6 +91,7 @@ func (pool *Pool) broadcast3WordsList(words []string) {
 	})
 }
 
+// 8
 func (pool *Pool) broadcastCurrentWordDetails() {
 	pool.broadcast(model.SocketMessage{
 		Type:              8,
@@ -94,6 +102,7 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 	})
 }
 
+// 81
 func (pool *Pool) broadcastTurnOver() {
 	pool.broadcast(model.SocketMessage{
 		Type:           81,
@@ -102,6 +111,7 @@ func (pool *Pool) broadcastTurnOver() {
 	})
 }
 
+// 32
 func (pool *Pool) broadcastWordReveal() {
 	pool.broadcast(model.SocketMessage{
 		Type:    32,

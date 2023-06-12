@@ -1,5 +1,5 @@
 :root {
-	--status-bar-h: 25px;
+	--status-bar-h: 24px;
 }
 
 .game-content {
@@ -27,7 +27,7 @@
 
 .status-bar > div span {
 	line-height: var(--status-bar-h);
-	font-size: var(--fs-2);
+	font-size: var(--fs-12);
 }
 
 .round {
@@ -70,26 +70,27 @@ canvas {
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 2;
 	cursor: pointer;
-	font-size: var(--fs-3);
+	font-size: var(--fs-13);
 	color: white;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-#overlay > div {
+/* overlay pseudo classes */
+
+.overlay-div {
 	padding: 10px;
 	margin: 0 auto;
 }
 
 .overlay-p {
-	font-size: var(--fs-4);
-	margin-bottom: 15px;
+	font-size: var(--fs-14);
+	margin-bottom: 20px;
 }
 
-/* overlay pseudo classes */
-
 .word-option {
+	font-size: var(--fs-14);
 	padding: 8px;
 	background-color: rgb(50, 50, 50);
 	border-radius: 5px;
@@ -143,19 +144,19 @@ canvas {
 }
 
 .member-num {
-	font-size: var(--fs-1);
+	font-size: var(--fs-11);
 }
 
 .member-name {
-	font-size: var(--fs-2);
+	font-size: var(--fs-12);
 }
 
 .member-score {
-	font-size: var(--fs-0);
+	font-size: var(--fs-10);
 }
 
 .message {
-	font-size: var(--fs-1);
+	font-size: var(--fs-11);
 	background-color: lightgrey;
 	padding: 4px;
 	text-align: left;
@@ -178,17 +179,83 @@ canvas {
 	height: 25px;
 	width: 180px;
 	padding-right: 30px;
-	font-size: var(--fs-3);
+	font-size: var(--fs-13);
 }
 
 .input-wrapper span {
 	position: absolute;
 	right: 60px;
+	top: 2px;
 	line-height: 25px;
-	font-size: var(--fs-2);
+	font-size: var(--fs-12);
 }
 
 .chat-box .btn {
 	padding: 3px;
 	width: 50px;
+}
+
+@media screen and (min-width: 580px) {
+	:root {
+		--status-bar-h: 36px;
+	}
+
+	.status-bar > div span {
+		font-size: var(--fs-14);
+	}
+
+	.overlay-p {
+		font-size: var(--fs-20);
+	}
+
+	.word-option {
+		font-size: var(--fs-17);
+	}
+
+	.mc-container {
+		height: 300px;
+	}
+
+	.member {
+		padding: 8px;
+	}
+
+	.member-num {
+		font-size: var(--fs-13);
+	}
+
+	.member-name {
+		font-size: var(--fs-14);
+	}
+
+	.member-score {
+		font-size: var(--fs-13);
+	}
+
+	.message {
+		font-size: var(--fs-13);
+		padding: 6px;
+	}
+
+	.chat-box {
+		margin-top: 10px;
+	}
+
+	.chat-box input {
+		height: 30px;
+		width: 200px;
+		padding-right: 30px;
+		font-size: var(--fs-15);
+	}
+
+	.input-wrapper span {
+		right: 75px;
+		top: 4px;
+		font-size: var(--fs-13);
+	}
+
+	.chat-box .btn {
+		padding: 4px;
+		width: 65px;
+	}
 }

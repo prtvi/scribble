@@ -1,6 +1,6 @@
 'use strict';
 
-// 1, 2, 3, 31, 32
+// 1, 2, 3, 31, 32, 312
 function appendChatMsgToDOM(msg, formatColor) {
 	// adds the msg into the DOM
 
@@ -31,7 +31,7 @@ function showWordToChoose(socketMessage) {
 	if (clientId === socketMessage.currSketcherId) {
 		const words = JSON.parse(socketMessage.content);
 
-		let html = `<div><p class="overlay-p">Choose a word to draw</p>`;
+		let html = `<div class="overlay-div"><p class="overlay-p">Choose a word to draw</p>`;
 		words.forEach(w => (html += `<span class="word-option">${w}</span>`));
 		html += `</div>`;
 
@@ -54,7 +54,7 @@ function showWordToChoose(socketMessage) {
 			sendViaSocket(socketMsg);
 		});
 	} else {
-		overlay.innerHTML = `<div><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`;
+		overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`;
 		displayOverlay();
 	}
 }
@@ -112,7 +112,7 @@ function startGame(socketMessage) {
 	hideAndRemoveElForJoiningLink();
 
 	// display game started overlay
-	overlay.innerHTML = `<div><p class="overlay-p">Game started</p></div>`;
+	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">Game started</p></div>`;
 	displayOverlay();
 
 	document.querySelector('.time-left-for-word span').textContent =
@@ -128,7 +128,7 @@ function renderRoundDetails(socketMessage) {
 		'span'
 	).textContent = `Round: ${socketMessage.currRound}`;
 
-	overlay.innerHTML = `<div><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`;
+	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`;
 	displayOverlay();
 }
 
@@ -186,7 +186,7 @@ function disableSketching(socketMessage) {
 function displayScores(socketMessage) {
 	const dataArr = JSON.parse(socketMessage.content);
 
-	let html = `<div>
+	let html = `<div class="overlay-div">
 	<p class="overlay-p">Game over!</p>
 	<table>
 	<tr>

@@ -101,6 +101,7 @@ func (pool *Pool) wordChooseCountdown(words []string) {
 	}
 }
 
+// 70
 func (pool *Pool) startGameAndBroadcast() {
 	// flag and broadcast the starting of the game
 	pool.HasGameStarted = true
@@ -240,6 +241,7 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 	return message
 }
 
+// 9
 func (pool *Pool) EndGame() {
 	// flag and broadcast game end
 
