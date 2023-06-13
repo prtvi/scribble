@@ -31,6 +31,10 @@ func PrintSocketMessage(m model.SocketMessage) {
 		utils.Cs(msgTypeColor, messageTypeMap[m.Type]))
 }
 
+func sleep(d time.Duration) {
+	time.Sleep(d)
+}
+
 func NewPool(uuid string, capacity int) *Pool {
 	// returns a new Pool
 	now := time.Now()
@@ -61,7 +65,8 @@ func Maintainer() {
 	// clears the pools in which the game has ended every 10 mins
 
 	for {
-		time.Sleep(DeletePoolAfterGameEndsDuration) // TODO - to be tested
+		// TODO - to be tested
+		sleep(DeletePoolAfterGameEndsDuration)
 
 		for poolId, pool := range HUB {
 			// if pool exists and game has ended
@@ -92,9 +97,9 @@ func DebugMode() {
 	DEBUG = true
 	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 
-	GameStartDurationInSeconds = time.Duration(time.Second * 500)
-	TimeForEachWordInSeconds = time.Duration(time.Second * 30)
-	RenderClientsEvery = time.Duration(time.Second * 10)
+	GameStartDurationInSeconds = time.Second * 500
+	TimeForEachWordInSeconds = time.Second * 30
+	RenderClientsEvery = time.Second * 10
 
 	poolId := "debug"
 	pool := NewPool(poolId, 4)

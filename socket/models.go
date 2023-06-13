@@ -12,12 +12,12 @@ import (
 // color string hash value without the #
 
 type Client struct {
-	ID, Name, Color         string
-	HasSketched, HasGuessed bool
-	Score                   int
-	Conn                    *websocket.Conn
-	Pool                    *Pool
-	mu                      sync.Mutex
+	ID, Name, Color           string
+	DoneSketching, HasGuessed bool
+	Score                     int
+	Conn                      *websocket.Conn
+	Pool                      *Pool
+	mu                        sync.Mutex
 }
 
 type Pool struct {

@@ -18,14 +18,14 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	GameStartDurationInSeconds      = time.Duration(time.Second * 120)
-	TimeForEachWordInSeconds        = time.Duration(time.Second * 75)
-	RenderClientsEvery              = time.Duration(time.Second * 5)
-	WaitAfterRoundStarts            = time.Duration(time.Second * 2)
-	WaitAfterTurnEnds               = time.Duration(time.Second * 2)
-	TimeoutForChoosingWord          = time.Duration(time.Second * 10)
-	DeletePoolAfterGameEndsDuration = time.Duration(time.Minute * 10)
-	RemovePoolAfterGameNotStarted   = time.Duration(time.Minute * 20)
+	GameStartDurationInSeconds      = time.Second * 120
+	TimeForEachWordInSeconds        = time.Second * 75
+	RenderClientsEvery              = time.Second * 5
+	WaitAfterRoundStarts            = time.Second * 2
+	WaitAfterTurnEnds               = time.Second * 2
+	TimeoutForChoosingWord          = time.Second * 10
+	DeletePoolAfterGameEndsDuration = time.Minute * 10
+	RemovePoolAfterGameNotStarted   = time.Minute * 20
 	ScoreForCorrectGuess            = 25
 	NumberOfRounds                  = 3
 

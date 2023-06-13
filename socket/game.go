@@ -29,7 +29,6 @@ func (pool *Pool) Start() {
 			}
 
 			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
-
 			break
 
 		case client := <-pool.Unregister:
@@ -38,7 +37,6 @@ func (pool *Pool) Start() {
 			pool.broadcastClientUnregister(client.ID, client.Name)
 
 			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
-
 			break
 
 		case message := <-pool.Broadcast:
@@ -65,6 +63,8 @@ func (pool *Pool) Start() {
 			default:
 				break
 			}
+
+			break
 		}
 	}
 }
@@ -73,7 +73,7 @@ func (pool *Pool) BeginGameFlow() {
 	// schedule timers for current word and current sketcher
 
 	// wait for the "game started" overlay
-	time.Sleep(time.Duration(time.Second * 2))
+	sleep(time.Second * 2)
 
 	// loop over the number of rounds
 	for i := 0; i < NumberOfRounds; i++ {
@@ -81,7 +81,7 @@ func (pool *Pool) BeginGameFlow() {
 
 		// broadcast round number and wait
 		pool.broadcastRoundNumber()
-		time.Sleep(WaitAfterRoundStarts)
+		sleep(WaitAfterRoundStarts)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
@@ -94,19 +94,22 @@ func (pool *Pool) BeginGameFlow() {
 			// TODO: send the whole thing to client who's sketching, send minimal details to rest
 			pool.clientWordAssignmentFlow(c)
 			pool.broadcastCurrentWordDetails()
-			time.Sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
+
+			sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
 			// broadcast turn_over, reveal the word and clear canvas
-			pool.broadcastTurnOver()
+			pool.broadcastTurnOver() // TODO: show these events on overlay
+			sleep(time.Second * 2)
 			pool.broadcastWordReveal()
+			sleep(time.Second * 2)
 			pool.broadcastClearCanvasEvent()
 
-			// clear the current word, sketcher
-			pool.CurrWord = ""
-			pool.CurrSketcher = nil
-
-			time.Sleep(WaitAfterTurnEnds)
+			// flag sketching done, clear the current word and sketcher
+			pool.turnOver(c)
+			sleep(WaitAfterTurnEnds)
 		}
+
+		pool.flagAllClientsAsNotSketched()
 	}
 
 	// once all clients are done playing, end the game and broadcast the same

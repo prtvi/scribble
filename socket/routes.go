@@ -47,14 +47,14 @@ func HandlerWsConnection(c echo.Context) error {
 
 	// create a new client to append to Pool.Clients map
 	client := &Client{
-		ID:          clientId,
-		Name:        clientName,
-		Color:       clientColor,
-		HasSketched: false,
-		HasGuessed:  false,
-		Score:       0,
-		Conn:        conn,
-		Pool:        pool,
+		ID:            clientId,
+		Name:          clientName,
+		Color:         clientColor,
+		DoneSketching: false,
+		HasGuessed:    false,
+		Score:         0,
+		Conn:          conn,
+		Pool:          pool,
 	}
 
 	// register and notify other clients

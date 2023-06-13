@@ -1,6 +1,6 @@
 'use strict';
 
-// 1, 2, 3, 31, 32, 312
+// 1, 2, 3, 31, 312
 function appendChatMsgToDOM(msg, formatColor) {
 	// adds the msg into the DOM
 
@@ -24,6 +24,14 @@ function appendChatMsgToDOM(msg, formatColor) {
 
 	document.querySelector('.msg').value = '';
 	document.querySelector('.input-wrapper span').textContent = 0;
+}
+
+// 32
+function displayTimeUpOnOverlayAndChat(socketMessage) {
+	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">The word was '${socketMessage.content}'</p></div>`;
+	displayOverlay();
+
+	appendChatMsgToDOM(`The word was '${socketMessage.content}'`, '#ffa500');
 }
 
 // 33
@@ -180,6 +188,9 @@ function disableSketching(socketMessage) {
 	// display painter utils div and remove EL
 	painterUtilsDiv.classList.add('hidden');
 	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
+
+	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`;
+	displayOverlay();
 }
 
 // 9

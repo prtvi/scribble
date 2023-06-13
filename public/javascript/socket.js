@@ -65,7 +65,7 @@ function socketOnMessage(message) {
 			break;
 
 		case 32:
-			appendChatMsgToDOM(`The word was '${socketMessage.content}'`, '#ffa500');
+			displayTimeUpOnOverlayAndChat(socketMessage);
 			break;
 
 		case 33:
