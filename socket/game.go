@@ -49,8 +49,7 @@ func (pool *Pool) Start() {
 				pool.broadcast(message)
 
 			case 4, 5:
-				message.CurrSketcherId = pool.CurrSketcher.ID // to disable redrawing on sketcher's canvas
-				pool.broadcast(message)
+				pool.sendExcludingClientId(pool.CurrSketcher.ID, message)
 
 			case 7:
 				PrintSocketMessage(message)
@@ -93,19 +92,21 @@ func (pool *Pool) BeginGameFlow() {
 			// broadcast current word, current sketcher and other details to all clients
 			// TODO: send the whole thing to client who's sketching, send minimal details to rest
 			pool.clientWordAssignmentFlow(c)
-			pool.broadcastCurrentWordDetails()
+			pool.broadcastCurrentWordDetails() // DOTO: dont broadcast to everyone
 
 			sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
 			// broadcast turn_over, reveal the word and clear canvas
-			pool.broadcastTurnOver() // TODO: show these events on overlay
+			pool.broadcastTurnOver() // DOTO: dont broadcast to everyone, but different event for everyone, guessers & sketcher
 			sleep(time.Second * 2)
+
 			pool.broadcastWordReveal()
 			sleep(time.Second * 2)
 			pool.broadcastClearCanvasEvent()
 
 			// flag sketching done, clear the current word and sketcher
 			pool.turnOver(c)
+
 			sleep(WaitAfterTurnEnds)
 		}
 

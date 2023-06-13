@@ -17,10 +17,14 @@ func PrintSocketMessage(m model.SocketMessage) {
 	var msgTypeColor string
 
 	switch m.Type {
-	case 1, 2, 3, 4, 5:
+	case 1, 2, 3:
 		msgTypeColor = "blue"
+	case 4, 5:
+		msgTypeColor = "red"
 	case 7, 34:
 		msgTypeColor = "purple"
+	case 8, 33:
+		msgTypeColor = "yellow"
 	default:
 		msgTypeColor = "green"
 	}

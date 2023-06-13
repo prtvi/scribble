@@ -65,7 +65,7 @@ function socketOnMessage(message) {
 			break;
 
 		case 32:
-			displayTimeUpOnOverlayAndChat(socketMessage);
+			revealWordOnOverlayAndChat(socketMessage);
 			break;
 
 		case 33:

@@ -7,18 +7,35 @@ import (
 	utils "scribble/utils"
 )
 
+func sendToClientConnection(c *Client, m model.SocketMessage) {
+	c.mu.Lock()
+	err := c.Conn.WriteJSON(m)
+	c.mu.Unlock()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMessage) {
+	PrintSocketMessage(message)
+
+	// broadcasts the given message to all clients in the pool
+	for _, c := range pool.Clients {
+		if c.ID == excludeId {
+			continue
+		}
+
+		sendToClientConnection(c, message)
+	}
+}
+
 func (pool *Pool) broadcast(message model.SocketMessage) {
 	PrintSocketMessage(message)
 
 	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
-		c.mu.Lock()
-		err := c.Conn.WriteJSON(message)
-		c.mu.Unlock()
-
-		if err != nil {
-			fmt.Println(err)
-		}
+		sendToClientConnection(c, message)
 	}
 }
 

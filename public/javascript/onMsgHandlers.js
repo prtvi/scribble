@@ -27,7 +27,7 @@ function appendChatMsgToDOM(msg, formatColor) {
 }
 
 // 32
-function displayTimeUpOnOverlayAndChat(socketMessage) {
+function revealWordOnOverlayAndChat(socketMessage) {
 	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">The word was '${socketMessage.content}'</p></div>`;
 	displayOverlay();
 
@@ -70,10 +70,7 @@ function showWordToChoose(socketMessage) {
 // 4
 function displayImgOnCanvas(socketMessage) {
 	// display image data on canvas
-
-	if (clientId === socketMessage.currSketcherId) return;
-
-	var img = new Image();
+	const img = new Image();
 	// scale up/down canvas data based on current canvas size using outer bounds
 	img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 	img.setAttribute('src', socketMessage.content);

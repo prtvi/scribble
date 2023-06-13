@@ -70,6 +70,9 @@ async function paint(event) {
 // clear canvas
 
 function requestCanvasClear() {
+	// clear canvas and request clear on rest of the clients
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 	// broadcast clear canvas
 	const socketMsg = {
 		type: 5,
