@@ -28,8 +28,9 @@ function appendChatMsgToDOM(msg, formatColor) {
 
 // 32
 function revealWordOnOverlayAndChat(socketMessage) {
-	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">The word was '${socketMessage.content}'</p></div>`;
-	displayOverlay();
+	displayOverlay(
+		`<div class="overlay-div"><p class="overlay-p">The word was '${socketMessage.content}'</p></div>`
+	);
 
 	appendChatMsgToDOM(`The word was '${socketMessage.content}'`, '#ffa500');
 }
@@ -42,8 +43,7 @@ function showWordToChoose(socketMessage) {
 	words.forEach(w => (html += `<span class="word-option">${w}</span>`));
 	html += `</div>`;
 
-	overlay.innerHTML = html;
-	displayOverlay();
+	displayOverlay(html);
 
 	overlay.querySelector('div').addEventListener('click', function (e) {
 		const chosenWord = e.target.textContent.trim();
@@ -64,8 +64,9 @@ function showWordToChoose(socketMessage) {
 
 // 35
 function showChoosingWordOnOverlay(socketMessage) {
-	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`;
-	displayOverlay();
+	displayOverlay(
+		`<div class="overlay-div"><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`
+	);
 }
 
 // 4
@@ -118,8 +119,9 @@ function startGame(socketMessage) {
 	hideAndRemoveElForJoiningLink();
 
 	// display game started overlay
-	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">Game started</p></div>`;
-	displayOverlay();
+	displayOverlay(
+		`<div class="overlay-div"><p class="overlay-p">Game started</p></div>`
+	);
 
 	document.querySelector('.time-left-for-word span').textContent =
 		'Game started';
@@ -134,8 +136,9 @@ function renderRoundDetails(socketMessage) {
 		'span'
 	).textContent = `Round: ${socketMessage.currRound}`;
 
-	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`;
-	displayOverlay();
+	displayOverlay(
+		`<div class="overlay-div"><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`
+	);
 }
 
 // 8
@@ -182,8 +185,9 @@ function disableSketching(socketMessage) {
 	painterUtilsDiv.classList.add('hidden');
 	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
 
-	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`;
-	displayOverlay();
+	displayOverlay(
+		`<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`
+	);
 }
 
 // 9
@@ -202,8 +206,7 @@ function displayScores(socketMessage) {
 	);
 	html += `</table> </div>`;
 
-	overlay.innerHTML = html;
-	displayOverlay();
+	displayOverlay(html);
 }
 
 // 10

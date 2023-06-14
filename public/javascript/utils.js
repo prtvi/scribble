@@ -88,7 +88,8 @@ function sendChatMsgBtnEL(e) {
 	sendViaSocket(socketMsg);
 }
 
-function displayOverlay() {
+function displayOverlay(html) {
+	overlay.innerHTML = html;
 	overlay.style.display = 'flex';
 
 	// disable scroll on overlay display

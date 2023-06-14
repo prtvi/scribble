@@ -101,6 +101,10 @@ function socketOnMessage(message) {
 			beginClientSketchingFlow(socketMessage);
 			break;
 
+		case 88:
+			showClientDrawing(socketMessage);
+			break;
+
 		case 81:
 			disableSketching(socketMessage);
 			break;
