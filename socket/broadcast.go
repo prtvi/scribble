@@ -7,7 +7,7 @@ import (
 	utils "scribble/utils"
 )
 
-func sendToClientConnection(c *Client, m model.SocketMessage) {
+func (c *Client) send(m model.SocketMessage) {
 	c.mu.Lock()
 	err := c.Conn.WriteJSON(m)
 	c.mu.Unlock()
@@ -26,25 +26,19 @@ func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMe
 			continue
 		}
 
-		sendToClientConnection(c, message)
-	}
-}
-
-func (pool *Pool) sendToClientId(id string, message model.SocketMessage) {
-	for _, c := range pool.Clients {
-		if c.ID == id {
-			sendToClientConnection(c, message)
-			break
-		}
+		c.send(message)
 	}
 }
 
 func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessage) {
+	PrintSocketMessage(m1)
+	PrintSocketMessage(m)
+
 	for _, c := range pool.Clients {
 		if c.ID == id1 {
-			sendToClientConnection(c, m1)
+			c.send(m1)
 		} else {
-			sendToClientConnection(c, m)
+			c.send(m)
 		}
 	}
 }
@@ -54,7 +48,7 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 
 	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
-		sendToClientConnection(c, message)
+		c.send(message)
 	}
 }
 

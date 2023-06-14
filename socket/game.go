@@ -97,7 +97,7 @@ func (pool *Pool) BeginGameFlow() {
 			sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 
 			// broadcast turn_over, reveal the word and clear canvas
-			pool.broadcastTurnOver() // DOTO: dont broadcast to everyone, but different event for everyone, guessers & sketcher
+			pool.broadcastTurnOver()
 			sleep(time.Second * 2)
 
 			pool.broadcastWordReveal()

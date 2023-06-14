@@ -35,8 +35,15 @@ var (
 // B=> broadcasting to everyone
 // b=> broadcasting to some
 
+// S B=> Cs
+// S b=> Cs
+// S => C
+// C => S B=> Cs
+// C => S b=> Cs
+// C => S
+
 var messageTypeMap = map[int]string{
-	// server B=> clients - green
+	// S B=> Cs - green
 	6:   "sc__client_info",
 	9:   "sc__end_game",
 	10:  "sc__get_this_map",
@@ -46,25 +53,27 @@ var messageTypeMap = map[int]string{
 	51:  "sc__clear_canvas",
 	70:  "sc__game_started",
 	71:  "sc__round_num",
-	81:  "sc__disable_sketching",
-	82:  "sc__turn_over",
 
-	// server => client - yellow
-	8:  "sc__word_assigned",
-	88: "sc__sketcher_drawing",
-	33: "sc__choose_word",
+	// S b=> Cs - cyan
 	35: "sc__choosing_word",
+	82: "sc__turn_over",
 
-	// client => server B=> clients - blue
+	// S => C - yellow
+	8:  "sc__word_assigned",
+	33: "sc__choose_word",
+	81: "sc__disable_sketching",
+	88: "sc__sketcher_drawing",
+
+	// C => S B=> Cs - blue
 	1: "csc__client_connect",
 	2: "csc__client_disconnect",
 	3: "csc__text_msg",
 
-	// client => server b=> clients - red
+	// C => S b=> Cs - red
 	4: "csc__canvas_data",
 	5: "csc__clear_canvas",
 
-	// client => server - purple
+	// C => S - purple
 	7:  "cs__req_start_game",
 	34: "cs__chosen_word",
 }
