@@ -130,7 +130,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 
 	// create a list of words for client to choose
 	words := utils.Get3RandomWords(utils.WORDS)
-	pool.broadcast3WordsList(words) // DOTO: dont broadcast to everyone
+	pool.broadcast3WordsList(words)
 
 	// start a timeout for assigning word if not chosen by client
 	go pool.wordChooseCountdown(words)

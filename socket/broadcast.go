@@ -30,6 +30,25 @@ func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMe
 	}
 }
 
+func (pool *Pool) sendToClientId(id string, message model.SocketMessage) {
+	for _, c := range pool.Clients {
+		if c.ID == id {
+			sendToClientConnection(c, message)
+			break
+		}
+	}
+}
+
+func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessage) {
+	for _, c := range pool.Clients {
+		if c.ID == id1 {
+			sendToClientConnection(c, m1)
+		} else {
+			sendToClientConnection(c, m)
+		}
+	}
+}
+
 func (pool *Pool) broadcast(message model.SocketMessage) {
 	PrintSocketMessage(message)
 
@@ -96,16 +115,25 @@ func (pool *Pool) broadcastClearCanvasEvent() {
 	})
 }
 
-// 33
+// 33, 35
 func (pool *Pool) broadcast3WordsList(words []string) {
 	byteInfo, _ := json.Marshal(words)
-	pool.broadcast(model.SocketMessage{
+	m1 := model.SocketMessage{
 		Type:             33,
 		TypeStr:          messageTypeMap[33],
 		Content:          string(byteInfo),
 		CurrSketcherId:   pool.CurrSketcher.ID,
 		CurrSketcherName: pool.CurrSketcher.Name,
-	})
+	}
+
+	m := model.SocketMessage{
+		Type:             35,
+		TypeStr:          messageTypeMap[35],
+		CurrSketcherName: pool.CurrSketcher.Name,
+	}
+
+	// send m1 to sketcher client and m to rest of the clients
+	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
 // 8

@@ -72,6 +72,10 @@ function socketOnMessage(message) {
 			showWordToChoose(socketMessage);
 			break;
 
+		case 35:
+			showChoosingWordOnOverlay(socketMessage);
+			break;
+
 		case 4:
 			displayImgOnCanvas(socketMessage);
 			break;

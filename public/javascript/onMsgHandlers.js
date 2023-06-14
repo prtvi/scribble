@@ -36,35 +36,36 @@ function revealWordOnOverlayAndChat(socketMessage) {
 
 // 33
 function showWordToChoose(socketMessage) {
-	if (clientId === socketMessage.currSketcherId) {
-		const words = JSON.parse(socketMessage.content);
+	const words = JSON.parse(socketMessage.content);
 
-		let html = `<div class="overlay-div"><p class="overlay-p">Choose a word to draw</p>`;
-		words.forEach(w => (html += `<span class="word-option">${w}</span>`));
-		html += `</div>`;
+	let html = `<div class="overlay-div"><p class="overlay-p">Choose a word to draw</p>`;
+	words.forEach(w => (html += `<span class="word-option">${w}</span>`));
+	html += `</div>`;
 
-		overlay.innerHTML = html;
-		displayOverlay();
+	overlay.innerHTML = html;
+	displayOverlay();
 
-		overlay.querySelector('div').addEventListener('click', function (e) {
-			const chosenWord = e.target.textContent.trim();
-			if (!words.includes(chosenWord)) return;
+	overlay.querySelector('div').addEventListener('click', function (e) {
+		const chosenWord = e.target.textContent.trim();
+		if (!words.includes(chosenWord)) return;
 
-			const socketMsg = {
-				type: 34,
-				typeStr: messageTypeMap.get(34),
-				content: chosenWord,
-				clientName,
-				clientId,
-				poolId,
-			};
+		const socketMsg = {
+			type: 34,
+			typeStr: messageTypeMap.get(34),
+			content: chosenWord,
+			clientName,
+			clientId,
+			poolId,
+		};
 
-			sendViaSocket(socketMsg);
-		});
-	} else {
-		overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`;
-		displayOverlay();
-	}
+		sendViaSocket(socketMsg);
+	});
+}
+
+// 35
+function showChoosingWordOnOverlay(socketMessage) {
+	overlay.innerHTML = `<div class="overlay-div"><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`;
+	displayOverlay();
 }
 
 // 4

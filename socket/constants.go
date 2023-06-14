@@ -51,6 +51,7 @@ var messageTypeMap = map[int]string{
 	// server => client - yellow
 	8:  "sc__word_assigned",
 	33: "sc__choose_word",
+	35: "sc__choosing_word",
 
 	// client => server B=> clients - blue
 	1: "csc__client_connect",
