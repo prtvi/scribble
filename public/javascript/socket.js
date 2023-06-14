@@ -106,7 +106,11 @@ function socketOnMessage(message) {
 			break;
 
 		case 81:
-			disableSketching(socketMessage);
+			disableSketching();
+			break;
+
+		case 82:
+			showTimeUp();
 			break;
 
 		case 9:

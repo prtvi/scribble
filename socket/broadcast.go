@@ -157,13 +157,19 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
-// 81
+// 81, 82
 func (pool *Pool) broadcastTurnOver() {
-	pool.broadcast(model.SocketMessage{
-		Type:           81,
-		TypeStr:        messageTypeMap[81],
-		CurrSketcherId: pool.CurrSketcher.ID,
-	})
+	m1 := model.SocketMessage{
+		Type:    81,
+		TypeStr: messageTypeMap[81],
+	}
+
+	m := model.SocketMessage{
+		Type:    82,
+		TypeStr: messageTypeMap[82],
+	}
+
+	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
 // 32

@@ -173,9 +173,7 @@ function showClientDrawing(socketMessage) {
 }
 
 // 81
-function disableSketching(socketMessage) {
-	if (clientId !== socketMessage.currSketcherId) return;
-
+function disableSketching() {
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.clear-canvas');
 
@@ -185,6 +183,11 @@ function disableSketching(socketMessage) {
 	painterUtilsDiv.classList.add('hidden');
 	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
 
+	showTimeUp();
+}
+
+// 82
+function showTimeUp() {
 	displayOverlay(
 		`<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`
 	);

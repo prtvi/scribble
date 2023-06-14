@@ -46,7 +46,8 @@ var messageTypeMap = map[int]string{
 	51:  "sc__clear_canvas",
 	70:  "sc__game_started",
 	71:  "sc__round_num",
-	81:  "sc__turn_over",
+	81:  "sc__disable_sketching",
+	82:  "sc__turn_over",
 
 	// server => client - yellow
 	8:  "sc__word_assigned",
