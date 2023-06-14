@@ -136,15 +136,25 @@ func (pool *Pool) broadcast3WordsList(words []string) {
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
-// 8
+// 8, 88
 func (pool *Pool) broadcastCurrentWordDetails() {
-	pool.broadcast(model.SocketMessage{
+	m1 := model.SocketMessage{
 		Type:              8,
 		TypeStr:           messageTypeMap[8],
 		CurrSketcherId:    pool.CurrSketcher.ID,
 		CurrWord:          pool.CurrWord,
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
-	})
+	}
+
+	m := model.SocketMessage{
+		Type:              88,
+		TypeStr:           messageTypeMap[88],
+		CurrWordLen:       len(pool.CurrWord),
+		CurrSketcherName:  pool.CurrSketcher.Name,
+		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
+	}
+
+	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
 // 81

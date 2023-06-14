@@ -25,6 +25,7 @@ type SocketMessage struct {
 	CurrSketcherId    string `json:"currSketcherId,omitempty"`
 	CurrSketcherName  string `json:"currSketcherName,omitempty"`
 	CurrWord          string `json:"currWord,omitempty"`
+	CurrWordLen       int    `json:"currWordLen"`
 	CurrWordExpiresAt string `json:"currWordExpiresAt,omitempty"`
 }
 

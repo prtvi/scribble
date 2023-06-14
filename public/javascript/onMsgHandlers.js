@@ -140,38 +140,33 @@ function renderRoundDetails(socketMessage) {
 
 // 8
 function beginClientSketchingFlow(socketMessage) {
-	hideOverlay();
+	beginClientSketchingFlowInit(socketMessage);
 
-	// initialise the time at which this word expires
-	const currentWordExpiresAt = new Date(
-		socketMessage.currWordExpiresAt
-	).getTime();
-
-	const timeLeftSpan = document.querySelector('.time-left-for-word span');
-	timeLeftSpan.textContent = timeForEachWord;
-	runTimer(timeLeftSpan, currentWordExpiresAt);
-
+	// for enabling drawing access if clientId matches
 	const wordDiv = document.querySelector('.word');
 	wordDiv.classList.remove('hidden');
 	const wordSpan = wordDiv.querySelector('span');
 
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.clear-canvas');
+	paintUtils.isAllowedToPaint = true;
 
-	// for enabling drawing access if clientId matches
-	if (clientId === socketMessage.currSketcherId) {
-		paintUtils.isAllowedToPaint = true;
+	// display the word
+	wordSpan.textContent = socketMessage.currWord;
 
-		// display the word
-		wordSpan.textContent = socketMessage.currWord;
+	// display painter utils div and add EL for clearing the canvas
+	painterUtilsDiv.classList.remove('hidden');
+	clearCanvasBtn.addEventListener('click', requestCanvasClear);
+}
 
-		// display painter utils div and add EL for clearing the canvas
-		painterUtilsDiv.classList.remove('hidden');
-		clearCanvasBtn.addEventListener('click', requestCanvasClear);
-	} else {
-		// show word length
-		wordSpan.textContent = `${socketMessage.currWord.length} characters`;
-	}
+// 88
+function showClientDrawing(socketMessage) {
+	beginClientSketchingFlowInit(socketMessage);
+
+	const wordDiv = document.querySelector('.word');
+	wordDiv.classList.remove('hidden');
+	const wordSpan = wordDiv.querySelector('span');
+	wordSpan.textContent = `${socketMessage.currWordLen} characters`;
 }
 
 // 81

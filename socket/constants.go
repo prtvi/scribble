@@ -50,6 +50,7 @@ var messageTypeMap = map[int]string{
 
 	// server => client - yellow
 	8:  "sc__word_assigned",
+	88: "sc__sketcher_drawing",
 	33: "sc__choose_word",
 	35: "sc__choosing_word",
 

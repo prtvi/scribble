@@ -92,7 +92,7 @@ func (pool *Pool) BeginGameFlow() {
 			// broadcast current word, current sketcher and other details to all clients
 			// TODO: send the whole thing to client who's sketching, send minimal details to rest
 			pool.clientWordAssignmentFlow(c)
-			pool.broadcastCurrentWordDetails() // DOTO: dont broadcast to everyone
+			pool.broadcastCurrentWordDetails()
 
 			sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
 

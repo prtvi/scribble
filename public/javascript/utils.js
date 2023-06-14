@@ -105,6 +105,19 @@ function hideOverlay() {
 	document.body.scroll = 'yes';
 }
 
+function beginClientSketchingFlowInit(socketMessage) {
+	hideOverlay();
+
+	// initialise the time at which this word expires
+	const currentWordExpiresAt = new Date(
+		socketMessage.currWordExpiresAt
+	).getTime();
+
+	const timeLeftSpan = document.querySelector('.time-left-for-word span');
+	timeLeftSpan.textContent = timeForEachWord;
+	runTimer(timeLeftSpan, currentWordExpiresAt);
+}
+
 function runTimer(timerElement, timeoutAt) {
 	const countdownTimer = setInterval(function () {
 		const secondsLeft = getSecondsLeftFrom(timeoutAt);
