@@ -9,6 +9,10 @@ import (
 )
 
 func printSocketMsg(m model.SocketMessage) {
+	if !DEBUG {
+		return
+	}
+
 	from := m.ClientName
 	if from == "" {
 		from = "server"
@@ -31,9 +35,9 @@ func printSocketMsg(m model.SocketMessage) {
 		msgTypeColor = "green"
 	}
 
-	utils.Cp("black",
+	utils.Cp("white",
 		"from:", utils.Cs(msgTypeColor, fmt.Sprintf("%-15s ", from)),
-		utils.Cs("black", "msg type: "), utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
+		utils.Cs("white", "msg type: "), utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
 		utils.Cs(msgTypeColor, messageTypeMap[m.Type]))
 }
 
@@ -80,7 +84,7 @@ func Maintainer() {
 				utils.Cp("yellowBg", "Removing pool from HUB, poolId:", poolId)
 				delete(HUB, poolId)
 
-				fmt.Println("Size of HUB:", len(HUB))
+				pool.printStats("Game ended for poolId:", poolId)
 			}
 
 			// if pool exists and game hasn't started for RemovePoolAfterGameNotStarted duration
@@ -88,7 +92,7 @@ func Maintainer() {
 				utils.Cp("yellowBg", "Removing pool from HUB after game not started for RemovePoolAfterGameNotStarted duration, poolId:", poolId)
 				delete(HUB, poolId)
 
-				fmt.Println("Size of HUB:", len(HUB))
+				pool.printStats("Deleting junky pool, poolId:", poolId)
 			}
 		}
 	}
@@ -114,4 +118,16 @@ func DebugMode() {
 	HUB[poolId] = pool
 
 	go pool.start()
+
+	go func() {
+		// print pool stats every 1 min
+		for {
+			sleep(time.Minute * 1)
+			pool.printStats()
+
+			if len(HUB) == 0 {
+				break
+			}
+		}
+	}()
 }

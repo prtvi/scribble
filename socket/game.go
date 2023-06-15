@@ -1,8 +1,6 @@
 package socket
 
 import (
-	"fmt"
-	utils "scribble/utils"
 	"time"
 )
 
@@ -28,7 +26,7 @@ func (pool *Pool) start() {
 				go pool.startGameCountdown()
 			}
 
-			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
+			pool.printStats("client connected, clientId:", client.ID)
 			break
 
 		case client := <-pool.Unregister:
@@ -36,7 +34,7 @@ func (pool *Pool) start() {
 			pool.removeClientFromList(client)
 			pool.broadcastClientUnregister(client.ID, client.Name)
 
-			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client disconnected:"), client.Name)
+			pool.printStats("client disconnected, clientId:", client.ID)
 			break
 
 		case message := <-pool.Broadcast:
@@ -106,8 +104,6 @@ func (pool *Pool) beginGameFlow() {
 
 			// flag sketching done, clear the current word and sketcher
 			pool.turnOver(c)
-
-			sleep(WaitAfterTurnEnds)
 		}
 
 		pool.flagAllClientsAsNotSketched()

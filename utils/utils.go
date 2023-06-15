@@ -24,6 +24,10 @@ func FormatTimeLong(t time.Time) string {
 	return t.Format(time.RFC3339Nano)
 }
 
+func GetTimeString(t time.Time) string {
+	return fmt.Sprintf("%02d:%02d:%02d", t.Hour(), t.Minute(), t.Second())
+}
+
 func GetSecondsLeftFrom(t time.Time) int {
 	return int(t.Sub(time.Now()).Seconds())
 }
@@ -59,7 +63,7 @@ func ShuffleList(list []string) []string {
 func LoadEnv() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		fmt.Println("Error loading .env file")
+		Cp("redBg", "Error loading .env file")
 	}
 }
 
@@ -103,12 +107,10 @@ var colorMap map[string]string = map[string]string{
 }
 
 func getColor(color string) string {
-	c, ok := colorMap[color]
-	if ok {
+	if c, ok := colorMap[color]; ok {
 		return c
-	} else {
-		return reset
 	}
+	return reset
 }
 
 func Cp(color string, message ...string) {

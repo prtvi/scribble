@@ -3,9 +3,11 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	model "scribble/model"
 	utils "scribble/utils"
 	"strings"
+	"text/tabwriter"
 	"time"
 )
 
@@ -231,7 +233,8 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 	}
 
 	// check if the text message contains the word, word exists in message
-	if strings.Contains(guessedLower, currWordLower) {
+	// send this response only if client has already guessed the current word
+	if strings.Contains(guessedLower, currWordLower) && guesserClient.HasGuessed {
 		message.Type = 312
 		message.TypeStr = messageTypeMap[312]
 	}
@@ -251,4 +254,34 @@ func (pool *Pool) endGame() {
 		TypeStr: messageTypeMap[9],
 		Content: pool.getClientInfoList().Content,
 	})
+}
+
+func (pool *Pool) printStats(event ...string) {
+	if !DEBUG {
+		return
+	}
+
+	// poolId, capacity, size, createdTime, gameStartTime
+	// hasGameStarted, hasGameEnded, hasClientInfoBroadcastStarted
+	// currRound, currWord, currSketcherName, currWordExpiresAt
+
+	utils.Cp("green", "--------------------------------------------------------------")
+	if len(event) != 0 {
+		utils.Cp("red", event...)
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
+	fmt.Fprintln(w, "\nPoolId\tCapacity\tSize\tCreatedTime\tGameStartTime")
+	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartTime)))
+
+	fmt.Fprintln(w, "HasGameStarted\tHasClientInfoBroadcastStarted\tHasGameEnded")
+	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\n", pool.HasGameStarted, pool.HasClientInfoBroadcastStarted, pool.HasGameEnded))
+
+	if pool.CurrSketcher != nil && pool.HasGameStarted {
+		fmt.Fprintln(w, "CurrRound\tCurrWord\tCurrSketcherName")
+		fmt.Fprintln(w, fmt.Sprintf("%d\t%s\t%v\n", pool.CurrRound, pool.CurrWord, pool.CurrSketcher.Name))
+	}
+
+	w.Flush()
+	utils.Cp("green", "--------------------------------------------------------------")
 }

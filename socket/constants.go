@@ -22,7 +22,6 @@ var (
 	TimeForEachWordInSeconds        = time.Second * 75
 	RenderClientsEvery              = time.Second * 5
 	WaitAfterRoundStarts            = time.Second * 2
-	WaitAfterTurnEnds               = time.Second * 2
 	TimeoutForChoosingWord          = time.Second * 10
 	DeletePoolAfterGameEndsDuration = time.Minute * 10
 	RemovePoolAfterGameNotStarted   = time.Minute * 20
