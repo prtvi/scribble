@@ -59,7 +59,7 @@ func HandlerWsConnection(c echo.Context) error {
 
 	// register and notify other clients
 	pool.Register <- client
-	client.Read()
+	client.read()
 
 	return nil
 }
@@ -87,11 +87,11 @@ func CreateRoomLink(c echo.Context) error {
 
 	// create a new pool with an uuid
 	poolId := utils.GenerateUUID()
-	pool := NewPool(poolId, capacity)
+	pool := newPool(poolId, capacity)
 
 	// append to global Hub map, and start listening to pool connections
 	HUB[poolId] = pool
-	go pool.Start()
+	go pool.start()
 
 	utils.Cp("blue", "HUB size:", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
 

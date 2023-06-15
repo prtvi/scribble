@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func PrintSocketMessage(m model.SocketMessage) {
+func printSocketMsg(m model.SocketMessage) {
 	from := m.ClientName
 	if from == "" {
 		from = "server"
@@ -41,7 +41,7 @@ func sleep(d time.Duration) {
 	time.Sleep(d)
 }
 
-func NewPool(uuid string, capacity int) *Pool {
+func newPool(uuid string, capacity int) *Pool {
 	// returns a new Pool
 	now := time.Now()
 	later := now.Add(GameStartDurationInSeconds)
@@ -108,10 +108,10 @@ func DebugMode() {
 	RenderClientsEvery = time.Second * 10
 
 	poolId := "debug"
-	pool := NewPool(poolId, 4)
+	pool := newPool(poolId, 4)
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+poolId)
 
 	HUB[poolId] = pool
 
-	go pool.Start()
+	go pool.start()
 }

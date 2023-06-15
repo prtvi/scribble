@@ -10,7 +10,7 @@ import (
 )
 
 // read messages received from client
-func (c *Client) Read() {
+func (c *Client) read() {
 	defer func() {
 		c.Pool.Unregister <- c
 		c.Conn.Close()
@@ -143,9 +143,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
 }
 
-// methods called in Start or BeginGameFlow funcs
-
-func (pool *Pool) BeginBroadcastClientInfo() {
+func (pool *Pool) beginBroadcastClientInfo() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
 	utils.Cp("yellow", "Broadcasting client info start!")
@@ -162,7 +160,7 @@ func (pool *Pool) BeginBroadcastClientInfo() {
 	}
 }
 
-func (pool *Pool) StartGameCountdown() {
+func (pool *Pool) startGameCountdown() {
 	// as soon as the first player/client joins, start this countdown to start the game, after this timeout, the game begin message will broadcast
 
 	// sleep until its the game starting time
@@ -178,20 +176,20 @@ func (pool *Pool) StartGameCountdown() {
 	utils.Cp("greenBg", "Game started! by server countdown")
 
 	// start game flow
-	go pool.BeginGameFlow()
+	go pool.beginGameFlow()
 }
 
-func (pool *Pool) StartGameRequest() {
+func (pool *Pool) startGameRequestFromClient() {
 	// when the client requests to start the game instead of the countdown
 	// start the game and broadcast the same
 	pool.startGameAndBroadcast()
 	utils.Cp("greenBg", "Game started! by client using btn")
 
 	// start game flow
-	go pool.BeginGameFlow()
+	go pool.beginGameFlow()
 }
 
-func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
+func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 	// update score for the client that guesses the word right, return true if correctly guessed
 
 	// when the game has not begun, the curr sketcher will be nil
@@ -242,7 +240,7 @@ func (pool *Pool) UpdateScore(message model.SocketMessage) model.SocketMessage {
 }
 
 // 9
-func (pool *Pool) EndGame() {
+func (pool *Pool) endGame() {
 	// flag and broadcast game end
 
 	utils.Cp("yellowBg", "All players done playing!")

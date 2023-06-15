@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (pool *Pool) Start() {
+func (pool *Pool) start() {
 	// start listening to pool connections and messages
 	for {
 		select {
@@ -24,8 +24,8 @@ func (pool *Pool) Start() {
 
 				// flag the client info broadcast start, run two sep goroutines to begin broadcasting client info at regular intervals and start game countdown
 				pool.HasClientInfoBroadcastStarted = true
-				go pool.BeginBroadcastClientInfo()
-				go pool.StartGameCountdown()
+				go pool.beginBroadcastClientInfo()
+				go pool.startGameCountdown()
 			}
 
 			utils.Cp("yellow", "Size of pool:", utils.Cs("reset", fmt.Sprintf("%d", len(pool.Clients))), utils.Cs("yellow", "client connected:"), client.Name)
@@ -45,18 +45,18 @@ func (pool *Pool) Start() {
 
 			switch message.Type {
 			case 3:
-				message := pool.UpdateScore(message)
+				message := pool.updateScore(message)
 				pool.broadcast(message)
 
 			case 4, 5:
 				pool.sendExcludingClientId(pool.CurrSketcher.ID, message)
 
 			case 7:
-				PrintSocketMessage(message)
-				pool.StartGameRequest()
+				printSocketMsg(message)
+				pool.startGameRequestFromClient()
 
 			case 34:
-				PrintSocketMessage(message)
+				printSocketMsg(message)
 				pool.CurrWord = message.Content // client choosing word
 
 			default:
@@ -68,7 +68,7 @@ func (pool *Pool) Start() {
 	}
 }
 
-func (pool *Pool) BeginGameFlow() {
+func (pool *Pool) beginGameFlow() {
 	// schedule timers for current word and current sketcher
 
 	// wait for the "game started" overlay
@@ -114,5 +114,5 @@ func (pool *Pool) BeginGameFlow() {
 	}
 
 	// once all clients are done playing, end the game and broadcast the same
-	pool.EndGame()
+	pool.endGame()
 }
