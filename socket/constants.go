@@ -8,7 +8,7 @@ import (
 )
 
 // map of {poolId: pool}
-var HUB = map[string]*Pool{}
+var hub = map[string]*Pool{}
 
 // to handle socket connections
 var upgrader = websocket.Upgrader{
@@ -28,7 +28,7 @@ var (
 	ScoreForCorrectGuess            = 25
 	NumberOfRounds                  = 3
 
-	DEBUG = false
+	debug = false
 )
 
 // B=> broadcasting to everyone

@@ -34,6 +34,16 @@ func (c *Client) read() {
 	}
 }
 
+func (c *Client) send(m model.SocketMessage) {
+	c.mu.Lock()
+	err := c.Conn.WriteJSON(m)
+	c.mu.Unlock()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func (pool *Pool) getClientInfoList() model.SocketMessage {
 	// returns client info list embedded in model.SocketMessage
 
@@ -119,6 +129,8 @@ func (pool *Pool) turnOver(c *Client) {
 func (pool *Pool) startGameAndBroadcast() {
 	// flag and broadcast the starting of the game
 	pool.HasGameStarted = true
+	pool.GameStartedAt = time.Now()
+
 	pool.broadcast(model.SocketMessage{
 		Type:    70,
 		TypeStr: messageTypeMap[70],
@@ -257,7 +269,7 @@ func (pool *Pool) endGame() {
 }
 
 func (pool *Pool) printStats(event ...string) {
-	if !DEBUG {
+	if !debug {
 		return
 	}
 
@@ -271,8 +283,8 @@ func (pool *Pool) printStats(event ...string) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
-	fmt.Fprintln(w, "\nPoolId\tCapacity\tSize\tCreatedTime\tGameStartTime")
-	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartTime)))
+	fmt.Fprintln(w, "\nPoolId\tCapacity\tSize\tCreatedTime\tGameStartTime\tGameStartedAt")
+	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartTime), utils.GetTimeString(pool.GameStartedAt)))
 
 	fmt.Fprintln(w, "HasGameStarted\tHasClientInfoBroadcastStarted\tHasGameEnded")
 	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\n", pool.HasGameStarted, pool.HasClientInfoBroadcastStarted, pool.HasGameEnded))

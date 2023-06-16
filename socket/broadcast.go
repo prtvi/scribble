@@ -2,20 +2,9 @@ package socket
 
 import (
 	"encoding/json"
-	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
 )
-
-func (c *Client) send(m model.SocketMessage) {
-	c.mu.Lock()
-	err := c.Conn.WriteJSON(m)
-	c.mu.Unlock()
-
-	if err != nil {
-		fmt.Println(err)
-	}
-}
 
 func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMessage) {
 	printSocketMsg(message)

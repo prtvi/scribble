@@ -21,13 +21,13 @@ type Client struct {
 }
 
 type Pool struct {
-	ID, JoiningLink, CurrWord                                   string
-	Capacity, CurrRound                                         int
-	ColorList                                                   []string
-	Register, Unregister                                        chan *Client
-	Clients                                                     []*Client
-	Broadcast                                                   chan model.SocketMessage
-	CreatedTime, GameStartTime, CurrWordExpiresAt               time.Time
-	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted bool
-	CurrSketcher                                                *Client
+	ID, JoiningLink, CurrWord                                    string
+	Capacity, CurrRound                                          int
+	ColorList                                                    []string
+	Register, Unregister                                         chan *Client
+	Clients                                                      []*Client
+	Broadcast                                                    chan model.SocketMessage
+	CreatedTime, GameStartTime, GameStartedAt, CurrWordExpiresAt time.Time
+	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted  bool
+	CurrSketcher                                                 *Client
 }

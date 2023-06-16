@@ -43,7 +43,7 @@ func HandlerWsConnection(c echo.Context) error {
 		fmt.Fprintf(c.Response().Writer, "%+v\n", err)
 	}
 
-	pool := HUB[poolId]
+	pool := hub[poolId]
 
 	// create a new client to append to Pool.Clients map
 	client := &Client{
@@ -73,7 +73,7 @@ func CreateRoom(c echo.Context) error {
 		"RoomCreated": false,
 		"Link":        "",
 
-		"DEBUG": DEBUG,
+		"debug": debug,
 	})
 }
 
@@ -90,10 +90,10 @@ func CreateRoomLink(c echo.Context) error {
 	pool := newPool(poolId, capacity)
 
 	// append to global Hub map, and start listening to pool connections
-	HUB[poolId] = pool
+	hub[poolId] = pool
 	go pool.start()
 
-	utils.Cp("blue", "HUB size:", utils.Cs("white", fmt.Sprintf("%d", len(HUB))))
+	printHubStatus()
 
 	// generate link to join the pool
 	link := "/app?join=" + poolId
@@ -107,7 +107,7 @@ func CreateRoomLink(c echo.Context) error {
 		// show on submit, room size in input field
 		"Capacity": pool.Capacity,
 
-		"DEBUG": DEBUG,
+		"debug": debug,
 	})
 }
 
@@ -127,12 +127,12 @@ func App(c echo.Context) error {
 			"ConnectSocket":  false,
 			"Message":        "Hi there, are you lost?!",
 
-			"DEBUG": DEBUG,
+			"debug": debug,
 		})
 	}
 
 	// check if pool exists, if is does not exist then render no form
-	pool, ok := HUB[poolId]
+	pool, ok := hub[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
 		return c.Render(http.StatusOK, "app", map[string]any{
@@ -140,7 +140,7 @@ func App(c echo.Context) error {
 			"ConnectSocket":  false,
 			"Message":        "Pool expired or non-existent!",
 
-			"DEBUG": DEBUG,
+			"debug": debug,
 		})
 	}
 
@@ -151,7 +151,7 @@ func App(c echo.Context) error {
 			"ConnectSocket":  false,
 			"Message":        "Sorry! The game has already started! 🥹",
 
-			"DEBUG": DEBUG,
+			"debug": debug,
 		})
 	}
 
@@ -166,7 +166,7 @@ func App(c echo.Context) error {
 			"ConnectSocket":  false,
 			"Message":        "Your party is full!",
 
-			"DEBUG": DEBUG,
+			"debug": debug,
 		})
 	}
 
@@ -180,7 +180,7 @@ func App(c echo.Context) error {
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
 		"PoolId": poolId,
 
-		"DEBUG": DEBUG,
+		"debug": debug,
 	})
 }
 
@@ -192,7 +192,7 @@ func RegisterToPool(c echo.Context) error {
 	clientName := c.FormValue("clientName")
 
 	// extra check to prevent user from joining any random pool which does not exist
-	pool, ok := HUB[poolId]
+	pool, ok := hub[poolId]
 	if !ok {
 		return c.Render(http.StatusOK, "app", map[string]any{
 			"RegisterToPool": false,

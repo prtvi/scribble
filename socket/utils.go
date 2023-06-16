@@ -9,7 +9,7 @@ import (
 )
 
 func printSocketMsg(m model.SocketMessage) {
-	if !DEBUG {
+	if !debug {
 		return
 	}
 
@@ -62,6 +62,7 @@ func newPool(uuid string, capacity int) *Pool {
 		ColorList:                     utils.ShuffleList(utils.COLORS[:10]),
 		CreatedTime:                   now,
 		GameStartTime:                 later,
+		GameStartedAt:                 time.Time{},
 		CurrWordExpiresAt:             time.Time{},
 		HasGameStarted:                false,
 		HasGameEnded:                  false,
@@ -76,25 +77,37 @@ func Maintainer() {
 
 	for {
 		// TODO - to be tested
+		printHubStatus()
 		sleep(DeletePoolAfterGameEndsDuration)
 
-		for poolId, pool := range HUB {
+		for poolId, pool := range hub {
 			// if pool exists and game has ended
 			if pool != nil && pool.HasGameEnded {
-				utils.Cp("yellowBg", "Removing pool from HUB, poolId:", poolId)
-				delete(HUB, poolId)
-
-				pool.printStats("Game ended for poolId:", poolId)
+				pool.printStats("Removing pool from hub, poolId:", poolId)
+				delete(hub, poolId)
 			}
 
 			// if pool exists and game hasn't started for RemovePoolAfterGameNotStarted duration
 			if now := time.Now(); now.Sub(pool.CreatedTime) > RemovePoolAfterGameNotStarted {
-				utils.Cp("yellowBg", "Removing pool from HUB after game not started for RemovePoolAfterGameNotStarted duration, poolId:", poolId)
-				delete(HUB, poolId)
-
-				pool.printStats("Deleting junky pool, poolId:", poolId)
+				pool.printStats("Removing junky pool, poolId:", poolId)
+				delete(hub, poolId)
 			}
 		}
+
+		printHubStatus()
+	}
+}
+
+func printHubStatus() {
+	if !debug || len(hub) == 0 {
+		return
+	}
+
+	// HubSize
+	utils.Cp("white", "HubSize:", utils.Cs("green", fmt.Sprintf("%d", len(hub))))
+
+	for _, pool := range hub {
+		pool.printStats()
 	}
 }
 
@@ -104,7 +117,7 @@ func DebugMode() {
 		return
 	}
 
-	DEBUG = true
+	debug = true
 	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 
 	GameStartDurationInSeconds = time.Second * 500
@@ -115,19 +128,7 @@ func DebugMode() {
 	pool := newPool(poolId, 4)
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+poolId)
 
-	HUB[poolId] = pool
+	hub[poolId] = pool
 
 	go pool.start()
-
-	go func() {
-		// print pool stats every 1 min
-		for {
-			sleep(time.Minute * 1)
-			pool.printStats()
-
-			if len(HUB) == 0 {
-				break
-			}
-		}
-	}()
 }
