@@ -115,7 +115,6 @@ func (pool *Pool) wordChooseCountdown(words []string) {
 
 	if pool.CurrWord == "" {
 		pool.CurrWord = utils.GetRandomWord(words)
-		return
 	}
 }
 
@@ -252,6 +251,33 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 	}
 
 	return message
+}
+
+func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
+	// to be run as a separate goroutine
+	// every second, check if all clients have guessed the word
+	// if yes, then acknowledge the same on the channel and break this loop
+	for {
+		sleep(time.Second * 1)
+
+		var count int = 0
+		for _, c := range pool.Clients {
+			if c.HasGuessed {
+				count += 1
+			}
+		}
+
+		// if gussed clients is everyone except the sketcher
+		if count != 0 && count == len(pool.Clients)-1 {
+			stopTimer <- true // write to channel and break
+			break
+		}
+
+		// if current sketcher is reset/done sketching then break
+		if pool.CurrSketcher == nil || pool.CurrSketcher.DoneSketching {
+			break
+		}
+	}
 }
 
 // 9

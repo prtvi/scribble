@@ -45,6 +45,20 @@ func sleep(d time.Duration) {
 	time.Sleep(d)
 }
 
+func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
+	// this func can be used to sleep for d duration, with an interuppt if any to stop this sleep
+	// to achieve this interrupt before timeout, pass a channel bool, which will be used to break this timeout
+	// this chan needs to be used to pass acknowledgement for stopping this timeout
+	// returns boolean whether the timeout was interrupted or not, if interrupted then returns true
+
+	select {
+	case <-stop:
+		return true
+	case <-time.After(d):
+		return false
+	}
+}
+
 func newPool(uuid string, capacity int) *Pool {
 	// returns a new Pool
 	now := time.Now()

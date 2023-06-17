@@ -88,16 +88,23 @@ func (pool *Pool) beginGameFlow() {
 
 			// begin client drawing flow and sleep until the word expires
 			// broadcast current word, current sketcher and other details to all clients
-			// TODO: send the whole thing to client who's sketching, send minimal details to rest
 			pool.clientWordAssignmentFlow(c)
 			pool.broadcastCurrentWordDetails()
 
-			sleep(pool.CurrWordExpiresAt.Sub(time.Now()))
+			// start a timer with interrupt, create a channel to use it to interrupt the timer if required
+			// and run a go routine and pass this channel to pass data on this chan on all clients guess
+			stopSleep := make(chan bool)
+			go pool.checkIfAllGuessed(stopSleep)
+			interrupted := sleepWithInterrupt(pool.CurrWordExpiresAt.Sub(time.Now()), stopSleep)
 
 			// broadcast turn_over, reveal the word and clear canvas
-			pool.broadcastTurnOver()
-			sleep(time.Second * 2)
+			if interrupted {
+				pool.broadcastTurnOverBeforeTimeout()
+			} else {
+				pool.broadcastTurnOver()
+			}
 
+			sleep(time.Second * 2)
 			pool.broadcastWordReveal()
 			sleep(time.Second * 2)
 			pool.broadcastClearCanvasEvent()

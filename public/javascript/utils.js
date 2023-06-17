@@ -106,6 +106,17 @@ function hideOverlay() {
 	document.body.scroll = 'yes';
 }
 
+function disableSketching() {
+	const painterUtilsDiv = document.querySelector('.painter-utils');
+	const clearCanvasBtn = document.querySelector('.clear-canvas');
+
+	paintUtils.isAllowedToPaint = false;
+
+	// display painter utils div and remove EL
+	painterUtilsDiv.classList.add('hidden');
+	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
+}
+
 function beginClientSketchingFlowInit(socketMessage) {
 	hideOverlay();
 
@@ -116,7 +127,7 @@ function beginClientSketchingFlowInit(socketMessage) {
 
 	const timeLeftSpan = document.querySelector('.time-left-for-word span');
 	timeLeftSpan.textContent = timeForEachWord;
-	runTimer(timeLeftSpan, currentWordExpiresAt);
+	return runTimer(timeLeftSpan, currentWordExpiresAt);
 }
 
 function runTimer(timerElement, timeoutAt) {
@@ -125,6 +136,7 @@ function runTimer(timerElement, timeoutAt) {
 		if (secondsLeft >= 0) timerElement.textContent = secondsLeft;
 		else clearInterval(countdownTimer);
 	}, 1000);
+	return countdownTimer;
 }
 
 //

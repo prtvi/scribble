@@ -18,6 +18,7 @@ const startGameTimerId = gameStartTimer();
 
 let messageTypeMap;
 let timeForEachWord;
+let wordExpiryTimer;
 
 // if overlay is active, disable scroll
 if (overlay.style.display !== 'none') {

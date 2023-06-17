@@ -98,19 +98,27 @@ function socketOnMessage(message) {
 			break;
 
 		case 8:
-			beginClientSketchingFlow(socketMessage);
+			wordExpiryTimer = beginClientSketchingFlow(socketMessage);
 			break;
 
 		case 88:
-			showClientDrawing(socketMessage);
+			wordExpiryTimer = showClientDrawing(socketMessage);
 			break;
 
 		case 81:
-			disableSketching();
+			disableSketchingTurnOver();
 			break;
 
 		case 82:
 			showTimeUp();
+			break;
+
+		case 83:
+			disableSketchingAllGuessed();
+			break;
+
+		case 84:
+			showAllHaveGuessed();
 			break;
 
 		case 9:

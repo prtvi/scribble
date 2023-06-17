@@ -39,7 +39,9 @@ function revealWordOnOverlayAndChat(socketMessage) {
 function showWordToChoose(socketMessage) {
 	const words = JSON.parse(socketMessage.content);
 
-	let html = `<div class="overlay-div"><p class="overlay-p">Choose a word to draw</p>`;
+	let html = `<div class="overlay-div">
+	<p class="overlay-p">Your turn</p>
+	<p class="overlay-p">Choose a word to draw</p>`;
 	words.forEach(w => (html += `<span class="word-option">${w}</span>`));
 	html += `</div>`;
 
@@ -143,7 +145,7 @@ function renderRoundDetails(socketMessage) {
 
 // 8
 function beginClientSketchingFlow(socketMessage) {
-	beginClientSketchingFlowInit(socketMessage);
+	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
 	// for enabling drawing access if clientId matches
 	const wordDiv = document.querySelector('.word');
@@ -160,36 +162,51 @@ function beginClientSketchingFlow(socketMessage) {
 	// display painter utils div and add EL for clearing the canvas
 	painterUtilsDiv.classList.remove('hidden');
 	clearCanvasBtn.addEventListener('click', requestCanvasClear);
+
+	return wordExpiryCountdown;
 }
 
 // 88
 function showClientDrawing(socketMessage) {
-	beginClientSketchingFlowInit(socketMessage);
+	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
 	const wordDiv = document.querySelector('.word');
 	wordDiv.classList.remove('hidden');
 	const wordSpan = wordDiv.querySelector('span');
 	wordSpan.textContent = `${socketMessage.currWordLen} characters`;
+
+	return wordExpiryCountdown;
 }
 
 // 81
-function disableSketching() {
-	const painterUtilsDiv = document.querySelector('.painter-utils');
-	const clearCanvasBtn = document.querySelector('.clear-canvas');
-
-	paintUtils.isAllowedToPaint = false;
-
-	// display painter utils div and remove EL
-	painterUtilsDiv.classList.add('hidden');
-	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
-
+function disableSketchingTurnOver() {
+	clearAllIntervals(wordExpiryTimer);
+	disableSketching();
 	showTimeUp();
 }
 
 // 82
 function showTimeUp() {
+	clearAllIntervals(wordExpiryTimer);
+
 	displayOverlay(
 		`<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`
+	);
+}
+
+// 83
+function disableSketchingAllGuessed() {
+	clearAllIntervals(wordExpiryTimer);
+	disableSketching();
+	showAllHaveGuessed();
+}
+
+// 84
+function showAllHaveGuessed() {
+	clearAllIntervals(wordExpiryTimer);
+
+	displayOverlay(
+		`<div class="overlay-div"><p class="overlay-p">Everyone guessed the word!</p></div>`
 	);
 }
 

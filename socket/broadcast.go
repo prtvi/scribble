@@ -155,6 +155,21 @@ func (pool *Pool) broadcastTurnOver() {
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
+// 83, 84
+func (pool *Pool) broadcastTurnOverBeforeTimeout() {
+	m1 := model.SocketMessage{
+		Type:    83,
+		TypeStr: messageTypeMap[83],
+	}
+
+	m := model.SocketMessage{
+		Type:    84,
+		TypeStr: messageTypeMap[84],
+	}
+
+	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
+}
+
 // 32
 func (pool *Pool) broadcastWordReveal() {
 	pool.broadcast(model.SocketMessage{
