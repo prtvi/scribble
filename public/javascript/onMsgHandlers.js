@@ -40,10 +40,9 @@ function showWordToChoose(socketMessage) {
 	const words = JSON.parse(socketMessage.content);
 
 	let html = `<div class="overlay-div">
-	<p class="overlay-p">Your turn</p>
-	<p class="overlay-p">Choose a word to draw</p>`;
+	<p class="overlay-p">Your turn! Choose a word to draw</p>`;
 	words.forEach(w => (html += `<span class="word-option">${w}</span>`));
-	html += `</div>`;
+	html += `<span class="word-choose-timer"></span> </div>`;
 
 	displayOverlay(html);
 
@@ -62,6 +61,11 @@ function showWordToChoose(socketMessage) {
 
 		sendViaSocket(socketMsg);
 	});
+
+	const timeoutAt = new Date(socketMessage.timeoutAfter).getTime();
+	const timerEle = overlay.querySelector('span.word-choose-timer');
+	timerEle.textContent = `${timeForChoosingWordInSeconds}s`;
+	runTimer(timerEle, timeoutAt);
 }
 
 // 35
@@ -233,7 +237,8 @@ function displayScores(socketMessage) {
 function makeMessageTypeMapGlobal(socketMessage) {
 	const content = JSON.parse(socketMessage.content);
 
-	timeForEachWord = content.timeForEachWord;
+	timeForEachWordInSeconds = content.timeForEachWordInSeconds;
+	timeForChoosingWordInSeconds = content.timeForChoosingWordInSeconds;
 
 	const m = content.messageTypeMap;
 	const keys = Object.keys(m);

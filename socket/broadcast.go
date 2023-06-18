@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	model "scribble/model"
 	utils "scribble/utils"
+	"time"
 )
 
 func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMessage) {
@@ -44,8 +45,9 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 // 10
 func (pool *Pool) broadcastConfigs() {
 	cfg := model.SharedConfig{
-		MessageTypeMap:  messageTypeMap,
-		TimeForEachWord: utils.DurationToSeconds(TimeForEachWordInSeconds),
+		MessageTypeMap:               messageTypeMap,
+		TimeForEachWordInSeconds:     utils.DurationToSeconds(TimeForEachWordInSeconds),
+		TimeForChoosingWordInSeconds: utils.DurationToSeconds(TimeoutForChoosingWord),
 	}
 
 	byteInfo, _ := json.Marshal(cfg)
@@ -107,6 +109,7 @@ func (pool *Pool) broadcast3WordsList(words []string) {
 		Content:          string(byteInfo),
 		CurrSketcherId:   pool.CurrSketcher.ID,
 		CurrSketcherName: pool.CurrSketcher.Name,
+		TimeoutAfter:     utils.FormatTimeLong(time.Now().Add(TimeoutForChoosingWord)),
 	}
 
 	m := model.SocketMessage{

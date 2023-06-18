@@ -17,7 +17,8 @@ const socket = initSocket();
 const startGameTimerId = gameStartTimer();
 
 let messageTypeMap;
-let timeForEachWord;
+let timeForEachWordInSeconds;
+let timeForChoosingWordInSeconds;
 let wordExpiryTimer;
 
 // if overlay is active, disable scroll

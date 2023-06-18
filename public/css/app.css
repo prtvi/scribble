@@ -102,6 +102,17 @@ canvas {
 	border: 1px solid var(--white);
 }
 
+.word-choose-timer {
+	display: block;
+	margin: 0 auto;
+	margin-top: 20px;
+	width: fit-content;
+	padding: 4px;
+	color: black;
+	border: 1px solid black;
+	border-radius: 5px;
+}
+
 /* overlay pseudo classes */
 
 .painter-utils {

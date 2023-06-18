@@ -12,6 +12,7 @@ package model
 // CurrSketcherName:  current sketcher's name
 // CurrWord:          current word to be guessed
 // CurrWordExpiresAt: current word's expiry time as a string
+// TimeoutAfter:      timeout for any event as such, rn used for choosing word
 
 type SocketMessage struct {
 	Type              int    `json:"type"`
@@ -25,8 +26,9 @@ type SocketMessage struct {
 	CurrSketcherId    string `json:"currSketcherId,omitempty"`
 	CurrSketcherName  string `json:"currSketcherName,omitempty"`
 	CurrWord          string `json:"currWord,omitempty"`
-	CurrWordLen       int    `json:"currWordLen"`
+	CurrWordLen       int    `json:"currWordLen,omitempty"`
 	CurrWordExpiresAt string `json:"currWordExpiresAt,omitempty"`
+	TimeoutAfter      string `json:"timeoutAfter,omitempty"`
 }
 
 type ClientInfo struct {
@@ -37,6 +39,7 @@ type ClientInfo struct {
 }
 
 type SharedConfig struct {
-	MessageTypeMap  map[int]string `json:"messageTypeMap"`
-	TimeForEachWord int            `json:"timeForEachWord"`
+	MessageTypeMap               map[int]string `json:"messageTypeMap"`
+	TimeForEachWordInSeconds     int            `json:"timeForEachWordInSeconds"`
+	TimeForChoosingWordInSeconds int            `json:"timeForChoosingWordInSeconds"`
 }

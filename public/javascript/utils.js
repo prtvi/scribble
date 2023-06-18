@@ -126,14 +126,14 @@ function beginClientSketchingFlowInit(socketMessage) {
 	).getTime();
 
 	const timeLeftSpan = document.querySelector('.time-left-for-word span');
-	timeLeftSpan.textContent = timeForEachWord;
+	timeLeftSpan.textContent = `${timeForEachWordInSeconds}s`;
 	return runTimer(timeLeftSpan, currentWordExpiresAt);
 }
 
 function runTimer(timerElement, timeoutAt) {
 	const countdownTimer = setInterval(function () {
 		const secondsLeft = getSecondsLeftFrom(timeoutAt);
-		if (secondsLeft >= 0) timerElement.textContent = secondsLeft;
+		if (secondsLeft >= 0) timerElement.textContent = `${secondsLeft}s`;
 		else clearInterval(countdownTimer);
 	}, 1000);
 	return countdownTimer;
