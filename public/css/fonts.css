@@ -1,0 +1,53 @@
+/* Extra extra bold */
+@font-face {
+	font-family: xxb900;
+	src: url('../assets/font-poppins/Black900.ttf');
+}
+
+/* Extra bold */
+@font-face {
+	font-family: xb800;
+	src: url('../assets/font-poppins/ExtraBold800.ttf');
+}
+
+/* Bold */
+@font-face {
+	font-family: b700;
+	src: url('../assets/font-poppins/Bold700.ttf');
+}
+
+/* Semi bold */
+@font-face {
+	font-family: sb600;
+	src: url('../assets/font-poppins/SemiBold600.ttf');
+}
+
+/* Medium */
+@font-face {
+	font-family: m500;
+	src: url('../assets/font-poppins/Medium500.ttf');
+}
+
+/* Regular */
+@font-face {
+	font-family: r400;
+	src: url('../assets/font-poppins/Regular400.ttf');
+}
+
+/* Light */
+@font-face {
+	font-family: l300;
+	src: url('../assets/font-poppins/Light300.ttf');
+}
+
+/* Extra light */
+@font-face {
+	font-family: xl200;
+	src: url('../assets/font-poppins/ExtraLight200.ttf');
+}
+
+/* Thin */
+@font-face {
+	font-family: t100;
+	src: url('../assets/font-poppins/Thin100.ttf');
+}

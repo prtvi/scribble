@@ -29,19 +29,19 @@ function socketOnMessage(message) {
 			if (socketMessage.clientId === clientId)
 				// if the current clientId and the clientId from response match then
 				appendChatMsgToDOM(
-					`You joined the pool as <strong>${socketMessage.clientName}</strong>!`,
+					`You joined the room as <strong>${socketMessage.clientName}</strong>!`,
 					''
 				);
 			else
 				appendChatMsgToDOM(
-					`<strong>${socketMessage.clientName}</strong> has joined the pool!`,
+					`<strong>${socketMessage.clientName}</strong> has joined the room!`,
 					''
 				);
 			break;
 
 		case 2:
 			appendChatMsgToDOM(
-				`<strong>${socketMessage.clientName}</strong> has left the pool!`,
+				`<strong>${socketMessage.clientName}</strong> has left the room!`,
 				''
 			);
 			break;

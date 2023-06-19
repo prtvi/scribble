@@ -1,4 +1,6 @@
 .vscode/
+bg-images/
+font-poppins/
 .env
 .DS_Store
 gin-bin

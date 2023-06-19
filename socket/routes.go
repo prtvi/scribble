@@ -16,7 +16,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 		dt := utils.FormatTimeLong(time.Now())
 		reqMethod := c.Request().Method
 
-		utils.Cp("yellow", fmt.Sprintf("%s: %s  %s", reqMethod, fmt.Sprintf("%s", c.Request().URL), dt))
+		utils.Cp("green", fmt.Sprintf("%s: %s  %s", reqMethod, fmt.Sprintf("%s", c.Request().URL), dt))
 
 		return next(c)
 	}
@@ -24,7 +24,9 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 
 // GET /
 func Welcome(c echo.Context) error {
-	return c.Render(http.StatusOK, "welcome", nil)
+	return c.Render(http.StatusOK, "welcome", map[string]any{
+		"debug": debug,
+	})
 }
 
 // GET /ws?poolId=234bkj&clientId=123123&clientName=joy&clientColor=2def45
@@ -198,6 +200,8 @@ func RegisterToPool(c echo.Context) error {
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
 			"Message":        "Pool expired or non-existent!",
+
+			"debug": debug,
 		})
 	}
 
@@ -207,6 +211,8 @@ func RegisterToPool(c echo.Context) error {
 			"RegisterToPool": false,
 			"ConnectSocket":  false,
 			"Message":        "Sorry! The game has already started! 🥹",
+
+			"debug": debug,
 		})
 	}
 
@@ -235,5 +241,7 @@ func RegisterToPool(c echo.Context) error {
 		"ClientName":    clientName,
 		"ClientColor":   clientColor,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
+
+		"debug": debug,
 	})
 }
