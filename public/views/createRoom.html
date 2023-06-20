@@ -7,7 +7,7 @@
 	<body>
 		<main class="main">
 			<div class="content">
-				<div class="content-container">
+				<div>
 					<div class="title"><h1>Scribble</h1></div>
 
 					<div class="subtext">
@@ -29,7 +29,7 @@
 									/>
 								</div>
 								<div>
-									<button class="btn create-form-btn" type="submit">
+									<button class="btn create-room-btn" type="submit">
 										Create
 									</button>
 								</div>
@@ -51,7 +51,7 @@
 								<img
 									src="public/assets/copy.png"
 									alt="copy icon"
-									class="copy-link-icon"
+									class="copy-link-img"
 								/>
 							</div>
 						</div>
@@ -60,13 +60,13 @@
 							// copy to clipboard
 							const aTag = document.querySelector('.copy-link');
 							document
-								.querySelector('.copy-link-icon')
+								.querySelector('.copy-link-img')
 								.addEventListener('click', () =>
 									navigator.clipboard.writeText(aTag.href)
 								);
 
 							// disable create btn
-							document.querySelector('.create-form-btn').disabled = true;
+							document.querySelector('.create-room-btn').disabled = true;
 
 							// populate capacity in input field
 							document.getElementById('capacity').value = '{{ .Capacity }}';
@@ -80,6 +80,9 @@
 
 					<script>
 						document.querySelector('#capacity').value = 4;
+						document.querySelector('.copy-link') &&
+							(document.querySelector('.copy-link').href =
+								'http://localhost:1323/app?join=debug');
 					</script>
 
 					{{ end }}

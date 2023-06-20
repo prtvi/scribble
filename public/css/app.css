@@ -1,3 +1,14 @@
+/* before game start, before registering to game */
+
+input#clientName {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding: 5px;
+	border-radius: 5px;
+}
+
+/* game content */
+
 :root {
 	--status-bar-h: 24px;
 }
@@ -274,6 +285,10 @@ canvas {
 }
 
 @media screen and (min-width: 768px) {
+	#clientName {
+		font-size: var(--fs-15);
+	}
+
 	:root {
 		--status-bar-h: 42px;
 	}

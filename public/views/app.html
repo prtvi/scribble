@@ -9,36 +9,33 @@
 			<!-- render this form when get request to /app is made, then capture form response and register to pool -->
 			{{ if .RegisterToPool }}
 
-			<style>
-				#clientName {
-					margin-top: 20px;
-					margin-bottom: 20px;
-					padding: 5px;
-					border-radius: 5px;
-				}
-			</style>
-
 			<div class="content">
-				<div class="content-container">
+				<div>
 					<div class="title"><h1>Scribble</h1></div>
 
 					<div class="form-container">
 						<form action="/app" method="post">
-							<input type="hidden" name="poolId" value="{{ .PoolId }}" />
+							<div class="form-content register-form">
+								<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-							<label class="form-label" for="clientName"
-								>Enter your name to join:</label
-							>
-							<input
-								type="text"
-								name="clientName"
-								id="clientName"
-								maxlength="15"
-								required
-								autofocus
-							/>
+								<div class="">
+									<label class="form-label" for="clientName"
+										>Enter your name to join:</label
+									>
+									<input
+										type="text"
+										name="clientName"
+										id="clientName"
+										maxlength="15"
+										required
+										autofocus
+									/>
+								</div>
+							</div>
 
-							<button class="btn" type="submit">Join</button>
+							<div>
+								<button class="btn" type="submit">Join</button>
+							</div>
 						</form>
 					</div>
 

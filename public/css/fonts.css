@@ -1,53 +1,53 @@
 /* Extra extra bold */
 @font-face {
 	font-family: xxb900;
-	src: url('../assets/font-poppins/Black900.ttf');
+	src: url('../assets/font-poppins/xxb900.ttf');
 }
 
 /* Extra bold */
 @font-face {
 	font-family: xb800;
-	src: url('../assets/font-poppins/ExtraBold800.ttf');
+	src: url('../assets/font-poppins/xb800.ttf');
 }
 
 /* Bold */
 @font-face {
 	font-family: b700;
-	src: url('../assets/font-poppins/Bold700.ttf');
+	src: url('../assets/font-poppins/b700.ttf');
 }
 
 /* Semi bold */
 @font-face {
 	font-family: sb600;
-	src: url('../assets/font-poppins/SemiBold600.ttf');
+	src: url('../assets/font-poppins/sb600.ttf');
 }
 
 /* Medium */
 @font-face {
 	font-family: m500;
-	src: url('../assets/font-poppins/Medium500.ttf');
+	src: url('../assets/font-poppins/m500.ttf');
 }
 
 /* Regular */
 @font-face {
 	font-family: r400;
-	src: url('../assets/font-poppins/Regular400.ttf');
+	src: url('../assets/font-poppins/r400.ttf');
 }
 
 /* Light */
 @font-face {
 	font-family: l300;
-	src: url('../assets/font-poppins/Light300.ttf');
+	src: url('../assets/font-poppins/l300.ttf');
 }
 
 /* Extra light */
 @font-face {
 	font-family: xl200;
-	src: url('../assets/font-poppins/ExtraLight200.ttf');
+	src: url('../assets/font-poppins/xl200.ttf');
 }
 
 /* Thin */
 @font-face {
 	font-family: t100;
-	src: url('../assets/font-poppins/Thin100.ttf');
+	src: url('../assets/font-poppins/t100.ttf');
 }
