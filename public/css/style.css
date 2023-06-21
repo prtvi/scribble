@@ -100,6 +100,10 @@
 	z-index: 1;
 }
 
+.content > div {
+	width: 85%;
+}
+
 .title {
 	font-family: xb800, var(--ff);
 	font-weight: var(--fw-800);
@@ -115,6 +119,12 @@
 }
 
 /* common */
+
+.form-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 
 .form-content {
 	width: 220px;
@@ -148,11 +158,12 @@
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-13);
+	height: 25px;
 }
 
 .form-content input#capacity {
 	width: 30px;
-	height: 20px;
+	height: 22px;
 }
 
 /* room created container */
@@ -187,54 +198,28 @@
 
 @media screen and (min-width: 580px) {
 	.btn {
-		padding: 8px;
 		font-size: var(--fs-16);
 	}
 
-	.title {
-		font-size: var(--fs-18);
-	}
-
-	.subtext {
-		font-size: var(--fs-16);
-	}
-
-	.form-content {
-		width: 250px;
-	}
-
-	.form-content > div:first-child {
-		margin-right: 15px;
-	}
-
-	.form-label {
-		font-weight: var(--fw-400);
-		font-size: var(--fs-16);
-	}
-
-	.copy-link-img {
-		width: 20px;
-		height: 20px;
-	}
-}
-
-@media screen and (min-width: 768px) {
 	.content {
-		height: 280px;
+		height: 220px;
 	}
 
 	.title {
-		font-size: var(--fs-20);
+		font-size: var(--fs-18);
 	}
 
 	.subtext {
-		font-size: var(--fs-18);
-		margin-bottom: 20px;
+		font-size: var(--fs-16);
 	}
 
 	.form-content {
-		width: 300px;
-		justify-content: center;
+		width: 260px;
+	}
+
+	.register-form {
+		width: 350px;
+		margin-bottom: 10px;
 	}
 
 	.form-content > div:first-child {
@@ -242,7 +227,58 @@
 	}
 
 	.form-label {
+		font-size: var(--fs-16);
+	}
+
+	.form-content input {
+		font-size: var(--fs-14);
+	}
+
+	.copy-link-img {
+		width: 22px;
+		height: 22px;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.btn {
 		font-size: var(--fs-17);
+	}
+
+	.content {
+		height: 280px;
+	}
+
+	.title {
+		font-size: var(--fs-20);
+		margin-bottom: 20px;
+	}
+
+	.subtext {
+		font-size: var(--fs-18);
+		margin-bottom: 30px;
+	}
+
+	.form-content {
+		width: 300px;
+		justify-content: center;
+	}
+
+	.register-form {
+		width: 450px;
+		margin-bottom: 20px;
+	}
+
+	.form-content > div:first-child {
+		margin-right: 20px;
+	}
+
+	.form-label {
+		font-size: var(--fs-18);
+	}
+
+	.form-content input {
+		font-size: var(--fs-16);
 	}
 
 	.room-created-container {
