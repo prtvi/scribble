@@ -55,13 +55,23 @@ function socketOnMessage(message) {
 
 		case 31:
 			appendChatMsgToDOM(
-				`${socketMessage.clientName} guessed the word!`,
+				`<strong>${socketMessage.clientName}</strong> guessed the word!`,
 				'#00ff00'
 			);
 			break;
 
 		case 312:
-			appendChatMsgToDOM(`Naughty @${socketMessage.clientName}`, '#ff0000');
+			appendChatMsgToDOM(
+				`Naughty <strong>@${socketMessage.clientName}</strong>`,
+				'#ff0000'
+			);
+			break;
+
+		case 313:
+			appendChatMsgToDOM(
+				`You can't reveal the word <strong>@${socketMessage.clientName}</strong>`,
+				'#ff7f00'
+			);
 			break;
 
 		case 32:

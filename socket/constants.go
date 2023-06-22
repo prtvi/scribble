@@ -48,6 +48,7 @@ var messageTypeMap = map[int]string{
 	10:  "sc__get_this_map",
 	31:  "sc__correct_guess",
 	312: "sc__word_in_msg",
+	313: "sc__cant_reveal_word",
 	32:  "sc__reveal_word",
 	51:  "sc__clear_canvas",
 	70:  "sc__game_started",

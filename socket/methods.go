@@ -224,6 +224,15 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 	guessedLower := strings.ToLower(message.Content)
 	currWordLower := strings.ToLower(pool.CurrWord)
 
+	// if guesserClient == nil then its the sketcher sending the message, then modify the message if the sketcher tries to reveal the word
+	if guesserClient == nil &&
+		(guessedLower == currWordLower || strings.Contains(guessedLower, currWordLower)) {
+
+		message.Type = 313
+		message.TypeStr = messageTypeMap[313]
+		return message
+	}
+
 	// if the sketcher is the guesser, then the guesserClient will be nil, hence check if guesserClient is nil
 	// check if the word matches with the current word and check if the guesserClient hasn't already guessed
 	if guesserClient != nil &&

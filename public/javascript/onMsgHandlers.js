@@ -1,6 +1,6 @@
 'use strict';
 
-// 1, 2, 3, 31, 312
+// 1, 2, 3, 31, 312, 313
 function appendChatMsgToDOM(msg, formatColor) {
 	// adds the msg into the DOM
 
