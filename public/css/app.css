@@ -7,14 +7,23 @@ input#clientName {
 	border-radius: 5px;
 }
 
+.register-form {
+	width: 270px;
+	margin-bottom: 15px;
+}
+
 /* game content */
 
 :root {
-	--status-bar-h: 24px;
+	--status-bar-h: 26px;
 }
 
 .game-content {
 	margin: 0 auto;
+}
+
+.btn {
+	scale: 0.8;
 }
 
 .status-bar {
@@ -32,13 +41,16 @@ input#clientName {
 	height: inherit;
 	padding-left: 6px;
 	padding-right: 6px;
-	border-radius: 50px;
-	box-shadow: 2px 5px 9px #888888;
+	border-radius: 10px;
+	border: 1px solid gray;
+	/* box-shadow: 2px 5px 6px #888888; */
 }
 
 .status-bar > div span {
+	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
+	font-size: var(--fs-10);
 	line-height: var(--status-bar-h);
-	font-size: var(--fs-12);
 }
 
 .round {
@@ -88,6 +100,13 @@ canvas {
 	justify-content: center;
 }
 
+.painter-utils {
+	position: absolute;
+	right: 2px;
+	/* status bar height plus 2*padding (5px) plus 5px margin for canvas */
+	top: calc(var(--status-bar-h) + 15px);
+}
+
 /* overlay pseudo classes */
 
 .overlay-div {
@@ -96,11 +115,15 @@ canvas {
 }
 
 .overlay-p {
+	font-family: m500, var(--ff);
+	font-weight: var(--fw-500);
 	font-size: var(--fs-14);
 	margin-bottom: 20px;
 }
 
 .word-option {
+	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
 	font-size: var(--fs-14);
 	padding: 8px;
 	background-color: rgb(50, 50, 50);
@@ -114,6 +137,9 @@ canvas {
 }
 
 .word-choose-timer {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-14);
 	display: block;
 	margin: 0 auto;
 	margin-top: 20px;
@@ -125,13 +151,6 @@ canvas {
 }
 
 /* overlay pseudo classes */
-
-.painter-utils {
-	position: absolute;
-	right: 5px;
-	/* status bar height plus 2*padding (5px) plus 5px margin for canvas */
-	top: calc(var(--status-bar-h) + 15px);
-}
 
 .mc-container {
 	height: 250px;
@@ -166,22 +185,36 @@ canvas {
 }
 
 .member-num {
+	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
 	font-size: var(--fs-11);
 }
 
 .member-name {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
 	font-size: var(--fs-12);
 }
 
 .member-score {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
 	font-size: var(--fs-10);
 }
 
 .message {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
 	font-size: var(--fs-11);
 	background-color: lightgrey;
 	padding: 4px;
 	text-align: left;
+}
+
+.message strong {
+	font-family: m500, var(--ff);
+	font-weight: var(--fw-500);
+	font-size: var(--fs-11);
 }
 
 /* mc pseudo classes */
@@ -207,19 +240,26 @@ canvas {
 }
 
 .input-wrapper span {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-11);
 	position: absolute;
 	right: 60px;
-	top: 2px;
+	top: 4px;
 	line-height: 25px;
-	font-size: var(--fs-12);
 }
 
 .chat-box .btn {
-	padding: 3px;
+	padding: 6px;
 	width: 50px;
 }
 
 @media screen and (min-width: 580px) {
+	.register-form {
+		width: 350px;
+		margin-bottom: 10px;
+	}
+
 	:root {
 		--status-bar-h: 36px;
 	}
@@ -287,6 +327,11 @@ canvas {
 @media screen and (min-width: 768px) {
 	#clientName {
 		font-size: var(--fs-15);
+	}
+
+	.register-form {
+		width: 450px;
+		margin-bottom: 25px;
 	}
 
 	:root {

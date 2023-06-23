@@ -133,7 +133,7 @@ function beginClientSketchingFlowInit(socketMessage) {
 function runTimer(timerElement, timeoutAt) {
 	const countdownTimer = setInterval(function () {
 		const secondsLeft = getSecondsLeftFrom(timeoutAt);
-		if (secondsLeft >= 0) timerElement.textContent = `${secondsLeft}s`;
+		if (secondsLeft >= 0) timerElement.textContent = `${secondsLeft - 1}s`;
 		else clearInterval(countdownTimer);
 	}, 1000);
 	return countdownTimer;
