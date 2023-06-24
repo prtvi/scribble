@@ -22,13 +22,6 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// GET /
-func Welcome(c echo.Context) error {
-	return c.Render(http.StatusOK, "welcome", map[string]any{
-		"debug": debug,
-	})
-}
-
 // GET /ws?poolId=234bkj&clientId=123123&clientName=joy&clientColor=2def45
 func HandlerWsConnection(c echo.Context) error {
 	// handle socket connections for the pools
@@ -66,12 +59,21 @@ func HandlerWsConnection(c echo.Context) error {
 	return nil
 }
 
+// GET /
+func Welcome(c echo.Context) error {
+	return c.Render(http.StatusOK, "welcome", map[string]any{
+		"StyleSheet": "",
+		"debug":      debug,
+	})
+}
+
 // -----------------------------------------------------------------------------
 
 // GET /create-room
 func CreateRoom(c echo.Context) error {
 	// render a form to create a new pool
 	return c.Render(http.StatusOK, "createRoom", map[string]any{
+		"StyleSheet":  "createRoom",
 		"RoomCreated": false,
 		"Link":        "",
 
@@ -103,6 +105,7 @@ func CreateRoomLink(c echo.Context) error {
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "createRoom", map[string]any{
+		"StyleSheet":  "createRoom",
 		"RoomCreated": true,
 		"Link":        link,
 
@@ -124,10 +127,10 @@ func App(c echo.Context) error {
 
 	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" {
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Hi there, are you lost?!",
+		return c.Render(http.StatusOK, "join", map[string]any{
+			"StyleSheet": "createRoom",
+			"CanJoin":    false,
+			"Message":    "Hi there, are you lost?!",
 
 			"debug": debug,
 		})
@@ -137,10 +140,10 @@ func App(c echo.Context) error {
 	pool, ok := hub[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Pool expired or non-existent!",
+		return c.Render(http.StatusOK, "join", map[string]any{
+			"StyleSheet": "createRoom",
+			"CanJoin":    false,
+			"Message":    "Pool expired or non-existent!",
 
 			"debug": debug,
 		})
@@ -148,10 +151,10 @@ func App(c echo.Context) error {
 
 	// if game has already started then do not render both forms and display message
 	if pool.HasGameStarted {
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Sorry! The game has already started! 🥹",
+		return c.Render(http.StatusOK, "join", map[string]any{
+			"StyleSheet": "createRoom",
+			"CanJoin":    false,
+			"Message":    "Sorry! The game has already started! 🥹",
 
 			"debug": debug,
 		})
@@ -163,26 +166,26 @@ func App(c echo.Context) error {
 
 	if poolCurrSizePlus1 > poolCap {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
-		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Your party is full!",
+		return c.Render(http.StatusOK, "join", map[string]any{
+			"StyleSheet": "createRoom",
+			"CanJoin":    false,
+			"Message":    "Your party is full!",
 
 			"debug": debug,
 		})
 	}
 
 	// else if every check, checks out then render "RegisterToPool" form
-	return c.Render(http.StatusOK, "app", map[string]any{
-		"RegisterToPool": true,
-		"ConnectSocket":  false,
-		"CurrentSize":    len(pool.Clients),
-		"Message":        "",
+	return c.Render(http.StatusOK, "join", map[string]any{
+		"StyleSheet": "createRoom",
+		"CanJoin":    true,
+		"Message":    "",
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
 		"PoolId": poolId,
 
-		"debug": debug,
+		"CurrentSize": len(pool.Clients), // used in getting client num
+		"debug":       debug,
 	})
 }
 
@@ -197,9 +200,9 @@ func RegisterToPool(c echo.Context) error {
 	pool, ok := hub[poolId]
 	if !ok {
 		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Pool expired or non-existent!",
+			"StyleSheet": "",
+			"Connect":    false,
+			"Message":    "Pool expired or non-existent!",
 
 			"debug": debug,
 		})
@@ -208,9 +211,9 @@ func RegisterToPool(c echo.Context) error {
 	// if client reloads after game has already started
 	if pool.HasGameStarted {
 		return c.Render(http.StatusOK, "app", map[string]any{
-			"RegisterToPool": false,
-			"ConnectSocket":  false,
-			"Message":        "Sorry! The game has already started! 🥹",
+			"StyleSheet": "",
+			"Connect":    false,
+			"Message":    "Sorry! The game has already started! 🥹",
 
 			"debug": debug,
 		})
@@ -223,10 +226,10 @@ func RegisterToPool(c echo.Context) error {
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered
 	return c.Render(http.StatusOK, "app", map[string]any{
-		"RegisterToPool": false,
-		"ConnectSocket":  true,
-		"JoiningLink":    pool.JoiningLink,
-		"Message":        "",
+		"StyleSheet":  "app",
+		"Connect":     true,
+		"Message":     "",
+		"JoiningLink": pool.JoiningLink,
 
 		// variables in DOM
 		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),
