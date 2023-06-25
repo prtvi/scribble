@@ -41,26 +41,34 @@
 
 					<div class="room-created-container">
 						<div>
-							<a href="{{ .Link }}" class="copy-link"
-								><button class="btn">Click here to join</button></a
+							<a href="{{ .Link }}" class="link"
+								><button class="btn">Click here to join!</button></a
 							>
 						</div>
 
-						<div class="img-container">
-							<div title="Copy joining link">
-								<img
-									src="public/assets/copy.png"
-									alt="copy icon"
-									class="copy-link-img"
-								/>
-							</div>
+						<div title="Copy joining link">
+							<button class="btn btni copy-link-btn">
+								<div>
+									<div>
+										<span>Copy link</span>
+									</div>
+
+									<div class="img-container">
+										<img
+											src="public/assets/copy.png"
+											alt="copy icon"
+											class="copy-link-img"
+										/>
+									</div>
+								</div>
+							</button>
 						</div>
 					</div>
 
 					<!-- run this code only when the room-created-container is rendered -->
 					<script>
 						// copy to clipboard
-						const aTag = document.querySelector('.copy-link');
+						const aTag = document.querySelector('.link');
 						document
 							.querySelector('.copy-link-img')
 							.addEventListener('click', () =>
@@ -82,8 +90,8 @@
 		{{ if .debug }}
 		<script>
 			document.querySelector('#capacity').value = 4;
-			document.querySelector('.copy-link') &&
-				(document.querySelector('.copy-link').href =
+			document.querySelector('.link') &&
+				(document.querySelector('.link').href =
 					'http://localhost:1323/app?join=debug');
 		</script>
 		{{ end }}

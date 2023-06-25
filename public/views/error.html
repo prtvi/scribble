@@ -5,11 +5,22 @@
 	{{ template "header" .}}
 
 	<body>
+		<style>
+			.content {
+				height: 100px;
+			}
+			.subtext {
+				margin-bottom: 15px;
+			}
+		</style>
 		<main class="main">
 			<div class="content">
 				<div>
 					<div class="subtext">
 						<p>{{ .Message }}</p>
+					</div>
+					<div>
+						<a href="/"><button class="btn">Go home</button></a>
 					</div>
 				</div>
 			</div>

@@ -124,7 +124,7 @@ func App(c echo.Context) error {
 	if poolId == "" || len(poolId) == 0 {
 		return c.Render(http.StatusOK, "error", map[string]any{
 			"StyleSheets": []string{"global"},
-			"Message":     "Hi there, are you lost?!",
+			"Message":     "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
 
 			"debug": debug,
 		})
@@ -136,7 +136,7 @@ func App(c echo.Context) error {
 		// if not then do not render both forms and display message
 		return c.Render(http.StatusOK, "error", map[string]any{
 			"StyleSheets": []string{"global"},
-			"Message":     "Pool expired or non-existent!",
+			"Message":     "Pool expired or non-existent! Make sure you have the correct link! 😃",
 
 			"debug": debug,
 		})
@@ -146,7 +146,7 @@ func App(c echo.Context) error {
 	if pool.HasGameStarted {
 		return c.Render(http.StatusOK, "error", map[string]any{
 			"StyleSheets": []string{"global"},
-			"Message":     "Sorry! The game has already started! 🥹",
+			"Message":     "Oops! The game has already started! 🥹",
 
 			"debug": debug,
 		})
@@ -160,7 +160,7 @@ func App(c echo.Context) error {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
 		return c.Render(http.StatusOK, "error", map[string]any{
 			"StyleSheets": []string{"global"},
-			"Message":     "Your party is full!",
+			"Message":     "Your party is full! Maximum room capacity reached! 😃",
 
 			"debug": debug,
 		})
@@ -190,7 +190,7 @@ func RegisterToPool(c echo.Context) error {
 	if !ok {
 		return c.Render(http.StatusOK, "error", map[string]any{
 			"StyleSheets": []string{"global"},
-			"Message":     "Pool expired or non-existent!",
+			"Message":     "Pool expired or non-existent! Make sure you have the correct link! 😃",
 
 			"debug": debug,
 		})
@@ -200,7 +200,7 @@ func RegisterToPool(c echo.Context) error {
 	if pool.HasGameStarted {
 		return c.Render(http.StatusOK, "error", map[string]any{
 			"StyleSheets": []string{"global"},
-			"Message":     "Sorry! The game has already started! 🥹",
+			"Message":     "Oops! The game has already started! 🥹",
 
 			"debug": debug,
 		})

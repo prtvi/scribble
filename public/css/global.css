@@ -74,6 +74,11 @@ input {
 	transform: none;
 }
 
+.btni {
+	color: var(--black);
+	background-color: rgb(216, 215, 215);
+}
+
 .hidden {
 	display: none;
 }
@@ -129,15 +134,16 @@ input {
 	}
 
 	.content {
-		height: 220px;
+		height: 230px;
 	}
 
 	.title {
-		font-size: var(--fs-18);
+		font-size: var(--fs-20);
 	}
 
 	.subtext {
-		font-size: var(--fs-16);
+		font-size: var(--fs-18);
+		margin-bottom: 25px;
 	}
 }
 
