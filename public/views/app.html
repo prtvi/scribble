@@ -6,9 +6,6 @@
 
 	<body>
 		<div class="main">
-			<!-- render this form when post request to /app is made, render this form for chat msgs and then estalblish socket connection -->
-			{{ if .Connect }}
-
 			<div class="game-content">
 				<!-- status bar -->
 				<div class="status-bar">
@@ -69,31 +66,23 @@
 						</div>
 					</form>
 				</div>
-
-				<script>
-					const poolId = '{{ .PoolId }}';
-					const clientId = '{{ .ClientId }}';
-					const clientName = '{{ .ClientName }}';
-					const clientColor = '{{ .ClientColor }}';
-					const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
-					const joiningLink = '{{ .JoiningLink }}';
-				</script>
-
-				<script src="public/javascript/utils.js"></script>
-				<script src="public/javascript/canvas.js"></script>
-				<script src="public/javascript/onMsgHandlers.js"></script>
-				<script src="public/javascript/socket.js"></script>
-				<script src="public/javascript/main.js"></script>
 			</div>
-
-			{{ else }}
-
-			<div>
-				<p>{{ .Message }}</p>
-			</div>
-
-			{{ end }}
 		</div>
+
+		<script>
+			const poolId = '{{ .PoolId }}';
+			const clientId = '{{ .ClientId }}';
+			const clientName = '{{ .ClientName }}';
+			const clientColor = '{{ .ClientColor }}';
+			const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
+			const joiningLink = '{{ .JoiningLink }}';
+		</script>
+
+		<script src="public/javascript/utils.js"></script>
+		<script src="public/javascript/canvas.js"></script>
+		<script src="public/javascript/onMsgHandlers.js"></script>
+		<script src="public/javascript/socket.js"></script>
+		<script src="public/javascript/main.js"></script>
 	</body>
 </html>
 

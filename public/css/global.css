@@ -43,6 +43,7 @@ input {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-13);
+	padding: 2px;
 }
 
 .btn {

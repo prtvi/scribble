@@ -20,10 +20,9 @@
 	{{ end }}
 
 	<link rel="shortcut icon" href="public/assets/icon.ico" type="image/x-icon" />
-	<link rel="stylesheet" href="public/css/global.css" />
 
-	{{ if ne .StyleSheet "" }}
-	<link rel="stylesheet" href="public/css/{{ .StyleSheet }}.css" />
+	{{ range $val := .StyleSheets }}
+	<link rel="stylesheet" href="public/css/{{ $val }}.css" />
 	{{ end }}
 
 	<!-- display client name on title of the browser -->

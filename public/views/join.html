@@ -7,7 +7,6 @@
 	<body>
 		<main class="main">
 			<div class="content">
-				{{ if .CanJoin }}
 				<div>
 					<div class="title"><h1>Scribble</h1></div>
 
@@ -16,7 +15,7 @@
 							<div class="form-content register-form">
 								<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-								<div class="">
+								<div>
 									<label class="form-label" for="clientName"
 										>Enter your name to join:</label
 									>
@@ -36,27 +35,16 @@
 							</div>
 						</form>
 					</div>
-
-					{{ if .debug }}
-
-					<script>
-						document.querySelector('#clientName').value =
-							'doodler {{ .CurrentSize }}';
-					</script>
-
-					{{ end }}
 				</div>
-
-				<!-- if pool does not exist or some error occurs then render message only, render this part when .Message is not "empty" -->
-				{{ else }}
-
-				<div>
-					<p>{{ .Message }}</p>
-				</div>
-
-				{{ end }}
 			</div>
 		</main>
+
+		{{ if .debug }}
+		<script>
+			document.querySelector('#clientName').value =
+				'doodler {{ .currentSize }}';
+		</script>
+		{{ end }}
 	</body>
 </html>
 

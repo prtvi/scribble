@@ -1,3 +1,7 @@
+.subtext {
+	margin-bottom: 15px;
+}
+
 .form-container {
 	display: flex;
 	justify-content: center;
@@ -6,7 +10,7 @@
 
 .form-content {
 	width: 220px;
-	height: 75px;
+	height: 50px;
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
@@ -67,6 +71,20 @@
 	transform: translateY(1px);
 }
 
+/* join.html */
+
+input#clientName {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding: 4px;
+	border-radius: 5px;
+}
+
+.register-form {
+	width: 270px;
+	margin-bottom: 15px;
+}
+
 @media screen and (min-width: 580px) {
 	.form-content {
 		width: 260px;
@@ -92,6 +110,13 @@
 		width: 20px;
 		height: 20px;
 	}
+
+	/* join.html */
+
+	.register-form {
+		width: 350px;
+		margin-bottom: 10px;
+	}
 }
 
 @media screen and (min-width: 768px) {
@@ -114,5 +139,16 @@
 
 	.room-created-container {
 		margin-top: 25px;
+	}
+
+	/* join.html */
+
+	#clientName {
+		font-size: var(--fs-15);
+	}
+
+	.register-form {
+		width: 450px;
+		margin-bottom: 25px;
 	}
 }
