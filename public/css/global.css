@@ -49,7 +49,7 @@ input {
 .btn {
 	font-family: sb600, var(--ff);
 	font-weight: var(--fw-600);
-	font-size: var(--fs-13);
+	font-size: var(--fs-12);
 	color: var(--white);
 	width: fit-content;
 	height: fit-content;

@@ -105,7 +105,8 @@ input#clientName {
 	}
 
 	.room-created-container {
-		margin-top: 20px;
+		margin: 20px auto 0 auto;
+		width: 360px;
 	}
 
 	.copy-link-img {
@@ -117,7 +118,7 @@ input#clientName {
 
 	.register-form {
 		width: 350px;
-		margin-bottom: 10px;
+		margin-bottom: 20px;
 	}
 }
 
@@ -141,12 +142,13 @@ input#clientName {
 
 	.room-created-container {
 		margin-top: 25px;
+		width: 400px;
 	}
 
 	/* join.html */
 
 	#clientName {
-		font-size: var(--fs-15);
+		font-size: var(--fs-18);
 	}
 
 	.register-form {

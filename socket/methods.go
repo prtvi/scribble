@@ -168,6 +168,7 @@ func (pool *Pool) beginBroadcastClientInfo() {
 		// stop broadcasting when game ends
 		if pool.HasGameEnded || len(pool.Clients) == 0 {
 			utils.Cp("yellow", "Stopped broadcasting client info")
+			pool.HasClientInfoBroadcastStarted = false
 			break
 		}
 	}
