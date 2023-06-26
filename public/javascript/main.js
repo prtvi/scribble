@@ -48,7 +48,7 @@ window.addEventListener('load', () => {
 
 // copy joining link
 document
-	.querySelector('.joining-link')
+	.querySelector('.joining-link-btn')
 	.addEventListener('click', copyJoiningLinkEL);
 
 // add event listener to start game button to start game

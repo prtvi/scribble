@@ -125,7 +125,7 @@ function beginClientSketchingFlowInit(socketMessage) {
 		socketMessage.currWordExpiresAt
 	).getTime();
 
-	const timeLeftSpan = document.querySelector('.time-left-for-word span');
+	const timeLeftSpan = document.querySelector('.time-left span');
 	timeLeftSpan.textContent = `${timeForEachWordInSeconds}s`;
 	return runTimer(timeLeftSpan, currentWordExpiresAt);
 }
@@ -133,7 +133,7 @@ function beginClientSketchingFlowInit(socketMessage) {
 function runTimer(timerElement, timeoutAt) {
 	const countdownTimer = setInterval(function () {
 		const secondsLeft = getSecondsLeftFrom(timeoutAt);
-		if (secondsLeft >= 0) timerElement.textContent = `${secondsLeft}s`;
+		if (secondsLeft > -1) timerElement.textContent = `${secondsLeft}s`;
 		else clearInterval(countdownTimer);
 	}, 1000);
 	return countdownTimer;
@@ -153,7 +153,7 @@ function copyJoiningLinkEL() {
 
 function hideAndRemoveElForJoiningLink() {
 	document
-		.querySelector('.joining-link')
+		.querySelector('.joining-link-btn')
 		.removeEventListener('click', copyJoiningLinkEL);
 
 	document.querySelector('.joining-link-div').classList.add('hidden');

@@ -7,7 +7,9 @@
 }
 
 .btn {
-	scale: 0.8;
+	font-size: var(--fs-10);
+	padding: 6px 8px 6px 8px;
+	border-radius: 10px;
 }
 
 .status-bar {
@@ -21,13 +23,13 @@
 
 .status-bar > div:not(:last-child) {
 	vertical-align: middle;
+	text-align: center;
 	width: fit-content;
 	height: inherit;
 	padding-left: 6px;
 	padding-right: 6px;
 	border-radius: 10px;
 	border: 1px solid gray;
-	/* box-shadow: 2px 5px 6px #888888; */
 }
 
 .status-bar > div span {
@@ -45,12 +47,15 @@
 	background-color: orange;
 }
 
-.time-left-for-word {
+.time-left {
 	background-color: lime;
+	width: 18px;
+	min-width: 18px;
 }
 
-.joining-link-div {
-	transform: scale(0.9);
+.time-left span {
+	width: 18px;
+	min-width: 18px;
 }
 
 /*  */

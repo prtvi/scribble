@@ -129,8 +129,7 @@ function startGame(socketMessage) {
 		`<div class="overlay-div"><p class="overlay-p">Game started</p></div>`
 	);
 
-	document.querySelector('.time-left-for-word span').textContent =
-		'Game started';
+	document.querySelector('.time-left span').textContent = 'Game started';
 }
 
 // 71
@@ -192,7 +191,6 @@ function disableSketchingTurnOver() {
 // 82
 function showTimeUp() {
 	clearAllIntervals(wordExpiryTimer);
-
 	displayOverlay(
 		`<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`
 	);
@@ -208,7 +206,6 @@ function disableSketchingAllGuessed() {
 // 84
 function showAllHaveGuessed() {
 	clearAllIntervals(wordExpiryTimer);
-
 	displayOverlay(
 		`<div class="overlay-div"><p class="overlay-p">Everyone guessed the word!</p></div>`
 	);

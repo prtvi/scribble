@@ -150,6 +150,7 @@ input {
 @media screen and (min-width: 768px) {
 	.btn {
 		font-size: var(--fs-18);
+		padding: 10px 12px 10px 12px;
 	}
 
 	.content {

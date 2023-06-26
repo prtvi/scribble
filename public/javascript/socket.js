@@ -145,9 +145,10 @@ function socketOnMessage(message) {
 }
 
 function socketOnClose() {
+	// TODO: show to user when disconnected from server
 	// on socket conn close, stop all timer or intervals
 	console.log('Socket connection closed, stopping timers and timeouts!');
-	clearAllIntervals(startGameTimerId);
+	clearAllIntervals(startGameTimerId, wordExpiryTimer);
 }
 
 function sendViaSocket(socketMsg) {
@@ -165,6 +166,6 @@ function sendViaSocket(socketMsg) {
 			socket.readyState
 		);
 
-		clearAllIntervals(startGameTimerId);
+		clearAllIntervals(startGameTimerId, wordExpiryTimer);
 	}
 }
