@@ -45,6 +45,7 @@
 
 .word {
 	background-color: orange;
+	text-transform: uppercase;
 }
 
 .time-left {
@@ -98,16 +99,25 @@ canvas {
 
 /* overlay pseudo classes */
 
-.overlay-div {
+.overlay-content {
 	padding: 10px;
 	margin: 0 auto;
 }
 
-.overlay-p {
+.overlay-content > div:not(:last-child) {
+	margin-bottom: 15px;
+}
+
+.overlay-text {
 	font-family: m500, var(--ff);
 	font-weight: var(--fw-500);
 	font-size: var(--fs-14);
-	margin-bottom: 20px;
+}
+
+.word-options {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
 }
 
 .word-option {
@@ -131,11 +141,11 @@ canvas {
 	font-size: var(--fs-14);
 	display: block;
 	margin: 0 auto;
-	margin-top: 20px;
-	width: fit-content;
+	width: 28px;
+	min-width: 28px;
 	padding: 4px;
-	color: black;
-	border: 1px solid black;
+	color: white;
+	border: 1px solid white;
 	border-radius: 5px;
 }
 
@@ -252,7 +262,7 @@ canvas {
 		font-size: var(--fs-14);
 	}
 
-	.overlay-p {
+	.overlay-text {
 		font-size: var(--fs-20);
 	}
 
@@ -317,7 +327,7 @@ canvas {
 		font-size: var(--fs-15);
 	}
 
-	.overlay-p {
+	.overlay-text {
 		font-size: var(--fs-22);
 	}
 

@@ -34,6 +34,7 @@ func (c *Client) read() {
 	}
 }
 
+// send message to the associated client
 func (c *Client) send(m model.SocketMessage) {
 	c.mu.Lock()
 	err := c.Conn.WriteJSON(m)
@@ -44,9 +45,8 @@ func (c *Client) send(m model.SocketMessage) {
 	}
 }
 
+// returns client info list embedded in model.SocketMessage
 func (pool *Pool) getClientInfoList() model.SocketMessage {
-	// returns client info list embedded in model.SocketMessage
-
 	clientInfoList := make([]model.ClientInfo, 0)
 
 	// append client info into an array
@@ -59,7 +59,7 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 		})
 	}
 
-	// marshall array in byte and send as string
+	// marshall array in byte and init as string
 	byteInfo, _ := json.Marshal(clientInfoList)
 	return model.SocketMessage{
 		Type:    6,
@@ -68,8 +68,8 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 	}
 }
 
+// append the client to the clients list
 func (pool *Pool) appendClientToList(client *Client) {
-	// append the client into the list
 	pool.Clients = append(pool.Clients, client)
 
 	// remove the color that was picked in getColorForClient func from the list, the first color was picked from the list
@@ -77,6 +77,7 @@ func (pool *Pool) appendClientToList(client *Client) {
 	pool.ColorList = pool.ColorList[:len(pool.ColorList)-1]
 }
 
+// remove the client from the client list
 func (pool *Pool) removeClientFromList(client *Client) {
 	// take the removed client's color and append it to the color list
 	pool.ColorList = append(pool.ColorList, client.Color)
@@ -110,6 +111,7 @@ func (pool *Pool) getColorForClient() string {
 	return pool.ColorList[0]
 }
 
+// sleep until the duration, assign any random word to the client if timer runs out
 func (pool *Pool) wordChooseCountdown(words []string) {
 	sleep(TimeoutForChoosingWord)
 
@@ -118,15 +120,15 @@ func (pool *Pool) wordChooseCountdown(words []string) {
 	}
 }
 
+// flag the client's turn as over
 func (pool *Pool) turnOver(c *Client) {
 	c.DoneSketching = true
 	pool.CurrWord = ""
 	pool.CurrSketcher = nil
 }
 
-// 70
+// 70, flag and broadcast the starting of the game
 func (pool *Pool) startGameAndBroadcast() {
-	// flag and broadcast the starting of the game
 	pool.HasGameStarted = true
 	pool.GameStartedAt = time.Now()
 
@@ -137,6 +139,7 @@ func (pool *Pool) startGameAndBroadcast() {
 	})
 }
 
+// begin the client's turn to draw, assign them the word automatically based on timeout if not chosen
 func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	// select the client
 	pool.CurrSketcher = client
@@ -148,7 +151,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	// start a timeout for assigning word if not chosen by client
 	go pool.wordChooseCountdown(words)
 
-	// run an infinite loop until pool.CurrWord is initialised by sketcher client, initialised in pool.Start func
+	// run an infinite loop until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func), or initialised in wordChooseCountdown goroutine
 	for pool.CurrWord == "" {
 	}
 
@@ -156,6 +159,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
 }
 
+// begin clientInfo broadcast
 func (pool *Pool) beginBroadcastClientInfo() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
@@ -174,6 +178,7 @@ func (pool *Pool) beginBroadcastClientInfo() {
 	}
 }
 
+// begin the timeout to start the game if not started by the clients
 func (pool *Pool) startGameCountdown() {
 	// as soon as the first player/client joins, start this countdown to start the game, after this timeout, the game begin message will broadcast
 
@@ -193,6 +198,7 @@ func (pool *Pool) startGameCountdown() {
 	go pool.beginGameFlow()
 }
 
+// begin the game flow as soon as a client requests to start the game
 func (pool *Pool) startGameRequestFromClient() {
 	// when the client requests to start the game instead of the countdown
 	// start the game and broadcast the same
@@ -203,9 +209,8 @@ func (pool *Pool) startGameRequestFromClient() {
 	go pool.beginGameFlow()
 }
 
+// update score for the client that guesses the word right
 func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
-	// update score for the client that guesses the word right, return true if correctly guessed
-
 	// when the game has not begun, the curr sketcher will be nil
 	if pool.CurrSketcher == nil {
 		return message
@@ -266,6 +271,7 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 	return message
 }
 
+// checks if all the clients have guessed the word and acknowledges it on the stopTimer channel
 func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 	// to be run as a separate goroutine
 	// every second, check if all clients have guessed the word
@@ -293,10 +299,8 @@ func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 	}
 }
 
-// 9
+// 9, flag and broadcast game end
 func (pool *Pool) endGame() {
-	// flag and broadcast game end
-
 	utils.Cp("yellowBg", "All players done playing!")
 
 	pool.HasGameEnded = true

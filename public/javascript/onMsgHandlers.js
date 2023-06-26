@@ -28,42 +28,45 @@ function appendChatMsgToDOM(msg, formatColor) {
 
 // 32
 function revealWordOnOverlayAndChat(socketMessage) {
-	displayOverlay(
-		`<div class="overlay-div"><p class="overlay-p">The word was '${socketMessage.content}'</p></div>`
-	);
-
-	appendChatMsgToDOM(`The word was '${socketMessage.content}'`, '#ffa500');
+	const message = `The word was '${socketMessage.content}'`;
+	displayOverlay(getOverlayHtmlForTextOnly(message));
+	appendChatMsgToDOM(message, '#ffa500');
 }
 
 // 33
 function showWordToChoose(socketMessage) {
 	const words = JSON.parse(socketMessage.content);
 
-	let html = `<div class="overlay-div">
-	<p class="overlay-p">Your turn! Choose a word to draw</p>`;
-	words.forEach(w => (html += `<span class="word-option">${w}</span>`));
-	html += `<span class="word-choose-timer"></span> </div>`;
+	let html = `<div class="overlay-content">
+	<div><p class="overlay-text">Your turn, choose a word to draw!</p></div>
+	<div class="word-options">`;
+	words.forEach(
+		w => (html += `<div class="word-option"><span>${w}</span></div>`)
+	);
+	html += `</div> <div><div class="word-choose-timer"><span>${timeForChoosingWordInSeconds}s</span></div> </div>`;
 
 	displayOverlay(html);
 
-	overlay.querySelector('div').addEventListener('click', function (e) {
-		const chosenWord = e.target.textContent.trim();
-		if (!words.includes(chosenWord)) return;
+	overlay
+		.querySelector('.word-options')
+		.addEventListener('click', function (e) {
+			const chosenWord = e.target.textContent.trim();
+			if (!words.includes(chosenWord)) return;
 
-		const socketMsg = {
-			type: 34,
-			typeStr: messageTypeMap.get(34),
-			content: chosenWord,
-			clientName,
-			clientId,
-			poolId,
-		};
+			const socketMsg = {
+				type: 34,
+				typeStr: messageTypeMap.get(34),
+				content: chosenWord,
+				clientName,
+				clientId,
+				poolId,
+			};
 
-		sendViaSocket(socketMsg);
-	});
+			sendViaSocket(socketMsg);
+		});
 
 	const timeoutAt = new Date(socketMessage.timeoutAfter).getTime();
-	const timerEle = overlay.querySelector('span.word-choose-timer');
+	const timerEle = overlay.querySelector('div.word-choose-timer span');
 	timerEle.textContent = `${timeForChoosingWordInSeconds}s`;
 	runTimer(timerEle, timeoutAt);
 }
@@ -71,7 +74,9 @@ function showWordToChoose(socketMessage) {
 // 35
 function showChoosingWordOnOverlay(socketMessage) {
 	displayOverlay(
-		`<div class="overlay-div"><p class="overlay-p">${socketMessage.currSketcherName} is choosing a word!</p></div>`
+		getOverlayHtmlForTextOnly(
+			`${socketMessage.currSketcherName} is choosing a word!`
+		)
 	);
 }
 
@@ -111,7 +116,7 @@ function startGame(socketMessage) {
 	// called when socket receives message from server with type as 6
 	if (!socketMessage.success) return;
 
-	console.log('game started by server');
+	console.log('game started');
 
 	// flag game started
 	paintUtils.hasGameStarted = true;
@@ -125,10 +130,7 @@ function startGame(socketMessage) {
 	hideAndRemoveElForJoiningLink();
 
 	// display game started overlay
-	displayOverlay(
-		`<div class="overlay-div"><p class="overlay-p">Game started</p></div>`
-	);
-
+	displayOverlay(getOverlayHtmlForTextOnly('Game started!'));
 	document.querySelector('.time-left span').textContent = 'Game started';
 }
 
@@ -137,13 +139,9 @@ function renderRoundDetails(socketMessage) {
 	const roundDiv = document.querySelector('.round');
 	roundDiv.classList.remove('hidden');
 
-	roundDiv.querySelector(
-		'span'
-	).textContent = `Round: ${socketMessage.currRound}`;
-
-	displayOverlay(
-		`<div class="overlay-div"><p class="overlay-p">Round: ${socketMessage.currRound}</p></div>`
-	);
+	const text = `Round: ${socketMessage.currRound}`;
+	roundDiv.querySelector('span').textContent = text;
+	displayOverlay(getOverlayHtmlForTextOnly(text));
 }
 
 // 8
@@ -191,9 +189,7 @@ function disableSketchingTurnOver() {
 // 82
 function showTimeUp() {
 	clearAllIntervals(wordExpiryTimer);
-	displayOverlay(
-		`<div class="overlay-div"><p class="overlay-p">Time up!</p></div>`
-	);
+	displayOverlay(getOverlayHtmlForTextOnly('Time up!'));
 }
 
 // 83
@@ -206,18 +202,16 @@ function disableSketchingAllGuessed() {
 // 84
 function showAllHaveGuessed() {
 	clearAllIntervals(wordExpiryTimer);
-	displayOverlay(
-		`<div class="overlay-div"><p class="overlay-p">Everyone guessed the word!</p></div>`
-	);
+	displayOverlay(getOverlayHtmlForTextOnly('Everyone guessed the word!'));
 }
 
 // 9
 function displayScores(socketMessage) {
 	const dataArr = JSON.parse(socketMessage.content);
 
-	let html = `<div class="overlay-div">
-	<p class="overlay-p">Game over!</p>
-	<table>
+	let html = `<div class="overlay-content">
+	<div><p class="overlay-text">Game over!</p></div>`;
+	html += `<div> <table>
 	<tr>
 		<th>Name</th>
 		<th>Score</th>
@@ -225,7 +219,7 @@ function displayScores(socketMessage) {
 	dataArr.forEach(
 		item => (html += `<tr><td>${item.name}</td><td>${item.score}</td></tr>`)
 	);
-	html += `</table> </div>`;
+	html += `</table> </div> </div>`;
 
 	displayOverlay(html);
 }

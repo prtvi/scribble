@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// sends the given message to every client except the client with excludeId
 func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMessage) {
 	printSocketMsg(message)
 
@@ -20,6 +21,7 @@ func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMe
 	}
 }
 
+// sends m1: message to client with id -> id1, sends m: message to rest of the clients
 func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessage) {
 	printSocketMsg(m1)
 	printSocketMsg(m)
@@ -33,6 +35,7 @@ func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessag
 	}
 }
 
+// broadcast the given message to all clients in pool
 func (pool *Pool) broadcast(message model.SocketMessage) {
 	printSocketMsg(message)
 
@@ -118,7 +121,6 @@ func (pool *Pool) broadcast3WordsList(words []string) {
 		CurrSketcherName: pool.CurrSketcher.Name,
 	}
 
-	// send m1 to sketcher client and m to rest of the clients
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 

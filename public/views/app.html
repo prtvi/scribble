@@ -25,14 +25,19 @@
 				<!-- canvas -->
 				<div class="canvas-container">
 					<div id="overlay">
-						<div class="overlay-div">
-							<p class="overlay-p">
-								Waiting for others to join, starting game in
-								<span class="loading">{{ .GameStartDurationInSeconds }}</span>
-								seconds
-							</p>
+						<div class="overlay-content">
+							<div>
+								<p class="overlay-text">
+									Waiting for others to join, starting game in
+									<span class="loading"
+										>{{ .GameStartDurationInSeconds }}s</span
+									>
+								</p>
+							</div>
 
-							<button class="btn start-game-btn">Start now</button>
+							<div>
+								<button class="btn start-game-btn">Start now</button>
+							</div>
 						</div>
 					</div>
 

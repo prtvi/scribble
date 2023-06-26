@@ -26,12 +26,7 @@ function clearAllIntervals(...ids) {
 
 function gameStartTimer() {
 	// start game countdown to show user how much time is left for game to start
-	return setInterval(
-		() =>
-			(document.querySelector('.loading').textContent =
-				getSecondsLeftFrom(gameStartTime)),
-		1000
-	);
+	return runTimer(document.querySelector('.loading'), gameStartTime);
 }
 
 function getClientNameDiv(clientInfo, iteration) {
@@ -86,6 +81,17 @@ function sendChatMsgBtnEL(e) {
 
 	// convert object to string to transmit
 	sendViaSocket(socketMsg);
+}
+
+function getOverlayHtmlForTextOnly(overlayText) {
+	return `
+	<div class="overlay-content">
+		<div>
+			<p class="overlay-text">
+				${overlayText}
+			</p>
+		</div>
+	</div>`;
 }
 
 function displayOverlay(html) {

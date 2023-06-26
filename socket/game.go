@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
+// start listening to pool connections and messages
 func (pool *Pool) start() {
-	// start listening to pool connections and messages
 	for {
 		select {
 		case client := <-pool.Register:
@@ -47,7 +47,7 @@ func (pool *Pool) start() {
 				pool.broadcast(message)
 
 			case 4, 5:
-				pool.sendExcludingClientId(pool.CurrSketcher.ID, message)
+				pool.sendExcludingClientId(pool.CurrSketcher.ID, message) // avoid sending canvas data and clear canvas event to the curr sketcher
 
 			case 7:
 				printSocketMsg(message)
@@ -66,9 +66,8 @@ func (pool *Pool) start() {
 	}
 }
 
+// begin game flow by scheduling schedule timers
 func (pool *Pool) beginGameFlow() {
-	// schedule timers for current word and current sketcher
-
 	// wait for the "game started" overlay
 	sleep(time.Second * 2)
 
