@@ -188,6 +188,7 @@ function disableSketchingTurnOver() {
 
 // 82
 function showTimeUp() {
+	showZeroOnTimeLeftSpan();
 	clearAllIntervals(wordExpiryTimer);
 	displayOverlay(getOverlayHtmlForTextOnly('Time up!'));
 }
@@ -201,6 +202,7 @@ function disableSketchingAllGuessed() {
 
 // 84
 function showAllHaveGuessed() {
+	showZeroOnTimeLeftSpan();
 	clearAllIntervals(wordExpiryTimer);
 	displayOverlay(getOverlayHtmlForTextOnly('Everyone guessed the word!'));
 }

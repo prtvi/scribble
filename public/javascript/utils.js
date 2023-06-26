@@ -145,6 +145,11 @@ function runTimer(timerElement, timeoutAt) {
 	return countdownTimer;
 }
 
+function showZeroOnTimeLeftSpan() {
+	// to display 0s left, in the event that everyone guesses the word before the timeout
+	document.querySelector('.time-left span').textContent = '0s';
+}
+
 //
 //
 //

@@ -69,7 +69,7 @@
 }
 
 canvas {
-	background-color: white;
+	background-color: var(--white);
 	cursor: pointer;
 	border-radius: 3px;
 }
@@ -80,7 +80,7 @@ canvas {
 	top: 0;
 	left: 0;
 	right: 0;
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.65);
 	z-index: 2;
 	cursor: pointer;
 	font-size: var(--fs-13);
@@ -93,8 +93,8 @@ canvas {
 .painter-utils {
 	position: absolute;
 	right: 2px;
-	/* status bar height plus 2*padding (5px) plus 5px margin for canvas */
-	top: calc(var(--status-bar-h) + 15px);
+	/* status bar height + 2*padding (5px) + 5px margin for canvas */
+	top: calc(var(--status-bar-h) + 17px);
 }
 
 /* overlay pseudo classes */
