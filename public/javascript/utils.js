@@ -97,19 +97,19 @@ function getOverlayHtmlForTextOnly(overlayText) {
 function displayOverlay(html) {
 	overlay.innerHTML = html;
 	overlay.style.display = 'flex';
-
-	// disable scroll on overlay display
-	document.documentElement.style.overflow = 'hidden';
-	document.body.scroll = 'no';
+	adjustOverlay();
 }
 
 function hideOverlay() {
 	overlay.innerHTML = '';
 	overlay.style.display = 'none';
+}
 
-	// enable scroll on overlay display
-	document.documentElement.style.overflow = 'scroll';
-	document.body.scroll = 'yes';
+function adjustOverlay() {
+	// adjust overlay position on scroll
+	const cc = document.querySelector('.canvas-container');
+	overlay.style.top = `${cc.offsetTop}px`;
+	overlay.style.height = `${cc.offsetHeight}px`;
 }
 
 function disableSketching() {

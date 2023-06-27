@@ -21,12 +21,6 @@ let timeForEachWordInSeconds;
 let timeForChoosingWordInSeconds;
 let wordExpiryTimer;
 
-// if overlay is active, disable scroll
-if (overlay.style.display !== 'none') {
-	document.documentElement.style.overflow = 'hidden';
-	document.body.scroll = 'no';
-}
-
 // chat
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);
 
@@ -55,3 +49,6 @@ document
 document
 	.querySelector('.start-game-btn')
 	.addEventListener('click', startGameEl);
+
+// adjust overlay position on scroll
+window.addEventListener('scroll', adjustOverlay);

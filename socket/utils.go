@@ -134,9 +134,9 @@ func DebugMode() {
 	debug = true
 	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 
-	GameStartDurationInSeconds = time.Second * 500
-	TimeForEachWordInSeconds = time.Second * 30
-	RenderClientsEvery = time.Second * 25
+	GameStartDurationInSeconds = time.Second * 200
+	TimeForEachWordInSeconds = time.Second * 15
+	RenderClientsEvery = time.Second * 30
 
 	poolId := "debug"
 	pool := newPool(poolId, 4)
