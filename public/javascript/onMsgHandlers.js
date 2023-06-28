@@ -47,7 +47,7 @@ function showWordToChoose(socketMessage) {
 
 	displayOverlay(html);
 
-	setTimeout(function () {
+	setTimeout(() => {
 		overlay
 			.querySelector('.word-options')
 			.addEventListener('click', function (e) {
@@ -70,7 +70,7 @@ function showWordToChoose(socketMessage) {
 		const timerEle = overlay.querySelector('div.word-choose-timer span');
 		timerEle.textContent = `${timeForChoosingWordInSeconds}s`;
 		runTimer(timerEle, timeoutAt);
-	}, overlayFadeInAnimationDuration + 1);
+	}, overlayFadeInAnimationDuration + 50);
 }
 
 // 35
@@ -147,6 +147,8 @@ function renderRoundDetails(socketMessage) {
 
 // 8
 function beginClientSketchingFlow(socketMessage) {
+	hideOverlay();
+
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
 	// for enabling drawing access if clientId matches
@@ -168,8 +170,19 @@ function beginClientSketchingFlow(socketMessage) {
 	return wordExpiryCountdown;
 }
 
+// 87
+function showSketcherBeginDrawing(socketMessage) {
+	displayOverlay(
+		getOverlayHtmlForTextOnly(
+			`${socketMessage.currSketcherName} is now drawing!`
+		)
+	);
+
+	setTimeout(hideOverlay, 2000);
+}
+
 // 88
-function showClientDrawing(socketMessage) {
+function showSketcherIsDrawing(socketMessage) {
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
 	const wordDiv = document.querySelector('.word');

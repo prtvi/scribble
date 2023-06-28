@@ -47,6 +47,10 @@ func (pool *Pool) start() {
 				pool.broadcast(message)
 
 			case 4, 5:
+				if pool.CurrSketcher == nil {
+					break
+				}
+
 				pool.sendExcludingClientId(pool.CurrSketcher.ID, message) // avoid sending canvas data and clear canvas event to the curr sketcher
 
 			case 7:

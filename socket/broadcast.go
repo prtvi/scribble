@@ -143,6 +143,12 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 	}
 
+	pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
+		Type:             87,
+		TypeStr:          messageTypeMap[87],
+		CurrSketcherName: pool.CurrSketcher.Name,
+	})
+
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 

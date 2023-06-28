@@ -111,8 +111,12 @@ function socketOnMessage(message) {
 			wordExpiryTimer = beginClientSketchingFlow(socketMessage);
 			break;
 
+		case 87:
+			showSketcherBeginDrawing(socketMessage);
+			break;
+
 		case 88:
-			wordExpiryTimer = showClientDrawing(socketMessage);
+			wordExpiryTimer = showSketcherIsDrawing(socketMessage);
 			break;
 
 		case 81:

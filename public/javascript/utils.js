@@ -98,7 +98,9 @@ function getOverlayHtmlForTextOnly(overlayText) {
 	</div>`;
 }
 
-const overlayFadeInAnimationDuration = 200; // to be configured in css file too, #overlay{}
+// render animation/transition for changing innerHTML - https://stackoverflow.com/questions/29640486
+
+const overlayFadeInAnimationDuration = 300; // to be configured in css file too, #overlay{}
 
 function displayOverlay(html) {
 	// display overlay after some delay to render fade in animation
@@ -114,9 +116,15 @@ function displayOverlay(html) {
 }
 
 function hideOverlay() {
-	overlay.innerHTML = '';
-	overlay.style.display = 'none';
-	overlay.style.opacity = 0;
+	// render hiding animation using timeout
+	overlay.style.opacity = 1;
+	setTimeout(() => {
+		overlay.style.opacity = 0;
+		overlay.innerHTML = '';
+	}, overlayFadeInAnimationDuration);
+
+	// change overlay display property to none after the animation
+	setTimeout(() => (overlay.style.display = 'none'), 1000);
 }
 
 function adjustOverlay() {
@@ -138,8 +146,6 @@ function disableSketching() {
 }
 
 function beginClientSketchingFlowInit(socketMessage) {
-	hideOverlay();
-
 	// initialise the time at which this word expires
 	const currentWordExpiresAt = new Date(
 		socketMessage.currWordExpiresAt
