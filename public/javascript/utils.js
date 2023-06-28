@@ -170,24 +170,58 @@ function showZeroOnTimeLeftSpan() {
 	document.querySelector('.time-left span').textContent = '0s';
 }
 
-//
-//
-//
-//
-//
+function removeEventListenersOnGameStart() {
+	document
+		.querySelector('.start-game-btn')
+		.removeEventListener('click', startGameEl);
 
-// event listeners
-
-function copyJoiningLinkEL() {
-	navigator.clipboard.writeText(joiningLink);
-}
-
-function hideAndRemoveElForJoiningLink() {
 	document
 		.querySelector('.joining-link-btn')
 		.removeEventListener('click', copyJoiningLinkEL);
 
 	document.querySelector('.joining-link-div').classList.add('hidden');
+}
+
+// event listeners
+
+function initGlobalEventListeners() {
+	// chat
+	document
+		.querySelector('.send-msg')
+		.addEventListener('click', sendChatMsgBtnEL);
+
+	// show number of characters typed in chat box
+	const lenIndicator = document.querySelector('.input-wrapper span');
+	document
+		.querySelector('.msg')
+		.addEventListener(
+			'input',
+			e => (lenIndicator.textContent = e.target.value.length)
+		);
+
+	// event listeners for drawing
+	window.addEventListener('load', () => {
+		document.addEventListener('mousedown', startPainting);
+		document.addEventListener('mouseup', stopPainting);
+		document.addEventListener('mousemove', paint);
+	});
+
+	// copy joining link
+	document
+		.querySelector('.joining-link-btn')
+		.addEventListener('click', copyJoiningLinkEL);
+
+	// add event listener to start game button to start game
+	document
+		.querySelector('.start-game-btn')
+		.addEventListener('click', startGameEl);
+
+	// adjust overlay position on scroll
+	window.addEventListener('scroll', adjustOverlay);
+}
+
+function copyJoiningLinkEL() {
+	navigator.clipboard.writeText(joiningLink);
 }
 
 function startGameEl() {
@@ -196,6 +230,24 @@ function startGameEl() {
 		typeStr: messageTypeMap.get(7),
 		clientId,
 		clientName,
+		poolId,
+	};
+
+	sendViaSocket(socketMsg);
+}
+
+function wordChooseEL(e) {
+	// passing parameters to addEvenListener function by assigning the "this" element a new parameter, say words, then using it in the event handler like e.currentTarget.words
+
+	const chosenWord = e.target.textContent.trim();
+	if (!e.currentTarget.words.includes(chosenWord)) return;
+
+	const socketMsg = {
+		type: 34,
+		typeStr: messageTypeMap.get(34),
+		content: chosenWord,
+		clientName,
+		clientId,
 		poolId,
 	};
 

@@ -125,7 +125,7 @@ func (pool *Pool) broadcast3WordsList(words []string) {
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
-// 8, 88
+// 8, 87, 88
 func (pool *Pool) broadcastCurrentWordDetails() {
 	m1 := model.SocketMessage{
 		Type:              8,

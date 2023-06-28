@@ -58,14 +58,14 @@ var messageTypeMap = map[int]string{
 	35: "sc__choosing_word",
 	82: "sc__turn_over",
 	84: "sc__turn_over_all_guessed",
+	87: "sc__sketcher_begin_drawing",
+	88: "sc__sketcher_drawing",
 
 	// S => C - yellow
 	8:  "sc__word_assigned",
 	33: "sc__choose_word",
 	81: "sc__disable_sketching",
 	83: "sc__disable_sketching_all_guessed",
-	87: "sc__sketcher_begin_drawing",
-	88: "sc__sketcher_drawing",
 
 	// C => S B=> Cs - blue
 	1: "csc__client_connect",

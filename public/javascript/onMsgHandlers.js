@@ -48,23 +48,9 @@ function showWordToChoose(socketMessage) {
 	displayOverlay(html);
 
 	setTimeout(() => {
-		overlay
-			.querySelector('.word-options')
-			.addEventListener('click', function (e) {
-				const chosenWord = e.target.textContent.trim();
-				if (!words.includes(chosenWord)) return;
-
-				const socketMsg = {
-					type: 34,
-					typeStr: messageTypeMap.get(34),
-					content: chosenWord,
-					clientName,
-					clientId,
-					poolId,
-				};
-
-				sendViaSocket(socketMsg);
-			});
+		const optionsEle = overlay.querySelector('.word-options');
+		optionsEle.words = words;
+		optionsEle.addEventListener('click', wordChooseEL);
 
 		const timeoutAt = new Date(socketMessage.timeoutAfter).getTime();
 		const timerEle = overlay.querySelector('div.word-choose-timer span');
@@ -124,11 +110,7 @@ function startGame(socketMessage) {
 	clearAllIntervals(startGameTimerId);
 
 	// remove event listeners
-	document
-		.querySelector('.start-game-btn')
-		.removeEventListener('click', startGameEl);
-
-	hideAndRemoveElForJoiningLink();
+	removeEventListenersOnGameStart();
 
 	// display game started overlay
 	displayOverlay(getOverlayHtmlForTextOnly('Game started!'));
@@ -148,6 +130,9 @@ function renderRoundDetails(socketMessage) {
 // 8
 function beginClientSketchingFlow(socketMessage) {
 	hideOverlay();
+	overlay
+		.querySelector('.word-options')
+		.removeEventListener('click', wordChooseEL);
 
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
