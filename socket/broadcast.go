@@ -51,6 +51,7 @@ func (pool *Pool) broadcastConfigs() {
 		MessageTypeMap:               messageTypeMap,
 		TimeForEachWordInSeconds:     utils.DurationToSeconds(TimeForEachWordInSeconds),
 		TimeForChoosingWordInSeconds: utils.DurationToSeconds(TimeoutForChoosingWord),
+		PrintLogs:                    debug,
 	}
 
 	byteInfo, _ := json.Marshal(cfg)
@@ -176,10 +177,10 @@ func (pool *Pool) broadcastTurnOverBeforeTimeout() {
 }
 
 // 32
-func (pool *Pool) broadcastWordReveal() {
+func (pool *Pool) broadcastWordReveal(word string) {
 	pool.broadcast(model.SocketMessage{
 		Type:    32,
 		TypeStr: messageTypeMap[32],
-		Content: pool.CurrWord,
+		Content: word,
 	})
 }

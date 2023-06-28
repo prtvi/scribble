@@ -69,7 +69,7 @@ func (pool *Pool) start() {
 // begin game flow by scheduling schedule timers
 func (pool *Pool) beginGameFlow() {
 	// wait for the "game started" overlay
-	sleep(time.Second * 2)
+	sleep(InterGameWaitDuration)
 
 	// loop over the number of rounds
 	for i := 0; i < NumberOfRounds; i++ {
@@ -77,7 +77,7 @@ func (pool *Pool) beginGameFlow() {
 
 		// broadcast round number and wait
 		pool.broadcastRoundNumber()
-		sleep(WaitAfterRoundStarts)
+		sleep(InterGameWaitDuration)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
@@ -103,13 +103,12 @@ func (pool *Pool) beginGameFlow() {
 				pool.broadcastTurnOver()
 			}
 
-			sleep(time.Second * 2)
-			pool.broadcastWordReveal()
-			sleep(time.Second * 2)
-			pool.broadcastClearCanvasEvent()
-
 			// flag sketching done, clear the current word and sketcher
-			pool.turnOver(c)
+			currWord := pool.turnOver(c)
+
+			sleep(InterGameWaitDuration)
+			pool.broadcastWordReveal(currWord)
+			sleep(InterGameWaitDuration)
 		}
 
 		pool.flagAllClientsAsNotSketched()

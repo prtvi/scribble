@@ -116,7 +116,7 @@ function startGame(socketMessage) {
 	// called when socket receives message from server with type as 6
 	if (!socketMessage.success) return;
 
-	console.log('game started');
+	log('game started');
 
 	// flag game started
 	paintUtils.hasGameStarted = true;
@@ -224,6 +224,7 @@ function displayScores(socketMessage) {
 	html += `</table> </div> </div>`;
 
 	displayOverlay(html);
+	appendChatMsgToDOM('Game over!', '#ff0000');
 }
 
 // 10
@@ -232,6 +233,7 @@ function makeMessageTypeMapGlobal(socketMessage) {
 
 	timeForEachWordInSeconds = content.timeForEachWordInSeconds;
 	timeForChoosingWordInSeconds = content.timeForChoosingWordInSeconds;
+	allowLogs = content.printLogs;
 
 	const m = content.messageTypeMap;
 	const keys = Object.keys(m);

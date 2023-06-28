@@ -21,8 +21,8 @@ var (
 	GameStartDurationInSeconds      = time.Second * 120
 	TimeForEachWordInSeconds        = time.Second * 75
 	RenderClientsEvery              = time.Second * 5
-	WaitAfterRoundStarts            = time.Second * 2
-	TimeoutForChoosingWord          = time.Second * 10
+	InterGameWaitDuration           = time.Second * 2
+	TimeoutForChoosingWord          = time.Second * 15
 	DeletePoolAfterGameEndsDuration = time.Minute * 10
 	RemovePoolAfterGameNotStarted   = time.Minute * 20
 	ScoreForCorrectGuess            = 25

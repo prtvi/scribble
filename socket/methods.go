@@ -120,11 +120,15 @@ func (pool *Pool) wordChooseCountdown(words []string) {
 	}
 }
 
-// flag the client's turn as over
-func (pool *Pool) turnOver(c *Client) {
+// flag the client's turn as over and return the current word
+func (pool *Pool) turnOver(c *Client) string {
+	currWord := pool.CurrWord
+
 	c.DoneSketching = true
 	pool.CurrWord = ""
 	pool.CurrSketcher = nil
+
+	return currWord
 }
 
 // 70, flag and broadcast the starting of the game

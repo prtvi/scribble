@@ -3,7 +3,6 @@ package utils
 import (
 	"html/template"
 	"io"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,9 +12,6 @@ type Template struct {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	dataMap := data.(map[string]any)
-	Cp("yellow", name, "->", strings.Join(dataMap["StyleSheets"].([]string), ", "))
-
 	return t.templates[name].ExecuteTemplate(w, name, data)
 }
 

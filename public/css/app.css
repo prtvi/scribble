@@ -109,9 +109,9 @@ canvas {
 }
 
 .overlay-text {
-	font-family: m500, var(--ff);
-	font-weight: var(--fw-500);
-	font-size: var(--fs-14);
+	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
+	font-size: var(--fs-13);
 }
 
 .word-options {
@@ -123,7 +123,7 @@ canvas {
 .word-option {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
-	font-size: var(--fs-14);
+	font-size: var(--fs-13);
 	padding: 8px;
 	background-color: rgb(50, 50, 50);
 	border-radius: 5px;
@@ -138,7 +138,7 @@ canvas {
 .word-choose-timer {
 	font-family: l300, var(--ff);
 	font-weight: var(--fw-300);
-	font-size: var(--fs-14);
+	font-size: var(--fs-13);
 	display: block;
 	margin: 0 auto;
 	width: 28px;
@@ -178,7 +178,7 @@ canvas {
 
 .member {
 	background-color: rgb(240, 217, 188);
-	padding: 5px;
+	padding: 7px;
 	display: flex;
 	justify-content: space-between;
 }
@@ -192,28 +192,29 @@ canvas {
 .member-name {
 	font-family: l300, var(--ff);
 	font-weight: var(--fw-300);
-	font-size: var(--fs-12);
+	font-size: var(--fs-10);
 }
 
 .member-score {
-	font-family: l300, var(--ff);
-	font-weight: var(--fw-300);
+	font-family: xl200, var(--ff);
+	font-weight: var(--fw-200);
 	font-size: var(--fs-10);
 }
 
 .message {
 	font-family: l300, var(--ff);
 	font-weight: var(--fw-300);
-	font-size: var(--fs-11);
+	font-size: var(--fs-10);
 	background-color: lightgrey;
 	padding: 4px;
 	text-align: left;
+	overflow-x: hidden;
 }
 
 .message strong {
 	font-family: m500, var(--ff);
 	font-weight: var(--fw-500);
-	font-size: var(--fs-11);
+	font-size: var(--fs-10);
 }
 
 /* mc pseudo classes */
@@ -232,19 +233,19 @@ canvas {
 .chat-box input {
 	height: 25px;
 	width: 180px;
-	padding-right: 30px;
-	padding-left: 5px;
-	font-size: var(--fs-13);
+	padding: 3px 30px 3px 10px;
+	font-size: var(--fs-12);
 	border-radius: 8px;
+	text-align: left;
 }
 
 .input-wrapper span {
-	font-family: l300, var(--ff);
-	font-weight: var(--fw-300);
+	font-family: t100, var(--ff);
+	font-weight: var(--fw-100);
 	font-size: var(--fs-11);
 	position: absolute;
-	right: 60px;
-	top: 4px;
+	right: 62px;
+	top: 3px;
 	line-height: 25px;
 }
 
@@ -293,6 +294,10 @@ canvas {
 	.message {
 		font-size: var(--fs-13);
 		padding: 6px;
+	}
+
+	.message strong {
+		font-size: var(--fs-13);
 	}
 
 	.chat-box {
@@ -354,6 +359,10 @@ canvas {
 	.message {
 		font-size: var(--fs-14);
 		padding: 7px;
+	}
+
+	.message strong {
+		font-size: var(--fs-14);
 	}
 
 	.chat-box input {

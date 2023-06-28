@@ -1,5 +1,9 @@
 'use strict';
 
+function log(...args) {
+	if (allowLogs) console.log(...args);
+}
+
 function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }

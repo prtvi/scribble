@@ -43,7 +43,11 @@ input {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-13);
-	padding: 2px;
+	padding: 3px;
+	border-radius: 4px;
+	border: none;
+	border-bottom: 2px solid grey;
+	text-align: center;
 }
 
 .btn {
@@ -76,7 +80,7 @@ input {
 
 .btni {
 	color: var(--black);
-	background-color: rgb(216, 215, 215);
+	background-color: #e8e8e8;
 }
 
 .hidden {

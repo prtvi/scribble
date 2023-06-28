@@ -137,6 +137,7 @@ func DebugMode() {
 	GameStartDurationInSeconds = time.Second * 200
 	TimeForEachWordInSeconds = time.Second * 15
 	RenderClientsEvery = time.Second * 30
+	TimeoutForChoosingWord = time.Second * 10
 
 	poolId := "debug"
 	pool := newPool(poolId, 4)

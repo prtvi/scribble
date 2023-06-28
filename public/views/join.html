@@ -22,10 +22,11 @@
 									<input
 										type="text"
 										name="clientName"
+										class="clientName"
 										id="clientName"
 										maxlength="15"
+										placeholder="Type your name .."
 										required
-										autofocus
 									/>
 								</div>
 							</div>
@@ -42,7 +43,7 @@
 		{{ if .debug }}
 		<script>
 			document.querySelector('#clientName').value =
-				'doodler {{ .currentSize }}';
+				'doodler_{{ .currentSize }}';
 		</script>
 		{{ end }}
 	</body>

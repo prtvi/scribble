@@ -7,8 +7,8 @@ function initSocket() {
 
 	const socket = new WebSocket(wsUrl);
 
-	socket.onopen = () => console.log('Socket successfully connected!');
-	socket.onerror = error => console.log('Socket error', error);
+	socket.onopen = () => log('Socket successfully connected!');
+	socket.onerror = error => log('Socket error', error);
 	socket.onmessage = socketOnMessage;
 	socket.onclose = socketOnClose;
 
@@ -21,8 +21,8 @@ function socketOnMessage(message) {
 	// parse json string into json object
 	const socketMessage = JSON.parse(message.data);
 
-	if (socketMessage.type !== 4)
-		console.log(socketMessage.type, socketMessage.typeStr);
+	if (socketMessage.type !== 4 && allowLogs)
+		log(socketMessage.type, socketMessage.typeStr);
 
 	switch (socketMessage.type) {
 		case 1:
@@ -147,7 +147,7 @@ function socketOnMessage(message) {
 function socketOnClose() {
 	// TODO: show to user when disconnected from server
 	// on socket conn close, stop all timer or intervals
-	console.log('Socket connection closed, stopping timers and timeouts!');
+	log('Socket connection closed, stopping timers and timeouts!');
 	clearAllIntervals(startGameTimerId, wordExpiryTimer);
 }
 
@@ -161,7 +161,7 @@ function sendViaSocket(socketMsg) {
 
 	if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(socketMsg));
 	else {
-		console.log(
+		log(
 			'0: connecting | 1: open | 2: closing | 3: closed, current state:',
 			socket.readyState
 		);

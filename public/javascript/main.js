@@ -20,6 +20,7 @@ let messageTypeMap;
 let timeForEachWordInSeconds;
 let timeForChoosingWordInSeconds;
 let wordExpiryTimer;
+let allowLogs;
 
 // chat
 document.querySelector('.send-msg').addEventListener('click', sendChatMsgBtnEL);

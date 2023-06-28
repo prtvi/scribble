@@ -42,7 +42,7 @@
 	height: 25px;
 }
 
-.form-content input#capacity {
+.form-content input.capacity {
 	width: 30px;
 	height: 22px;
 }
@@ -75,7 +75,7 @@
 
 /* join.html */
 
-input#clientName {
+input.clientName {
 	margin-top: 20px;
 	margin-bottom: 20px;
 	padding: 4px;
@@ -147,7 +147,7 @@ input#clientName {
 
 	/* join.html */
 
-	#clientName {
+	input.clientName {
 		font-size: var(--fs-18);
 	}
 

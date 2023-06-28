@@ -42,4 +42,5 @@ type SharedConfig struct {
 	MessageTypeMap               map[int]string `json:"messageTypeMap"`
 	TimeForEachWordInSeconds     int            `json:"timeForEachWordInSeconds"`
 	TimeForChoosingWordInSeconds int            `json:"timeForChoosingWordInSeconds"`
+	PrintLogs                    bool           `json:"printLogs"`
 }
