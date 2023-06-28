@@ -98,15 +98,25 @@ function getOverlayHtmlForTextOnly(overlayText) {
 	</div>`;
 }
 
+const overlayFadeInAnimationDuration = 200; // to be configured in css file too, #overlay{}
+
 function displayOverlay(html) {
-	overlay.innerHTML = html;
-	overlay.style.display = 'flex';
-	adjustOverlay();
+	// display overlay after some delay to render fade in animation
+	// if event listeners are to be added to the given html, then use the same timeout to attach the event listeners
+
+	overlay.style.opacity = 0;
+	setTimeout(function () {
+		overlay.innerHTML = html;
+		overlay.style.display = 'flex';
+		overlay.style.opacity = 1;
+		adjustOverlay();
+	}, overlayFadeInAnimationDuration);
 }
 
 function hideOverlay() {
 	overlay.innerHTML = '';
 	overlay.style.display = 'none';
+	overlay.style.opacity = 0;
 }
 
 function adjustOverlay() {

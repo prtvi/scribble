@@ -81,8 +81,7 @@ func (pool *Pool) beginGameFlow() {
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
-			// broadcast clear canvas event, flag all clients as not guessed
-			pool.broadcastClearCanvasEvent()
+			// flag all clients as not guessed
 			pool.flagAllClientsAsNotGuessed()
 
 			// begin client drawing flow and sleep until the word expires
@@ -105,10 +104,11 @@ func (pool *Pool) beginGameFlow() {
 
 			// flag sketching done, clear the current word and sketcher
 			currWord := pool.turnOver(c)
-
 			sleep(InterGameWaitDuration)
+
 			pool.broadcastWordReveal(currWord)
 			sleep(InterGameWaitDuration)
+			pool.broadcastClearCanvasEvent()
 		}
 
 		pool.flagAllClientsAsNotSketched()

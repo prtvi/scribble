@@ -47,28 +47,30 @@ function showWordToChoose(socketMessage) {
 
 	displayOverlay(html);
 
-	overlay
-		.querySelector('.word-options')
-		.addEventListener('click', function (e) {
-			const chosenWord = e.target.textContent.trim();
-			if (!words.includes(chosenWord)) return;
+	setTimeout(function () {
+		overlay
+			.querySelector('.word-options')
+			.addEventListener('click', function (e) {
+				const chosenWord = e.target.textContent.trim();
+				if (!words.includes(chosenWord)) return;
 
-			const socketMsg = {
-				type: 34,
-				typeStr: messageTypeMap.get(34),
-				content: chosenWord,
-				clientName,
-				clientId,
-				poolId,
-			};
+				const socketMsg = {
+					type: 34,
+					typeStr: messageTypeMap.get(34),
+					content: chosenWord,
+					clientName,
+					clientId,
+					poolId,
+				};
 
-			sendViaSocket(socketMsg);
-		});
+				sendViaSocket(socketMsg);
+			});
 
-	const timeoutAt = new Date(socketMessage.timeoutAfter).getTime();
-	const timerEle = overlay.querySelector('div.word-choose-timer span');
-	timerEle.textContent = `${timeForChoosingWordInSeconds}s`;
-	runTimer(timerEle, timeoutAt);
+		const timeoutAt = new Date(socketMessage.timeoutAfter).getTime();
+		const timerEle = overlay.querySelector('div.word-choose-timer span');
+		timerEle.textContent = `${timeForChoosingWordInSeconds}s`;
+		runTimer(timerEle, timeoutAt);
+	}, overlayFadeInAnimationDuration + 1);
 }
 
 // 35
@@ -91,7 +93,6 @@ function displayImgOnCanvas(socketMessage) {
 
 // 5
 function clearCanvas() {
-	hideOverlay();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
