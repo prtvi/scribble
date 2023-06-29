@@ -21,8 +21,7 @@ function socketOnMessage(message) {
 	// parse json string into json object
 	const socketMessage = JSON.parse(message.data);
 
-	if (socketMessage.type !== 4 && allowLogs)
-		log(socketMessage.type, socketMessage.typeStr);
+	if (socketMessage.type !== 4) log(socketMessage.type, socketMessage.typeStr);
 
 	switch (socketMessage.type) {
 		case 1:

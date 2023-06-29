@@ -1,7 +1,6 @@
 .vscode/
-bg-images/
-fonts/
 gin-bin
+assets/
 .DS_Store
 .env
 *.txt

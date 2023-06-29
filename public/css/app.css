@@ -1,5 +1,6 @@
 :root {
 	--status-bar-h: 26px;
+	--overlay-transition: opacity 0.3s ease-in-out;
 }
 
 .game-content {
@@ -30,6 +31,7 @@
 	padding-right: 6px;
 	border-radius: 10px;
 	border: 1px solid gray;
+	text-transform: uppercase;
 }
 
 .status-bar > div span {
@@ -45,7 +47,6 @@
 
 .word {
 	background-color: orange;
-	text-transform: uppercase;
 }
 
 .time-left {
@@ -57,6 +58,7 @@
 .time-left span {
 	width: 18px;
 	min-width: 18px;
+	text-transform: none;
 }
 
 /*  */
@@ -89,11 +91,11 @@ canvas {
 	align-items: center;
 	justify-content: center;
 	/* fade in animation on overlay display */
-	-webkit-transition: opacity 0.3s ease-in-out;
-	-moz-transition: opacity 0.3s ease-in-out;
-	-ms-transition: opacity 0.3s ease-in-out;
-	-o-transition: opacity 0.3s ease-in-out;
-	transition: opacity 0.3s ease-in-out;
+	-webkit-transition: var(--overlay-transition);
+	-moz-transition: var(--overlay-transition);
+	-ms-transition: var(--overlay-transition);
+	-o-transition: var(--overlay-transition);
+	transition: var(--overlay-transition);
 }
 
 .painter-utils {

@@ -31,6 +31,7 @@ function revealWordOnOverlayAndChat(socketMessage) {
 	const message = `The word was '${socketMessage.content}'`;
 	displayOverlay(getOverlayHtmlForTextOnly(message));
 	appendChatMsgToDOM(message, '#ffa500');
+	document.querySelector('.word span').textContent = socketMessage.content;
 }
 
 // 33
