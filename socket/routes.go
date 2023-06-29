@@ -61,8 +61,18 @@ func HandlerWsConnection(c echo.Context) error {
 
 // GET /
 func Welcome(c echo.Context) error {
+	aboutText := []string{"scribble is a free online multiplayer drawing and guessing pictionary game.", "A normal game consists of a few rounds, where every round a player has to draw their chosen word and others have to guess it to gain points!", "The person with the most points at the end of the game, will then be crowned as the winner!"}
+
+	howToSlides := []string{"When it's your turn, choose a word you want to draw!",
+		"Try to draw your choosen word! No spelling!",
+		"Let other players try to guess your drawn word!",
+		"When it's not your turn, try to guess what other players are drawing!",
+		"Score the most points and be crowned the winner at the end!"}
+
 	return c.Render(http.StatusOK, "welcome", map[string]any{
 		"StyleSheets": []string{"global"},
+		"AboutText":   aboutText,
+		"HowToSlides": howToSlides,
 		"debug":       debug,
 	})
 }
