@@ -12,33 +12,45 @@
 
 			<div class="container start">
 				<div>
-					<div class="avatar-customisable">
-						<div class="avc-lb-container">
-							<div class="avc-btn color-left"></div>
-							<div class="avc-btn eyes-left"></div>
-							<div class="avc-btn mouth-left"></div>
-						</div>
+					<input
+						type="text"
+						name="clientName"
+						class="clientName"
+						id="clientName"
+						maxlength="15"
+						placeholder="Enter your name"
+						required
+					/>
+				</div>
 
-						<div class="avatar">
-							<div class="color"></div>
-							<div class="eyes"></div>
-							<div class="mouth"></div>
-							<div class="special"></div>
-							<div class="owner"></div>
-						</div>
-
-						<div class="avc-rb-container">
-							<div class="avc-btn color-right"></div>
-							<div class="avc-btn eyes-right"></div>
-							<div class="avc-btn mouth-right"></div>
-						</div>
+				<div class="avatar-customisable">
+					<div class="avc-lb-container">
+						<div class="avc-btn eyes-left"></div>
+						<div class="avc-btn mouth-left"></div>
+						<div class="avc-btn color-left"></div>
 					</div>
 
-					<div>
-						<a href="/create-room"
-							><button class="btn play">Create private room</button></a
-						>
+					<div class="avatar">
+						<div class="color"></div>
+						<div class="eyes"></div>
+						<div class="mouth"></div>
+						<div class="special"></div>
+						<div class="owner"></div>
 					</div>
+
+					<div class="avc-rb-container">
+						<div class="avc-btn eyes-right"></div>
+						<div class="avc-btn mouth-right"></div>
+						<div class="avc-btn color-right"></div>
+					</div>
+
+					<div class="randomize"></div>
+				</div>
+
+				<div>
+					<a href="/create-room"
+						><button class="btn play">Create private room</button></a
+					>
 				</div>
 			</div>
 

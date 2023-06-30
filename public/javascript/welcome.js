@@ -20,6 +20,14 @@ const boundaries = {
 	mouth: { x: 0, y: 5 },
 };
 
+const validCoords = {
+	color: initValidCoords(boundaries.color),
+	eyes: initValidCoords(boundaries.eyes),
+	mouth: initValidCoords(boundaries.mouth),
+};
+
+randomizeAvatar();
+
 const colorLeft = document.querySelector('.avc-btn.color-left');
 const colorRight = document.querySelector('.avc-btn.color-right');
 colorLeft.name = 'color';
@@ -35,6 +43,8 @@ const mouthRight = document.querySelector('.avc-btn.mouth-right');
 mouthLeft.name = 'mouth';
 mouthRight.name = 'mouth';
 
+document.querySelector('.randomize').addEventListener('click', randomizeAvatar);
+
 [colorLeft, eyesLeft, mouthLeft].forEach(ele =>
 	ele.addEventListener('click', leftEL)
 );
@@ -43,11 +53,7 @@ mouthRight.name = 'mouth';
 	ele.addEventListener('click', rightEL)
 );
 
-setPosition(color, 0, 0);
-setPosition(eyes, 0, 0);
-setPosition(mouth, 0, 0);
-
-function setPosition(element, x, y) {
+function setBgPosition(element, x, y) {
 	element.style.backgroundPositionX = `-${x * offset}px`;
 	element.style.backgroundPositionY = `-${y * offset}px`;
 }
@@ -79,7 +85,7 @@ function rightEL(e) {
 		positions[name].y = 0;
 	}
 
-	setPosition(elem, positions[name].x, positions[name].y);
+	setBgPosition(elem, positions[name].x, positions[name].y);
 }
 
 function leftEL(e) {
@@ -101,7 +107,54 @@ function leftEL(e) {
 		positions[name].y = boundaries[name].y;
 	}
 
-	setPosition(elem, positions[name].x, positions[name].y);
+	setBgPosition(elem, positions[name].x, positions[name].y);
+}
+
+function randomizeAvatar() {
+	const coords = getRandomizedAvatarCoords();
+
+	positions.color = coords.color;
+	positions.eyes = coords.eyes;
+	positions.mouth = coords.mouth;
+
+	setBgPosition(color, coords.color.x, coords.color.y);
+	setBgPosition(eyes, coords.eyes.x, coords.eyes.y);
+	setBgPosition(mouth, coords.mouth.x, coords.mouth.y);
+}
+
+function getRandomValue(arr) {
+	return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getRandomizedAvatarCoords() {
+	return {
+		color: getRandomValue(validCoords.color),
+		eyes: getRandomValue(validCoords.eyes),
+		mouth: getRandomValue(validCoords.mouth),
+	};
+}
+
+function initValidCoords(prop) {
+	const rows = 10;
+	const columns = 10;
+	let flag = false;
+
+	const coords = [];
+
+	for (let row = 0; row < rows; row++) {
+		for (let col = 0; col < columns; col++) {
+			coords.push({ x: col, y: row });
+
+			if (col === prop.x && row === prop.y) {
+				flag = true;
+				break;
+			}
+		}
+
+		if (flag) break;
+	}
+
+	return coords;
 }
 
 // how to play slideshow
