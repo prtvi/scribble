@@ -1,6 +1,7 @@
 .vscode/
 gin-bin
 assets/
+test/
 .DS_Store
 .env
 *.txt

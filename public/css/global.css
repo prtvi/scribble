@@ -32,6 +32,9 @@
 
 	--black: #1d1d1f;
 	--white: #f5f5f7;
+
+	--avatar-size: 48px;
+	--avc-btn-size: 17px;
 }
 
 * {
@@ -122,6 +125,105 @@ input {
 	height: 200px;
 	margin-bottom: 100px;
 }
+
+/* avc - avatar customise */
+
+.avatar-customisable {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 30px;
+}
+
+.avatar {
+	width: var(--avatar-size);
+	height: var(--avatar-size);
+	position: relative;
+}
+
+.color,
+.eyes,
+.mouth {
+	width: var(--avatar-size);
+	height: var(--avatar-size);
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-position: 0 0;
+}
+
+.color {
+	background-image: url('../assets/images/avatar/color_atlas.gif');
+}
+.eyes {
+	background-image: url('../assets/images/avatar/eyes_atlas.gif');
+}
+.mouth {
+	background-image: url('../assets/images/avatar/mouth_atlas.gif');
+}
+
+.color::before,
+.eyes::before,
+.mouth::before {
+	content: '';
+	width: var(--avatar-size);
+	height: var(--avatar-size);
+	position: absolute;
+	z-index: -1;
+}
+
+/* btns */
+
+.avc-lb-container,
+.avc-rb-container {
+	height: calc(var(--avc-btn-size) * 3);
+	width: var(--avc-btn-size);
+	position: relative;
+}
+
+.avc-btn {
+	background: none;
+	width: var(--avc-btn-size);
+	height: var(--avc-btn-size);
+	border: none;
+	background-image: url('../assets/images/arrow.gif');
+	cursor: pointer;
+}
+
+.avc-btn::before {
+	content: '';
+	position: absolute;
+	width: var(--avc-btn-size);
+	height: var(--avc-btn-size);
+	z-index: -1;
+}
+
+/* position the image in left & right buttons */
+.avc-lb-container .avc-btn {
+	background-position: 0 0;
+}
+.avc-rb-container .avc-btn {
+	background-position: 0 calc(var(--avc-btn-size) * -1);
+}
+
+/* change image position on hover */
+.avc-lb-container .avc-btn:hover {
+	background-position: calc(var(--avc-btn-size) * -1) 0;
+}
+.avc-rb-container .avc-btn:hover {
+	background-position: calc(var(--avc-btn-size) * -1)
+		calc(var(--avc-btn-size) * -1);
+}
+
+/* translate btn to left/right */
+.avc-rb-container .avc-btn:active {
+	transform: translateX(1px);
+}
+.avc-lb-container .avc-btn:active {
+	transform: translateX(-1px);
+}
+
+/* avatar customise */
 
 .btn.play {
 	opacity: 1;

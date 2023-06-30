@@ -12,6 +12,28 @@
 
 			<div class="container start">
 				<div>
+					<div class="avatar-customisable">
+						<div class="avc-lb-container">
+							<div class="avc-btn color-left"></div>
+							<div class="avc-btn eyes-left"></div>
+							<div class="avc-btn mouth-left"></div>
+						</div>
+
+						<div class="avatar">
+							<div class="color"></div>
+							<div class="eyes"></div>
+							<div class="mouth"></div>
+							<div class="special"></div>
+							<div class="owner"></div>
+						</div>
+
+						<div class="avc-rb-container">
+							<div class="avc-btn color-right"></div>
+							<div class="avc-btn eyes-right"></div>
+							<div class="avc-btn mouth-right"></div>
+						</div>
+					</div>
+
 					<div>
 						<a href="/create-room"
 							><button class="btn play">Create private room</button></a
@@ -60,45 +82,10 @@
 					<span class="dot" id="dot_{{$id}}"></span>
 					{{ end }}
 				</div>
-
-				<script>
-					let slideIndex = 0;
-
-					const slides = document.getElementsByClassName('slides');
-					const dots = document.getElementsByClassName('dot');
-
-					showSlides();
-
-					for (let i = 0; i < dots.length; i++) {
-						dots[i].addEventListener('click', e => {
-							const id = e.currentTarget.id;
-							slideIndex = +id.slice(id.length - 1);
-
-							showCurrSlide(slideIndex);
-						});
-					}
-
-					function showCurrSlide(idx) {
-						for (let i = 0; i < slides.length; i++) {
-							slides[i].style.display = 'none';
-							dots[i].classList.remove('active');
-						}
-
-						slides[idx].style.display = 'block';
-						dots[idx].classList.add('active');
-					}
-
-					function showSlides() {
-						showCurrSlide(slideIndex);
-
-						slideIndex += 1;
-						if (slideIndex >= slides.length) slideIndex = 0;
-
-						setTimeout(showSlides, 2500);
-					}
-				</script>
 			</div>
 		</main>
+
+		<script src="public/javascript/welcome.js"></script>
 	</body>
 </html>
 
