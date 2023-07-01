@@ -81,30 +81,12 @@ func Welcome(c echo.Context) error {
 
 // GET /create-room
 func CreateRoom(c echo.Context) error {
-	type formOptions struct {
-		Key, Value string
-		Selected   bool
-	}
-
 	// render a form to create a new pool
 	return c.Render(http.StatusOK, "createRoom", map[string]any{
 		"StyleSheets": []string{"global", "createRoom"},
-
-		"Players": []formOptions{{Key: "2"}, {Key: "3"}, {Key: "4"}, {Key: "5", Selected: true}, {Key: "6"}, {Key: "7"}, {Key: "8"}, {Key: "9"}, {Key: "10"}},
-
-		"DrawTime": []formOptions{{Key: "15"}, {Key: "20"}, {Key: "40"}, {Key: "50"}, {Key: "60"}, {Key: "70"}, {Key: "80", Selected: true}, {Key: "90"}, {Key: "100"}, {Key: "120"}, {Key: "150"}, {Key: "180"}, {Key: "210"}, {Key: "240"}},
-
-		"Rounds": []formOptions{{Key: "2"}, {Key: "3", Selected: true}, {Key: "4"}, {Key: "5"}, {Key: "6"}, {Key: "7"}, {Key: "8"}, {Key: "9"}, {Key: "10"}},
-
-		"WordMode": []formOptions{{Key: "normal", Value: "Normal"}, {Key: "hidden", Value: "Hidden"}, {Key: "combination", Value: "Combination"}},
-
-		"WordCount": []formOptions{{Key: "1"}, {Key: "2"}, {Key: "3", Selected: true}, {Key: "4"}, {Key: "5"}},
-
-		"Hints": []formOptions{{Key: "1"}, {Key: "2", Selected: true}, {Key: "3"}, {Key: "4"}, {Key: "5"}},
-
+		"FormParams":  FormParams,
 		"RoomCreated": false,
-
-		"debug": debug,
+		"debug":       debug,
 	})
 }
 

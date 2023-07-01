@@ -44,3 +44,14 @@ type SharedConfig struct {
 	TimeForChoosingWordInSeconds int            `json:"timeForChoosingWordInSeconds"`
 	PrintLogs                    bool           `json:"printLogs"`
 }
+
+type FormOption struct {
+	Value, Label string
+	Selected     bool
+}
+
+type CreateFormParam struct {
+	ID, Label string
+	ImgIdx    int
+	Options   []FormOption
+}

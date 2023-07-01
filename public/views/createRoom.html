@@ -9,99 +9,26 @@
 			<div class="form-container">
 				<form action="/create-room" method="post">
 					<div class="form-content">
+						{{ range .FormParams }}
 						<div>
 							<div class="form-image-and-label">
-								<img src="public/assets/images/setting_1.gif" alt="" />
-								<label class="form-label" for="players">Players</label>
+								<img
+									src="public/assets/images/setting_{{.ImgIdx}}.gif"
+									alt=""
+								/>
+								<label for="{{.ID}}">{{.Label}}</label>
 							</div>
-							<div class="form-select">
-								<select id="players" name="players">
-									{{ range .Players }} {{ if .Selected }}
-									<option value="{{.Key}}" selected>{{.Key}}</option>
+							<div class="form-select-container">
+								<select id="{{.ID}}" name="{{.ID}}">
+									{{ range .Options }} {{ if .Selected }}
+									<option value="{{.Value}}" selected>{{.Label}}</option>
 									{{ else }}
-									<option value="{{.Key}}">{{.Key}}</option>
+									<option value="{{.Value}}">{{.Label}}</option>
 									{{ end }} {{ end }}
 								</select>
 							</div>
 						</div>
-
-						<div>
-							<div class="form-image-and-label">
-								<img src="public/assets/images/setting_2.gif" alt="" />
-								<label class="form-label" for="drawTime">Draw time</label>
-							</div>
-							<div class="form-select">
-								<select id="drawTime" name="drawTime">
-									{{ range .DrawTime }} {{ if .Selected }}
-									<option value="{{.Key}}" selected>{{.Key}}</option>
-									{{ else }}
-									<option value="{{.Key}}">{{.Key}}</option>
-									{{ end }} {{ end }}
-								</select>
-							</div>
-						</div>
-
-						<div>
-							<div class="form-image-and-label">
-								<img src="public/assets/images/setting_3.gif" alt="" />
-								<label class="form-label" for="rounds">Rounds</label>
-							</div>
-							<div class="form-select">
-								<select id="rounds" name="rounds">
-									{{ range .Rounds }} {{ if .Selected }}
-									<option value="{{.Key}}" selected>{{.Key}}</option>
-									{{ else }}
-									<option value="{{.Key}}">{{.Key}}</option>
-									{{ end }} {{ end }}
-								</select>
-							</div>
-						</div>
-
-						<div>
-							<div class="form-image-and-label">
-								<img src="public/assets/images/setting_4.gif" alt="" />
-								<label class="form-label" for="wordMode">Word Mode</label>
-							</div>
-							<div class="form-select">
-								<select id="wordMode" name="wordMode">
-									{{ range .WordMode }}
-									<option value="{{.Key}}">{{.Value}}</option>
-									{{ end }}
-								</select>
-							</div>
-						</div>
-
-						<div>
-							<div class="form-image-and-label">
-								<img src="public/assets/images/setting_5.gif" alt="" />
-								<label class="form-label" for="wordCount">Word Count</label>
-							</div>
-							<div class="form-select">
-								<select id="wordCount" name="wordCount">
-									{{ range .WordCount }} {{ if .Selected }}
-									<option value="{{.Key}}" selected>{{.Key}}</option>
-									{{ else }}
-									<option value="{{.Key}}">{{.Key}}</option>
-									{{ end }} {{ end }}
-								</select>
-							</div>
-						</div>
-
-						<div>
-							<div class="form-image-and-label">
-								<img src="public/assets/images/setting_6.gif" alt="" />
-								<label class="form-label" for="hints">Hints</label>
-							</div>
-							<div class="form-select">
-								<select id="hints" name="hints">
-									{{ range .Hints }} {{ if .Selected }}
-									<option value="{{.Key}}" selected>{{.Key}}</option>
-									{{ else }}
-									<option value="{{.Key}}">{{.Key}}</option>
-									{{ end }} {{ end }}
-								</select>
-							</div>
-						</div>
+						{{ end }}
 					</div>
 
 					<div class="form-btn-container">

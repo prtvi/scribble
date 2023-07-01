@@ -19,7 +19,6 @@
 	grid-template-columns: var(--col-width) var(--col-width) var(--col-width);
 	grid-template-rows: auto;
 }
-
 .form-content > div {
 	width: var(--col-width);
 	margin-bottom: 5px;
@@ -31,10 +30,28 @@
 	align-items: center;
 	margin: 5px;
 }
-
 .form-image-and-label img {
 	width: 25px;
 	margin-right: 5px;
+}
+.form-image-and-label label {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-12);
+}
+
+.form-select-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.form-select-container select {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-12);
+	height: 25px;
+	width: calc(var(--col-width) - 10px);
+	text-align: left;
 }
 
 .form-btn-container {
@@ -44,26 +61,7 @@
 	margin: 10px;
 }
 
-.form-select {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.form-label {
-	font-family: l300, var(--ff);
-	font-weight: var(--fw-300);
-	font-size: var(--fs-12);
-}
-
-.form-content select {
-	font-family: l300, var(--ff);
-	font-weight: var(--fw-300);
-	font-size: var(--fs-12);
-	height: 25px;
-	width: calc(var(--col-width) - 10px);
-	text-align: left;
-}
+/*  */
 
 .room-created-container {
 	margin-top: 15px;
