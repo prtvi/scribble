@@ -76,7 +76,7 @@ func (pool *Pool) beginGameFlow() {
 	sleep(InterGameWaitDuration)
 
 	// loop over the number of rounds
-	for i := 0; i < NumberOfRounds; i++ {
+	for i := 0; i < pool.Rounds; i++ {
 		pool.CurrRound = i + 1
 
 		// broadcast round number and wait

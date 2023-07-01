@@ -49,7 +49,7 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 func (pool *Pool) broadcastConfigs() {
 	cfg := model.SharedConfig{
 		MessageTypeMap:               messageTypeMap,
-		TimeForEachWordInSeconds:     utils.DurationToSeconds(TimeForEachWordInSeconds),
+		TimeForEachWordInSeconds:     utils.DurationToSeconds(pool.DrawTime),
 		TimeForChoosingWordInSeconds: utils.DurationToSeconds(TimeoutForChoosingWord),
 		PrintLogs:                    debug,
 	}
@@ -105,7 +105,7 @@ func (pool *Pool) broadcastClearCanvasEvent() {
 }
 
 // 33, 35
-func (pool *Pool) broadcast3WordsList(words []string) {
+func (pool *Pool) broadcastWordList(words []string) {
 	byteInfo, _ := json.Marshal(words)
 	m1 := model.SocketMessage{
 		Type:             33,

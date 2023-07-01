@@ -149,8 +149,8 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	pool.CurrSketcher = client
 
 	// create a list of words for client to choose
-	words := utils.Get3RandomWords(utils.WORDS)
-	pool.broadcast3WordsList(words)
+	words := utils.GetNrandomWords(utils.WORDS, pool.WordCount)
+	pool.broadcastWordList(words)
 
 	// start a timeout for assigning word if not chosen by client
 	go pool.wordChooseCountdown(words)
@@ -160,7 +160,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	}
 
 	// add the word expiry
-	pool.CurrWordExpiresAt = time.Now().Add(TimeForEachWordInSeconds)
+	pool.CurrWordExpiresAt = time.Now().Add(pool.DrawTime)
 }
 
 // begin clientInfo broadcast

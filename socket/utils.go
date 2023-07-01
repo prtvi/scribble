@@ -59,31 +59,31 @@ func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
 	}
 }
 
-func newPool(uuid string, capacity int) *Pool {
-	// returns a new Pool
+func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) (*Pool, string) {
+	uuid := utils.GenerateUUID()[0:8]
 	now := time.Now()
 	later := now.Add(GameStartDurationInSeconds)
 
 	return &Pool{
-		ID:                            uuid,
-		JoiningLink:                   "",
-		Capacity:                      capacity,
-		CurrRound:                     0,
-		Register:                      make(chan *Client),
-		Unregister:                    make(chan *Client),
-		Clients:                       make([]*Client, 0),
-		Broadcast:                     make(chan model.SocketMessage),
-		ColorList:                     utils.ShuffleList(utils.COLORS[:10]),
-		CreatedTime:                   now,
-		GameStartTime:                 later,
-		GameStartedAt:                 time.Time{},
-		CurrWordExpiresAt:             time.Time{},
-		HasGameStarted:                false,
-		HasGameEnded:                  false,
-		HasClientInfoBroadcastStarted: false,
-		CurrSketcher:                  nil,
-		CurrWord:                      "",
-	}
+		ID:        uuid,
+		Capacity:  players,
+		DrawTime:  time.Duration(time.Second * time.Duration(drawTime)),
+		Rounds:    rounds,
+		WordCount: wordCount,
+
+		// not implemented yet
+		WordMode: wordMode,
+		Hints:    hints,
+
+		Register:       make(chan *Client),
+		Unregister:     make(chan *Client),
+		Clients:        make([]*Client, 0),
+		Broadcast:      make(chan model.SocketMessage),
+		ColorList:      utils.ShuffleList(utils.COLORS[:10]),
+		CreatedTime:    now,
+		GameStartTime:  later,
+		HasGameStarted: false,
+	}, uuid
 }
 
 func Maintainer() {
@@ -135,15 +135,14 @@ func DebugMode() {
 	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 
 	GameStartDurationInSeconds = time.Second * 200
-	TimeForEachWordInSeconds = time.Second * 15
 	RenderClientsEvery = time.Second * 30
 	TimeoutForChoosingWord = time.Second * 10
 
-	poolId := "debug"
-	pool := newPool(poolId, 4)
-	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+poolId)
+	pool, _ := newPool(4, 15, 3, 4, 2, "normal")
+	pool.ID = "debug"
+	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+pool.ID)
 
-	hub[poolId] = pool
+	hub[pool.ID] = pool
 
 	go pool.start()
 }

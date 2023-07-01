@@ -94,13 +94,15 @@ func CreateRoom(c echo.Context) error {
 func CreateRoomLink(c echo.Context) error {
 	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
 
-	// get the pool capacity from form input
-	capacity, _ := strconv.Atoi(c.FormValue("players"))
-	utils.Cp("yellow", "Pool capacity:", utils.Cs("white", c.FormValue("players")))
+	players, _ := strconv.Atoi(c.FormValue("players")) // capacity
+	drawTime, _ := strconv.Atoi(c.FormValue("drawTime"))
+	rounds, _ := strconv.Atoi(c.FormValue("rounds"))
+	wordCount, _ := strconv.Atoi(c.FormValue("wordCount"))
+	hints, _ := strconv.Atoi(c.FormValue("hints"))
+	wordMode := c.FormValue("wordMode")
 
 	// create a new pool with an uuid
-	poolId := utils.GenerateUUID()
-	pool := newPool(poolId, capacity)
+	pool, poolId := newPool(players, drawTime, rounds, wordCount, hints, wordMode)
 
 	// append to global Hub map, and start listening to pool connections
 	hub[poolId] = pool
@@ -113,6 +115,7 @@ func CreateRoomLink(c echo.Context) error {
 	// send the link for the same
 	return c.Render(http.StatusOK, "createRoom", map[string]any{
 		"StyleSheets": []string{"global", "createRoom"},
+		"FormParams":  FormParams,
 		"RoomCreated": true,
 		"Link":        link,
 		"Capacity":    pool.Capacity, // show on submit, room size in input field

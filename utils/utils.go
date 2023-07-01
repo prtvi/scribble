@@ -39,10 +39,10 @@ func GetRandomWord(arr []string) string {
 	return arr[n]
 }
 
-func Get3RandomWords(arr []string) []string {
-	ret := make([]string, 3)
+func GetNrandomWords(arr []string, n int) []string {
+	ret := make([]string, n)
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < n; i++ {
 		ret[i] = GetRandomWord(arr)
 	}
 
