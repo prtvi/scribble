@@ -6,92 +6,159 @@
 
 	<body>
 		<main class="main">
-			<div class="content">
-				<div>
-					<div class="title"><h1>Scribble</h1></div>
-
-					<div class="subtext">
-						<p>Create your own private room</p>
-					</div>
-
-					<div class="form-container">
-						<form action="/create-room" method="post">
-							<div class="form-content">
-								<div>
-									<label class="form-label" for="capacity">Room size:</label>
-									<input
-										type="number"
-										name="capacity"
-										class="capacity"
-										id="capacity"
-										min="2"
-										max="10"
-										placeholder="4"
-										required
-									/>
-								</div>
-								<div>
-									<button class="btn create-room-btn" type="submit">
-										Create
-									</button>
-								</div>
-							</div>
-						</form>
-					</div>
-
-					{{ if .RoomCreated }}
-
-					<div class="room-created-container">
+			<div class="form-container">
+				<form action="/create-room" method="post">
+					<div class="form-content">
 						<div>
-							<a href="{{ .Link }}" class="link"
-								><button class="btn">Click here to join!</button></a
-							>
+							<div class="form-image-and-label">
+								<img src="public/assets/images/setting_1.gif" alt="" />
+								<label class="form-label" for="players">Players</label>
+							</div>
+							<div class="form-select">
+								<select id="players" name="players">
+									{{ range .Players }} {{ if .Selected }}
+									<option value="{{.Key}}" selected>{{.Key}}</option>
+									{{ else }}
+									<option value="{{.Key}}">{{.Key}}</option>
+									{{ end }} {{ end }}
+								</select>
+							</div>
 						</div>
 
-						<div title="Copy joining link">
-							<button class="btn btni copy-link-btn">
-								<div>
-									<div>
-										<span>Copy link</span>
-									</div>
+						<div>
+							<div class="form-image-and-label">
+								<img src="public/assets/images/setting_2.gif" alt="" />
+								<label class="form-label" for="drawTime">Draw time</label>
+							</div>
+							<div class="form-select">
+								<select id="drawTime" name="drawTime">
+									{{ range .DrawTime }} {{ if .Selected }}
+									<option value="{{.Key}}" selected>{{.Key}}</option>
+									{{ else }}
+									<option value="{{.Key}}">{{.Key}}</option>
+									{{ end }} {{ end }}
+								</select>
+							</div>
+						</div>
 
-									<div class="img-container">
-										<img
-											src="public/assets/images/copy.png"
-											alt="copy icon"
-											class="copy-link-img"
-										/>
-									</div>
-								</div>
-							</button>
+						<div>
+							<div class="form-image-and-label">
+								<img src="public/assets/images/setting_3.gif" alt="" />
+								<label class="form-label" for="rounds">Rounds</label>
+							</div>
+							<div class="form-select">
+								<select id="rounds" name="rounds">
+									{{ range .Rounds }} {{ if .Selected }}
+									<option value="{{.Key}}" selected>{{.Key}}</option>
+									{{ else }}
+									<option value="{{.Key}}">{{.Key}}</option>
+									{{ end }} {{ end }}
+								</select>
+							</div>
+						</div>
+
+						<div>
+							<div class="form-image-and-label">
+								<img src="public/assets/images/setting_4.gif" alt="" />
+								<label class="form-label" for="wordMode">Word Mode</label>
+							</div>
+							<div class="form-select">
+								<select id="wordMode" name="wordMode">
+									{{ range .WordMode }}
+									<option value="{{.Key}}">{{.Value}}</option>
+									{{ end }}
+								</select>
+							</div>
+						</div>
+
+						<div>
+							<div class="form-image-and-label">
+								<img src="public/assets/images/setting_5.gif" alt="" />
+								<label class="form-label" for="wordCount">Word Count</label>
+							</div>
+							<div class="form-select">
+								<select id="wordCount" name="wordCount">
+									{{ range .WordCount }} {{ if .Selected }}
+									<option value="{{.Key}}" selected>{{.Key}}</option>
+									{{ else }}
+									<option value="{{.Key}}">{{.Key}}</option>
+									{{ end }} {{ end }}
+								</select>
+							</div>
+						</div>
+
+						<div>
+							<div class="form-image-and-label">
+								<img src="public/assets/images/setting_6.gif" alt="" />
+								<label class="form-label" for="hints">Hints</label>
+							</div>
+							<div class="form-select">
+								<select id="hints" name="hints">
+									{{ range .Hints }} {{ if .Selected }}
+									<option value="{{.Key}}" selected>{{.Key}}</option>
+									{{ else }}
+									<option value="{{.Key}}">{{.Key}}</option>
+									{{ end }} {{ end }}
+								</select>
+							</div>
 						</div>
 					</div>
 
-					<!-- run this code only when the room-created-container is rendered -->
-					<script>
-						// copy to clipboard
-						const aTag = document.querySelector('.link');
-						document
-							.querySelector('.copy-link-img')
-							.addEventListener('click', () =>
-								navigator.clipboard.writeText(aTag.href)
-							);
+					<div class="form-btn-container">
+						<button class="btn create-room-btn" type="submit">Create</button>
+					</div>
+				</form>
+			</div>
 
-						// disable create btn
-						document.querySelector('.create-room-btn').disabled = true;
+			{{ if .RoomCreated }}
 
-						// populate capacity in input field
-						document.getElementById('capacity').value = '{{ .Capacity }}';
-					</script>
+			<div class="container room-created-container">
+				<div>
+					<a href="{{ .Link }}" class="link"
+						><button class="btn">Click here to join!</button></a
+					>
+				</div>
 
-					{{ end }}
+				<div title="Copy joining link">
+					<button class="btn btni copy-link-btn">
+						<div>
+							<div>
+								<span>Copy link</span>
+							</div>
+
+							<div class="img-container">
+								<img
+									src="public/assets/images/copy.png"
+									alt="copy icon"
+									class="copy-link-img"
+								/>
+							</div>
+						</div>
+					</button>
 				</div>
 			</div>
+
+			<script>
+				// copy to clipboard
+				const aTag = document.querySelector('.link');
+				document
+					.querySelector('.copy-link-img')
+					.addEventListener('click', () =>
+						navigator.clipboard.writeText(aTag.href)
+					);
+
+				// disable create btn
+				document.querySelector('.create-room-btn').disabled = true;
+
+				// populate capacity in input field
+				document.getElementById('players').value = '{{ .Capacity }}';
+			</script>
+
+			{{ end }}
 		</main>
 
 		{{ if .debug }}
 		<script>
-			document.querySelector('#capacity').value = 4;
 			document.querySelector('.link') &&
 				(document.querySelector('.link').href =
 					'http://localhost:1323/app?join=debug');

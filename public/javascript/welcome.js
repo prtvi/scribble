@@ -86,6 +86,7 @@ function rightEL(e) {
 	}
 
 	setBgPosition(elem, positions[name].x, positions[name].y);
+	// saveToLocalStorage('avatar_config', positions);
 }
 
 function leftEL(e) {
@@ -108,6 +109,7 @@ function leftEL(e) {
 	}
 
 	setBgPosition(elem, positions[name].x, positions[name].y);
+	// saveToLocalStorage('avatar_config', positions);
 }
 
 function randomizeAvatar() {
@@ -120,6 +122,8 @@ function randomizeAvatar() {
 	setBgPosition(color, coords.color.x, coords.color.y);
 	setBgPosition(eyes, coords.eyes.x, coords.eyes.y);
 	setBgPosition(mouth, coords.mouth.x, coords.mouth.y);
+
+	// saveToLocalStorage('avatar_config', positions);
 }
 
 function getRandomValue(arr) {
@@ -155,6 +159,10 @@ function initValidCoords(prop) {
 	}
 
 	return coords;
+}
+
+function saveToLocalStorage(key, value) {
+	window.localStorage.setItem(key, JSON.stringify(value));
 }
 
 // how to play slideshow

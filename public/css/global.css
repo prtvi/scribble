@@ -46,7 +46,7 @@
 
 body {
 	background-image: url('../assets/images/background.png');
-	background-repeat: repeat-y;
+	background-repeat: repeat;
 	background-color: #133695;
 }
 
@@ -69,22 +69,21 @@ input {
 	width: fit-content;
 	height: fit-content;
 	padding: 8px 10px 8px 10px;
-	background-color: rgb(49, 49, 49);
-	border: 1px solid rgb(100, 100, 100);
+	background-color: #53e236;
+	border: none;
 	border-radius: 6px;
 	cursor: pointer;
-	text-transform: uppercase;
 }
-
+.btn:hover {
+	background-color: #3aa262;
+}
 .btn:active {
 	transform: translateY(1px);
 }
-
 .btn:disabled {
 	background-color: gray;
 	transform: none;
 }
-
 .btni {
 	color: var(--black);
 	background-color: #e8e8e8;
@@ -286,15 +285,6 @@ input {
 
 /* avatar customise */
 
-.btn.play {
-	opacity: 1;
-	background-color: #53e236;
-}
-
-.btn.play:hover {
-	background-color: #3aa262;
-}
-
 .title {
 	font-family: b700, var(--ff);
 	font-weight: var(--fw-700);
@@ -384,24 +374,6 @@ input {
 	to {
 		opacity: 1;
 	}
-}
-
-/*  */
-
-.content {
-	display: flex;
-	justify-content: center;
-	vertical-align: middle;
-	align-items: center;
-	text-align: center;
-	padding: 30px 0;
-	height: 200px;
-	background-color: #133695;
-	color: var(--white);
-}
-
-.content > div {
-	width: 85%;
 }
 
 @media screen and (min-width: 580px) {

@@ -1,50 +1,68 @@
-.content {
-	height: fit-content;
+:root {
+	--width: 360px;
+	--col-width: calc(var(--width) / 3);
 }
 
-.subtext {
-	margin-bottom: 15px;
+.main {
+	display: flex;
+	justify-content: center;
 }
 
 .form-container {
+	background-color: #133695;
+	color: var(--white);
+}
+
+.form-content {
+	width: var(--width);
+	display: grid;
+	grid-template-columns: var(--col-width) var(--col-width) var(--col-width);
+	grid-template-rows: auto;
+}
+
+.form-content > div {
+	width: var(--col-width);
+	margin-bottom: 5px;
+}
+
+.form-image-and-label {
+	display: flex;
+	justify-content: left;
+	align-items: center;
+	margin: 5px;
+}
+
+.form-image-and-label img {
+	width: 25px;
+	margin-right: 5px;
+}
+
+.form-btn-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10px;
+}
+
+.form-select {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-.form-content {
-	width: 220px;
-	height: 50px;
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-	vertical-align: middle;
-}
-
-.form-content > div {
-	height: 40px;
-	display: flex;
-	align-items: center;
-	vertical-align: middle;
-}
-
 .form-label {
-	font-family: r400, var(--ff);
-	font-weight: var(--fw-400);
-	font-size: var(--fs-14);
-	margin-right: 10px;
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-12);
 }
 
-.form-content input {
-	font-family: r400, var(--ff);
-	font-weight: var(--fw-400);
-	font-size: var(--fs-13);
+.form-content select {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-12);
 	height: 25px;
-}
-
-.form-content input.capacity {
-	width: 30px;
-	height: 22px;
+	width: calc(var(--col-width) - 10px);
+	text-align: left;
 }
 
 .room-created-container {
