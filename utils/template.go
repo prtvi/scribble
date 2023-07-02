@@ -31,11 +31,6 @@ func InitTemplates() *Template {
 		"public/views/partials/header.html",
 	))
 
-	tmpls["createRoom"] = template.Must(template.ParseFiles(
-		"public/views/createRoom.html",
-		"public/views/partials/header.html",
-	))
-
 	tmpls["welcome"] = template.Must(template.ParseFiles(
 		"public/views/welcome.html",
 		"public/views/partials/header.html",

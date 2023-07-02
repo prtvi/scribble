@@ -10,6 +10,121 @@
 				<img src="public/assets/images/logo.gif" alt="scribble logo" />
 			</div>
 
+			{{ if .RenderCreateRoomForm }}
+
+			<div class="form-container">
+				<form action="/create-room" method="post">
+					<div class="form-content-grid">
+						{{ range .FormParams }}
+						<div>
+							<div class="form-image-and-label" title="{{.Desc}}">
+								<img
+									src="public/assets/images/setting_{{.ImgIdx}}.gif"
+									alt=""
+								/>
+								<label for="{{.ID}}">{{.Label}}</label>
+							</div>
+							<div class="form-select-container">
+								<select id="{{.ID}}" name="{{.ID}}">
+									{{ range .Options }} {{ if .Selected }}
+									<option value="{{.Value}}" selected>{{.Label}}</option>
+									{{ else }}
+									<option value="{{.Value}}">{{.Label}}</option>
+									{{ end }} {{ end }}
+								</select>
+							</div>
+						</div>
+						{{ end }}
+					</div>
+
+					<div class="custom-words-container">
+						<div>
+							<label for="customWords">Custom words</label>
+
+							<div class="input-checkbox-container">
+								<label for="useCustomWordsOnly">Use custom words only</label>
+								<input
+									type="checkbox"
+									name="useCustomWordsOnly"
+									id="useCustomWordsOnly"
+								/>
+							</div>
+						</div>
+						<div>
+							<textarea
+								name="customWords"
+								id="customWords"
+								maxlength="20000"
+								spellcheck="false"
+								placeholder="Minimum of 10 words. 1-32 characters per word! 20000 characters maximum. Separated by a , (comma)"
+							></textarea>
+						</div>
+					</div>
+
+					<div class="form-btn-container">
+						<button class="btn create-room-btn" type="submit">
+							Create room
+						</button>
+					</div>
+				</form>
+
+				{{ if .RoomCreated }}
+
+				<div class="room-created-container">
+					<div>
+						<a href="{{ .Link }}" class="link"
+							><button class="btn join-room-btn">Click here to join!</button></a
+						>
+					</div>
+
+					<div title="Copy joining link">
+						<button class="btn btni copy-link-btn">
+							<div>
+								<div>
+									<span>Copy link</span>
+								</div>
+
+								<div class="img-container">
+									<img
+										src="public/assets/images/setting_0.gif"
+										alt="copy icon"
+										class="copy-link-img"
+									/>
+								</div>
+							</div>
+						</button>
+					</div>
+				</div>
+
+				<script>
+					// copy to clipboard
+					const aTag = document.querySelector('.link');
+					document
+						.querySelector('.copy-link-btn')
+						.addEventListener('click', () =>
+							navigator.clipboard.writeText(aTag.href)
+						);
+
+					// disable create btn
+					document.querySelector('.create-room-btn').disabled = true;
+
+					// populate input fields
+					document.getElementById('players').value = '{{ .Players }}';
+					document.getElementById('drawTime').value = '{{ .DrawTime }}';
+					document.getElementById('rounds').value = '{{ .Rounds }}';
+					document.getElementById('wordCount').value = '{{ .WordCount }}';
+					document.getElementById('hints').value = '{{ .Hints }}';
+					document.getElementById('wordMode').value = '{{ .WordMode }}';
+					document.getElementById('customWords').value = '{{ .CustomWords }}';
+					document.getElementById('useCustomWordsOnly').checked =
+						'{{ .UseCustomWordsOnly }}' === 'true';
+				</script>
+
+				{{ end }}
+			</div>
+
+			{{ else }}
+
 			<div class="container start">
 				<div>
 					<input
@@ -51,7 +166,11 @@
 						><button class="btn play">Create private room</button></a
 					>
 				</div>
+
+				<script src="public/javascript/welcome.js"></script>
 			</div>
+
+			{{ end }}
 
 			<div class="container about">
 				<div class="title">
@@ -93,10 +212,55 @@
 					<span class="dot" id="dot_{{$id}}"></span>
 					{{ end }}
 				</div>
+
+				<script>
+					// how to play slideshow
+
+					let slideIndex = 0;
+
+					const slides = document.getElementsByClassName('slides');
+					const dots = document.getElementsByClassName('dot');
+
+					showSlides();
+
+					for (let i = 0; i < dots.length; i++) {
+						dots[i].addEventListener('click', e => {
+							const id = e.currentTarget.id;
+							slideIndex = +id.slice(id.length - 1);
+
+							showCurrSlide(slideIndex);
+						});
+					}
+
+					function showCurrSlide(idx) {
+						for (let i = 0; i < slides.length; i++) {
+							slides[i].style.display = 'none';
+							dots[i].classList.remove('active');
+						}
+
+						slides[idx].style.display = 'block';
+						dots[idx].classList.add('active');
+					}
+
+					function showSlides() {
+						showCurrSlide(slideIndex);
+
+						slideIndex += 1;
+						if (slideIndex >= slides.length) slideIndex = 0;
+
+						setTimeout(showSlides, 2500);
+					}
+				</script>
 			</div>
 		</main>
 
-		<script src="public/javascript/welcome.js"></script>
+		{{ if .debug }}
+		<script>
+			document.querySelector('.link') &&
+				(document.querySelector('.link').href =
+					'http://localhost:1323/app?join=debug');
+		</script>
+		{{ end }}
 	</body>
 </html>
 

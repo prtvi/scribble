@@ -63,10 +63,11 @@ func HandlerWsConnection(c echo.Context) error {
 // GET /
 func Welcome(c echo.Context) error {
 	return c.Render(http.StatusOK, "welcome", map[string]any{
-		"StyleSheets": []string{"global"},
-		"AboutText":   AboutText,
-		"HowToSlides": HowToSlides,
-		"debug":       debug,
+		"StyleSheets":          []string{"global"},
+		"RenderCreateRoomForm": false,
+		"AboutText":            AboutText,
+		"HowToSlides":          HowToSlides,
+		"debug":                debug,
 	})
 }
 
@@ -75,11 +76,14 @@ func Welcome(c echo.Context) error {
 // GET /create-room
 func CreateRoom(c echo.Context) error {
 	// render a form to create a new pool
-	return c.Render(http.StatusOK, "createRoom", map[string]any{
-		"StyleSheets": []string{"global", "createRoom"},
-		"FormParams":  FormParams,
-		"RoomCreated": false,
-		"debug":       debug,
+	return c.Render(http.StatusOK, "welcome", map[string]any{
+		"StyleSheets":          []string{"global"},
+		"RenderCreateRoomForm": true,
+		"FormParams":           FormParams,
+		"RoomCreated":          false,
+		"AboutText":            AboutText,
+		"HowToSlides":          HowToSlides,
+		"debug":                debug,
 	})
 }
 
@@ -107,11 +111,12 @@ func CreateRoomLink(c echo.Context) error {
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
 
 	// send the link for the same
-	return c.Render(http.StatusOK, "createRoom", map[string]any{
-		"StyleSheets": []string{"global", "createRoom"},
-		"FormParams":  FormParams,
-		"RoomCreated": true,
-		"Link":        link,
+	return c.Render(http.StatusOK, "welcome", map[string]any{
+		"StyleSheets":          []string{"global"},
+		"RenderCreateRoomForm": true,
+		"FormParams":           FormParams,
+		"RoomCreated":          true,
+		"Link":                 link,
 
 		// show on submit value submitted on form
 		"Players":            pool.Capacity,
@@ -122,6 +127,9 @@ func CreateRoomLink(c echo.Context) error {
 		"WordMode":           pool.WordMode,
 		"CustomWords":        strings.Join(pool.CustomWords, ","),
 		"UseCustomWordsOnly": pool.UseCustomWordsOnly,
+
+		"AboutText":   AboutText,
+		"HowToSlides": HowToSlides,
 
 		"debug": debug,
 	})
