@@ -1,4 +1,4 @@
-{{ define "welcome" }}
+{{ define "index" }}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -169,6 +169,17 @@
 						<button class="btn play-btn" type="submit">Play!</button>
 					</div>
 				</form>
+			</div>
+
+			{{ else }}
+
+			<div class="container">
+				<div class="subtext">
+					<p>{{ .Message }}</p>
+				</div>
+				<div>
+					<a href="/"><button class="btn">Go home</button></a>
+				</div>
 			</div>
 
 			{{ end }}

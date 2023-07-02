@@ -62,7 +62,7 @@ func HandlerWsConnection(c echo.Context) error {
 
 // GET /
 func Welcome(c echo.Context) error {
-	return c.Render(http.StatusOK, "welcome", map[string]any{
+	return c.Render(http.StatusOK, "index", map[string]any{
 		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "home",
 	})
@@ -73,7 +73,7 @@ func Welcome(c echo.Context) error {
 // GET /create-room
 func CreateRoom(c echo.Context) error {
 	// render a form to create a new pool
-	return c.Render(http.StatusOK, "welcome", map[string]any{
+	return c.Render(http.StatusOK, "index", map[string]any{
 		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "createRoom",
 		"FormParams":         utils.FormParams,
@@ -105,7 +105,7 @@ func CreateRoomLink(c echo.Context) error {
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
 
 	// send the link for the same
-	return c.Render(http.StatusOK, "welcome", map[string]any{
+	return c.Render(http.StatusOK, "index", map[string]any{
 		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "createRoom",
 		"FormParams":         utils.FormParams,
@@ -135,11 +135,10 @@ func App(c echo.Context) error {
 
 	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" || len(poolId) == 0 {
-		return c.Render(http.StatusOK, "error", map[string]any{
-			"StyleSheets": []string{"global"},
-			"Message":     "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
-
-			"debug": debug,
+		return c.Render(http.StatusOK, "index", map[string]any{
+			"StyleSheets":        []string{"global"},
+			"RenderTemplateName": "error",
+			"Message":            "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
 		})
 	}
 
@@ -147,21 +146,19 @@ func App(c echo.Context) error {
 	pool, ok := hub[poolId]
 	if !ok {
 		// if not then do not render both forms and display message
-		return c.Render(http.StatusOK, "error", map[string]any{
-			"StyleSheets": []string{"global"},
-			"Message":     "Pool expired or non-existent! Make sure you have the correct link! 😃",
-
-			"debug": debug,
+		return c.Render(http.StatusOK, "index", map[string]any{
+			"StyleSheets":        []string{"global"},
+			"RenderTemplateName": "error",
+			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
 		})
 	}
 
 	// if game has already started then do not render both forms and display message
 	if pool.HasGameStarted {
-		return c.Render(http.StatusOK, "error", map[string]any{
-			"StyleSheets": []string{"global"},
-			"Message":     "Oops! The game has already started! 🥹",
-
-			"debug": debug,
+		return c.Render(http.StatusOK, "index", map[string]any{
+			"StyleSheets":        []string{"global"},
+			"RenderTemplateName": "error",
+			"Message":            "Oops! The game has already started! 🥹",
 		})
 	}
 
@@ -171,16 +168,15 @@ func App(c echo.Context) error {
 
 	if poolCurrSizePlus1 > poolCap {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
-		return c.Render(http.StatusOK, "error", map[string]any{
-			"StyleSheets": []string{"global"},
-			"Message":     "Your party is full! Maximum room capacity reached! 😃",
-
-			"debug": debug,
+		return c.Render(http.StatusOK, "index", map[string]any{
+			"StyleSheets":        []string{"global"},
+			"RenderTemplateName": "error",
+			"Message":            "Your party is full! Maximum room capacity reached! 😃",
 		})
 	}
 
 	// else if every check, checks out then render "RegisterToPool" form
-	return c.Render(http.StatusOK, "welcome", map[string]any{
+	return c.Render(http.StatusOK, "index", map[string]any{
 		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "join",
 
@@ -201,21 +197,19 @@ func RegisterToPool(c echo.Context) error {
 	// extra check to prevent user from joining any random pool which does not exist
 	pool, ok := hub[poolId]
 	if !ok {
-		return c.Render(http.StatusOK, "error", map[string]any{
-			"StyleSheets": []string{"global"},
-			"Message":     "Pool expired or non-existent! Make sure you have the correct link! 😃",
-
-			"debug": debug,
+		return c.Render(http.StatusOK, "index", map[string]any{
+			"StyleSheets":        []string{"global"},
+			"RenderTemplateName": "error",
+			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
 		})
 	}
 
 	// if client reloads after game has already started
 	if pool.HasGameStarted {
-		return c.Render(http.StatusOK, "error", map[string]any{
-			"StyleSheets": []string{"global"},
-			"Message":     "Oops! The game has already started! 🥹",
-
-			"debug": debug,
+		return c.Render(http.StatusOK, "index", map[string]any{
+			"StyleSheets":        []string{"global"},
+			"RenderTemplateName": "error",
+			"Message":            "Oops! The game has already started! 🥹",
 		})
 	}
 
@@ -241,7 +235,5 @@ func RegisterToPool(c echo.Context) error {
 		"ClientName":    clientName,
 		"ClientColor":   clientColor,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
-
-		"debug": debug,
 	})
 }
