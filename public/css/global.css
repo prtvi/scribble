@@ -1,6 +1,4 @@
 :root {
-	--bg: #1dbdf2;
-
 	--ff: 'Poppins', sans-serif;
 	--fw-100: 100;
 	--fw-200: 200;
@@ -30,8 +28,15 @@
 	--fs-23: 23px;
 	--fs-24: 24px;
 
+	--bg: #133695;
+
 	--black: #1d1d1f;
 	--white: #f5f5f7;
+	--gray: #808080;
+
+	--btn-primary-color: #53e236;
+	--btn-inv-color: #e8e8e8;
+	--btn-inv-color-hover: #656565;
 
 	--scale-avatar-by: 3;
 	--randomize-icon-size: 36px;
@@ -50,7 +55,7 @@
 body {
 	background-image: url('../assets/images/background.png');
 	background-repeat: repeat;
-	background-color: #133695;
+	background-color: var(--bg);
 }
 
 input {
@@ -60,7 +65,7 @@ input {
 	padding: 3px;
 	border-radius: 4px;
 	border: none;
-	border-bottom: 2px solid grey;
+	border-bottom: 2px solid var(--gray);
 	text-align: center;
 }
 
@@ -72,25 +77,30 @@ input {
 	width: fit-content;
 	height: fit-content;
 	padding: 8px 10px 8px 10px;
-	background-color: #53e236;
+	background-color: var(--btn-primary-color);
 	border: none;
 	border-radius: 6px;
 	cursor: pointer;
 }
 .btn:hover {
-	background-color: #3aa262;
+	color: var(--black);
 }
 .btn:active {
 	transform: translateY(1px);
 }
 .btn:disabled {
-	background-color: gray;
+	background-color: var(--gray);
+	color: var(--black);
 	transform: none;
 	cursor: not-allowed;
 }
 .btni {
 	color: var(--black);
-	background-color: #e8e8e8;
+	background-color: var(--btn-inv-color);
+}
+.btni:hover {
+	background-color: var(--btn-inv-color-hover);
+	color: var(--white);
 }
 
 .hidden {
@@ -102,7 +112,7 @@ input {
 .container {
 	margin: 50px 10px;
 	border-radius: 8px;
-	background-color: #133695;
+	background-color: var(--bg);
 	color: var(--white);
 	padding: 30px 20px;
 }
@@ -114,7 +124,6 @@ input {
 	vertical-align: middle;
 	background-color: transparent;
 }
-
 .logo img {
 	width: 100%;
 	margin: auto;
@@ -123,9 +132,7 @@ input {
 
 .start {
 	text-align: center;
-	margin-bottom: 100px;
 }
-
 .start > div:not(:last-child) {
 	margin-bottom: 20px;
 }
@@ -138,7 +145,6 @@ input {
 	align-items: center;
 	position: relative;
 }
-
 .avatar {
 	width: var(--avatar-size);
 	height: var(--avatar-size);
@@ -235,6 +241,7 @@ input {
 	transform: translateX(-3px);
 }
 
+/* TODO */
 .randomize {
 	position: absolute;
 	background-image: url('../assets/images/randomize.gif');
@@ -289,6 +296,8 @@ input {
 
 /* avatar customise */
 
+/* footer */
+
 .title {
 	font-family: b700, var(--ff);
 	font-weight: var(--fw-700);
@@ -298,21 +307,17 @@ input {
 	display: flex;
 	justify-content: space-between;
 }
-
+.title-text {
+	margin: 0 auto 0 auto;
+}
 .title-image-container {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
-
 .title-image-container img {
 	width: 30px;
 }
-
-.title-text {
-	margin: 0 auto 0 auto;
-}
-
 .subtext {
 	font-family: m500, var(--ff);
 	font-weight: var(--fw-500);
@@ -338,12 +343,11 @@ input {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-14);
-	color: #f2f2f2;
+	color: var(--white);
 	font-size: 15px;
 	padding: 8px 12px;
 	text-align: center;
 }
-
 .dot-container {
 	text-align: center;
 }
@@ -360,7 +364,6 @@ input {
 .dot.active {
 	background-color: #717171;
 }
-
 .fade {
 	animation-name: fade;
 	animation-duration: 1.5s;
@@ -380,7 +383,7 @@ input {
 	margin: 50px 10px;
 	padding-top: 15px;
 	padding-bottom: 15px;
-	background-color: #133695;
+	background-color: var(--bg);
 	border-radius: 8px;
 	color: var(--white);
 }
@@ -494,8 +497,6 @@ input {
 	height: 14px;
 }
 
-/* create room form */
-
 /* join */
 
 .join-room-form form > div:not(:last-child) {
@@ -503,13 +504,9 @@ input {
 	margin: 0 auto 10px auto;
 	text-align: center;
 }
-
 .play-btn-container {
 	margin-top: 15px;
 }
-
 .form-btn-container .play-btn {
 	width: var(--form-width);
 }
-
-/* join */

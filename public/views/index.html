@@ -13,15 +13,8 @@
 			{{ if eq .RenderTemplateName "home" }}
 
 			<div class="container start">
-				<div>
-					<input
-						type="text"
-						name="ownerName"
-						class="ownerName"
-						id="ownerName"
-						maxlength="15"
-						placeholder="Enter your name"
-					/>
+				<div class="subtext">
+					<p>Create a private room to start playing with your friends!</p>
 				</div>
 
 				{{ template "customiseAvatar" .}}
