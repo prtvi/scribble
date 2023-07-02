@@ -3,6 +3,7 @@ package utils
 import (
 	"html/template"
 	"io"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,6 +13,17 @@ type Template struct {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	dataMap := data.(map[string]any)
+
+	if os.Getenv("ENV") == "DEV" {
+		dataMap["debug"] = true
+	}
+
+	if name != "app" {
+		dataMap["AboutText"] = AboutText
+		dataMap["HowToSlides"] = HowToSlides
+	}
+
 	return t.templates[name].ExecuteTemplate(w, name, data)
 }
 
@@ -26,19 +38,17 @@ func InitTemplates() *Template {
 		"public/views/partials/header.html",
 	))
 
-	tmpls["join"] = template.Must(template.ParseFiles(
-		"public/views/join.html",
-		"public/views/partials/header.html",
-	))
-
 	tmpls["welcome"] = template.Must(template.ParseFiles(
 		"public/views/welcome.html",
 		"public/views/partials/header.html",
+		"public/views/partials/footer.html",
+		"public/views/partials/customiseAvatar.html",
 	))
 
 	tmpls["error"] = template.Must(template.ParseFiles(
 		"public/views/error.html",
 		"public/views/partials/header.html",
+		"public/views/partials/footer.html",
 	))
 
 	return &Template{

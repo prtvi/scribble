@@ -10,7 +10,30 @@
 				<img src="public/assets/images/logo.gif" alt="scribble logo" />
 			</div>
 
-			{{ if .RenderCreateRoomForm }}
+			{{ if eq .RenderTemplateName "home" }}
+
+			<div class="container start">
+				<div>
+					<input
+						type="text"
+						name="ownerName"
+						class="ownerName"
+						id="ownerName"
+						maxlength="15"
+						placeholder="Enter your name"
+					/>
+				</div>
+
+				{{ template "customiseAvatar" .}}
+
+				<div>
+					<a href="/create-room"
+						><button class="btn play">Create private room</button></a
+					>
+				</div>
+			</div>
+
+			{{ else if eq .RenderTemplateName "createRoom" }}
 
 			<div class="form-container">
 				<form action="/create-room" method="post">
@@ -123,135 +146,35 @@
 				{{ end }}
 			</div>
 
-			{{ else }}
+			{{ else if eq .RenderTemplateName "join" }}
 
-			<div class="container start">
-				<div>
-					<input
-						type="text"
-						name="ownerName"
-						class="ownerName"
-						id="ownerName"
-						maxlength="15"
-						placeholder="Enter your name"
-					/>
-				</div>
+			<div class="form-container join-room-form">
+				<form action="/app" method="post">
+					<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
-				<div class="avatar-customisable">
-					<div class="avc-lb-container">
-						<div class="avc-btn eyes-left"></div>
-						<div class="avc-btn mouth-left"></div>
-						<div class="avc-btn color-left"></div>
+					<div class="join-room-input">
+						<input
+							type="text"
+							name="clientName"
+							id="clientName"
+							maxlength="20"
+							placeholder="Enter your name"
+							required
+						/>
 					</div>
 
-					<div class="avatar">
-						<div class="color"></div>
-						<div class="eyes"></div>
-						<div class="mouth"></div>
-						<div class="special"></div>
-						<div class="owner"></div>
+					{{ template "customiseAvatar" .}}
+
+					<div class="form-btn-container play-btn-container">
+						<button class="btn play-btn" type="submit">Play!</button>
 					</div>
-
-					<div class="avc-rb-container">
-						<div class="avc-btn eyes-right"></div>
-						<div class="avc-btn mouth-right"></div>
-						<div class="avc-btn color-right"></div>
-					</div>
-
-					<div class="randomize"></div>
-				</div>
-
-				<div>
-					<a href="/create-room"
-						><button class="btn play">Create private room</button></a
-					>
-				</div>
-
-				<script src="public/javascript/welcome.js"></script>
+				</form>
 			</div>
 
 			{{ end }}
 
-			<div class="container about">
-				<div class="title">
-					<div class="title-image-container">
-						<img src="public/assets/images/about.gif" alt="about" />
-					</div>
-					<h2 class="title-text">About</h2>
-				</div>
-
-				<div class="subtext">
-					{{ range .AboutText }}
-					<p>{{ . }}</p>
-					<br />
-					{{ end }}
-					<p>Have fun!</p>
-				</div>
-			</div>
-
-			<div class="container how-to-play">
-				<div class="title">
-					<div class="title-image-container">
-						<img src="public/assets/images/how.gif" alt="how to play" />
-					</div>
-					<h2 class="title-text">How to play</h2>
-				</div>
-
-				<div class="slideshow-container">
-					{{ range $i, $val := .HowToSlides }}
-					<div class="slides fade">
-						<img src="public/assets/images/tutorial/step{{$i}}.gif" />
-						<p>{{ $val }}</p>
-					</div>
-					{{ end }}
-				</div>
-				<br />
-
-				<div class="dot-container">
-					{{ range $id, $val := .HowToSlides }}
-					<span class="dot" id="dot_{{$id}}"></span>
-					{{ end }}
-				</div>
-
-				<script>
-					// how to play slideshow
-
-					let slideIndex = 0;
-
-					const slides = document.getElementsByClassName('slides');
-					const dots = document.getElementsByClassName('dot');
-
-					showSlides();
-
-					for (let i = 0; i < dots.length; i++) {
-						dots[i].addEventListener('click', e => {
-							const id = e.currentTarget.id;
-							slideIndex = +id.slice(id.length - 1);
-
-							showCurrSlide(slideIndex);
-						});
-					}
-
-					function showCurrSlide(idx) {
-						for (let i = 0; i < slides.length; i++) {
-							slides[i].style.display = 'none';
-							dots[i].classList.remove('active');
-						}
-
-						slides[idx].style.display = 'block';
-						dots[idx].classList.add('active');
-					}
-
-					function showSlides() {
-						showCurrSlide(slideIndex);
-
-						slideIndex += 1;
-						if (slideIndex >= slides.length) slideIndex = 0;
-
-						setTimeout(showSlides, 2500);
-					}
-				</script>
-			</div>
+			<!-- render about and how-to-play sections -->
+			{{ template "footer" .}}
 		</main>
 
 		{{ if .debug }}
@@ -259,6 +182,10 @@
 			document.querySelector('.link') &&
 				(document.querySelector('.link').href =
 					'http://localhost:1323/app?join=debug');
+
+			document.querySelector('#clientName') &&
+				(document.querySelector('#clientName').value =
+					'doodler_{{ .currentSize }}');
 		</script>
 		{{ end }}
 	</body>

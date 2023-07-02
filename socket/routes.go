@@ -63,11 +63,8 @@ func HandlerWsConnection(c echo.Context) error {
 // GET /
 func Welcome(c echo.Context) error {
 	return c.Render(http.StatusOK, "welcome", map[string]any{
-		"StyleSheets":          []string{"global"},
-		"RenderCreateRoomForm": false,
-		"AboutText":            AboutText,
-		"HowToSlides":          HowToSlides,
-		"debug":                debug,
+		"StyleSheets":        []string{"global"},
+		"RenderTemplateName": "home",
 	})
 }
 
@@ -77,13 +74,10 @@ func Welcome(c echo.Context) error {
 func CreateRoom(c echo.Context) error {
 	// render a form to create a new pool
 	return c.Render(http.StatusOK, "welcome", map[string]any{
-		"StyleSheets":          []string{"global"},
-		"RenderCreateRoomForm": true,
-		"FormParams":           FormParams,
-		"RoomCreated":          false,
-		"AboutText":            AboutText,
-		"HowToSlides":          HowToSlides,
-		"debug":                debug,
+		"StyleSheets":        []string{"global"},
+		"RenderTemplateName": "createRoom",
+		"FormParams":         utils.FormParams,
+		"RoomCreated":        false,
 	})
 }
 
@@ -112,11 +106,11 @@ func CreateRoomLink(c echo.Context) error {
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "welcome", map[string]any{
-		"StyleSheets":          []string{"global"},
-		"RenderCreateRoomForm": true,
-		"FormParams":           FormParams,
-		"RoomCreated":          true,
-		"Link":                 link,
+		"StyleSheets":        []string{"global"},
+		"RenderTemplateName": "createRoom",
+		"FormParams":         utils.FormParams,
+		"RoomCreated":        true,
+		"Link":               link,
 
 		// show on submit value submitted on form
 		"Players":            pool.Capacity,
@@ -127,11 +121,6 @@ func CreateRoomLink(c echo.Context) error {
 		"WordMode":           pool.WordMode,
 		"CustomWords":        strings.Join(pool.CustomWords, ","),
 		"UseCustomWordsOnly": pool.UseCustomWordsOnly,
-
-		"AboutText":   AboutText,
-		"HowToSlides": HowToSlides,
-
-		"debug": debug,
 	})
 }
 
@@ -191,13 +180,13 @@ func App(c echo.Context) error {
 	}
 
 	// else if every check, checks out then render "RegisterToPool" form
-	return c.Render(http.StatusOK, "join", map[string]any{
-		"StyleSheets": []string{"global", "createRoom"},
+	return c.Render(http.StatusOK, "welcome", map[string]any{
+		"StyleSheets":        []string{"global"},
+		"RenderTemplateName": "join",
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
 		"PoolId": poolId,
 
-		"debug":       debug,
 		"currentSize": len(pool.Clients), // used in getting client num, used in debug mode
 	})
 }

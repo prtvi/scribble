@@ -1,0 +1,82 @@
+{{ define "footer" }}
+
+<div class="container about">
+	<div class="title">
+		<div class="title-image-container">
+			<img src="public/assets/images/about.gif" alt="about" />
+		</div>
+		<h2 class="title-text">About</h2>
+	</div>
+
+	<div class="subtext">
+		{{ range .AboutText }}
+		<p>{{ . }}</p>
+		<br />
+		{{ end }}
+		<p>Have fun!</p>
+	</div>
+</div>
+
+<div class="container how-to-play">
+	<div class="title">
+		<div class="title-image-container">
+			<img src="public/assets/images/how.gif" alt="how to play" />
+		</div>
+		<h2 class="title-text">How to play</h2>
+	</div>
+
+	<div class="slideshow-container">
+		{{ range $i, $val := .HowToSlides }}
+		<div class="slides fade">
+			<img src="public/assets/images/tutorial/step{{$i}}.gif" />
+			<p>{{ $val }}</p>
+		</div>
+		{{ end }}
+	</div>
+	<br />
+
+	<div class="dot-container">
+		{{ range $id, $val := .HowToSlides }}
+		<span class="dot" id="dot_{{$id}}"></span>
+		{{ end }}
+	</div>
+
+	<script>
+		let slideIndex = 0;
+
+		const slides = document.getElementsByClassName('slides');
+		const dots = document.getElementsByClassName('dot');
+
+		showSlides();
+
+		for (let i = 0; i < dots.length; i++) {
+			dots[i].addEventListener('click', e => {
+				const id = e.currentTarget.id;
+				slideIndex = +id.slice(id.length - 1);
+
+				showCurrSlide(slideIndex);
+			});
+		}
+
+		function showCurrSlide(idx) {
+			for (let i = 0; i < slides.length; i++) {
+				slides[i].style.display = 'none';
+				dots[i].classList.remove('active');
+			}
+
+			slides[idx].style.display = 'block';
+			dots[idx].classList.add('active');
+		}
+
+		function showSlides() {
+			showCurrSlide(slideIndex);
+
+			slideIndex += 1;
+			if (slideIndex >= slides.length) slideIndex = 0;
+
+			setTimeout(showSlides, 2500);
+		}
+	</script>
+</div>
+
+{{ end }}

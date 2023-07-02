@@ -188,7 +188,7 @@ input {
 	background-image: url('../assets/images/crown.gif');
 }
 
-/* btns */
+/* .avatar-customisable-btns */
 
 .avc-lb-container,
 .avc-rb-container {
@@ -327,16 +327,13 @@ input {
 	position: relative;
 	margin: auto;
 }
-
 .slides {
 	display: none;
 }
-
 .slides img {
 	vertical-align: middle;
 	width: 100%;
 }
-
 .slides p {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
@@ -350,7 +347,6 @@ input {
 .dot-container {
 	text-align: center;
 }
-
 .dot {
 	height: 15px;
 	width: 15px;
@@ -361,7 +357,6 @@ input {
 	transition: background-color 0.6s ease;
 	cursor: pointer;
 }
-
 .dot.active {
 	background-color: #717171;
 }
@@ -370,7 +365,6 @@ input {
 	animation-name: fade;
 	animation-duration: 1.5s;
 }
-
 @keyframes fade {
 	from {
 		opacity: 0.4;
@@ -380,11 +374,11 @@ input {
 	}
 }
 
-/* create form */
+/* create room form */
 
 .form-container {
 	margin: 50px 10px;
-	padding-top: 10px;
+	padding-top: 15px;
 	padding-bottom: 15px;
 	background-color: #133695;
 	border-radius: 8px;
@@ -500,45 +494,22 @@ input {
 	height: 14px;
 }
 
-/* create form */
+/* create room form */
 
-@media screen and (min-width: 580px) {
-	.btn {
-		font-size: var(--fs-16);
-	}
+/* join */
 
-	.content {
-		height: 230px;
-	}
-
-	.title {
-		font-size: var(--fs-20);
-	}
-
-	.subtext {
-		font-size: var(--fs-18);
-		margin-bottom: 25px;
-	}
+.join-room-form form > div:not(:last-child) {
+	width: var(--form-width);
+	margin: 0 auto 10px auto;
+	text-align: center;
 }
 
-@media screen and (min-width: 768px) {
-	.btn {
-		font-size: var(--fs-18);
-		padding: 10px 12px 10px 12px;
-	}
-
-	.content {
-		height: 280px;
-		width: 80%;
-	}
-
-	.title {
-		font-size: var(--fs-22);
-		margin-bottom: 20px;
-	}
-
-	.subtext {
-		font-size: var(--fs-20);
-		margin-bottom: 30px;
-	}
+.play-btn-container {
+	margin-top: 15px;
 }
+
+.form-btn-container .play-btn {
+	width: var(--form-width);
+}
+
+/* join */
