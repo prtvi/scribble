@@ -51,7 +51,7 @@ type FormOption struct {
 }
 
 type CreateFormParam struct {
-	ID, Label string
-	ImgIdx    int
-	Options   []FormOption
+	ID, Label, Desc string
+	ImgIdx          int
+	Options         []FormOption
 }

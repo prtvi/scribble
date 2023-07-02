@@ -8,10 +8,10 @@
 		<main class="main">
 			<div class="form-container">
 				<form action="/create-room" method="post">
-					<div class="form-content">
+					<div class="form-content-grid">
 						{{ range .FormParams }}
 						<div>
-							<div class="form-image-and-label">
+							<div class="form-image-and-label" title="{{.Desc}}">
 								<img
 									src="public/assets/images/setting_{{.ImgIdx}}.gif"
 									alt=""
@@ -31,57 +31,88 @@
 						{{ end }}
 					</div>
 
-					<div class="form-btn-container">
-						<button class="btn create-room-btn" type="submit">Create</button>
-					</div>
-				</form>
-			</div>
-
-			{{ if .RoomCreated }}
-
-			<div class="container room-created-container">
-				<div>
-					<a href="{{ .Link }}" class="link"
-						><button class="btn">Click here to join!</button></a
-					>
-				</div>
-
-				<div title="Copy joining link">
-					<button class="btn btni copy-link-btn">
+					<div class="custom-words-container">
 						<div>
-							<div>
-								<span>Copy link</span>
-							</div>
+							<label for="customWords">Custom words</label>
 
-							<div class="img-container">
-								<img
-									src="public/assets/images/copy.png"
-									alt="copy icon"
-									class="copy-link-img"
+							<div class="input-checkbox-container">
+								<label for="useCustomWordsOnly">Use custom words only</label>
+								<input
+									type="checkbox"
+									name="useCustomWordsOnly"
+									id="useCustomWordsOnly"
 								/>
 							</div>
 						</div>
-					</button>
+						<div>
+							<textarea
+								name="customWords"
+								id="customWords"
+								maxlength="20000"
+								spellcheck="false"
+								placeholder="Minimum of 10 words. 1-32 characters per word! 20000 characters maximum. Separated by a , (comma)"
+							></textarea>
+						</div>
+					</div>
+
+					<div class="form-btn-container">
+						<button class="btn create-room-btn" type="submit">
+							Create room
+						</button>
+					</div>
+				</form>
+
+				{{ if .RoomCreated }}
+
+				<div class="room-created-container">
+					<div>
+						<a href="{{ .Link }}" class="link"
+							><button class="btn join-room-btn">Click here to join!</button></a
+						>
+					</div>
+
+					<div title="Copy joining link">
+						<button class="btn btni copy-link-btn">
+							<div>
+								<div>
+									<span>Copy link</span>
+								</div>
+
+								<div class="img-container">
+									<img
+										src="public/assets/images/setting_0.gif"
+										alt="copy icon"
+										class="copy-link-img"
+									/>
+								</div>
+							</div>
+						</button>
+					</div>
 				</div>
+
+				<script>
+					// copy to clipboard
+					const aTag = document.querySelector('.link');
+					document
+						.querySelector('.copy-link-btn')
+						.addEventListener('click', () =>
+							navigator.clipboard.writeText(aTag.href)
+						);
+
+					// disable create btn
+					document.querySelector('.create-room-btn').disabled = true;
+
+					// populate input fields
+					document.getElementById('players').value = '{{ .Players }}';
+					document.getElementById('drawTime').value = '{{ .DrawTime }}';
+					document.getElementById('rounds').value = '{{ .Rounds }}';
+					document.getElementById('wordCount').value = '{{ .WordCount }}';
+					document.getElementById('hints').value = '{{ .Hints }}';
+					document.getElementById('wordMode').value = '{{ .WordMode }}';
+				</script>
+
+				{{ end }}
 			</div>
-
-			<script>
-				// copy to clipboard
-				const aTag = document.querySelector('.link');
-				document
-					.querySelector('.copy-link-img')
-					.addEventListener('click', () =>
-						navigator.clipboard.writeText(aTag.href)
-					);
-
-				// disable create btn
-				document.querySelector('.create-room-btn').disabled = true;
-
-				// populate capacity in input field
-				document.getElementById('players').value = '{{ .Capacity }}';
-			</script>
-
-			{{ end }}
 		</main>
 
 		{{ if .debug }}

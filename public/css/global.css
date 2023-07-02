@@ -83,6 +83,7 @@ input {
 .btn:disabled {
 	background-color: gray;
 	transform: none;
+	cursor: not-allowed;
 }
 .btni {
 	color: var(--black);

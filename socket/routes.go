@@ -61,18 +61,11 @@ func HandlerWsConnection(c echo.Context) error {
 
 // GET /
 func Welcome(c echo.Context) error {
-	aboutText := []string{"scribble is a free online multiplayer drawing and guessing pictionary game.", "A normal game consists of a few rounds, where every round a player has to draw their chosen word and others have to guess it to gain points!", "The person with the most points at the end of the game, will then be crowned as the winner!"}
-
-	howToSlides := []string{"When it's your turn, choose a word you want to draw!",
-		"Try to draw your choosen word! No spelling!",
-		"Let other players try to guess your drawn word!",
-		"When it's not your turn, try to guess what other players are drawing!",
-		"Score the most points and be crowned the winner at the end!"}
 
 	return c.Render(http.StatusOK, "welcome", map[string]any{
 		"StyleSheets": []string{"global"},
-		"AboutText":   aboutText,
-		"HowToSlides": howToSlides,
+		"AboutText":   AboutText,
+		"HowToSlides": HowToSlides,
 		"debug":       debug,
 	})
 }
@@ -94,12 +87,18 @@ func CreateRoom(c echo.Context) error {
 func CreateRoomLink(c echo.Context) error {
 	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
 
-	players, _ := strconv.Atoi(c.FormValue("players")) // capacity
+	players, _ := strconv.Atoi(c.FormValue("players"))
 	drawTime, _ := strconv.Atoi(c.FormValue("drawTime"))
 	rounds, _ := strconv.Atoi(c.FormValue("rounds"))
 	wordCount, _ := strconv.Atoi(c.FormValue("wordCount"))
 	hints, _ := strconv.Atoi(c.FormValue("hints"))
 	wordMode := c.FormValue("wordMode")
+
+	customWords := c.FormValue("customWords")
+	useCustomWordsOnly := c.FormValue("useCustomWordsOnly")
+
+	fmt.Printf("%T %+v\n", customWords, customWords)
+	fmt.Printf("%T %+v\n", useCustomWordsOnly, useCustomWordsOnly)
 
 	// create a new pool with an uuid
 	pool, poolId := newPool(players, drawTime, rounds, wordCount, hints, wordMode)
@@ -118,7 +117,14 @@ func CreateRoomLink(c echo.Context) error {
 		"FormParams":  FormParams,
 		"RoomCreated": true,
 		"Link":        link,
-		"Capacity":    pool.Capacity, // show on submit, room size in input field
+
+		// show on submit value submitted on form
+		"Players":   pool.Capacity,
+		"DrawTime":  utils.DurationToSeconds(pool.DrawTime),
+		"Rounds":    pool.Rounds,
+		"WordCount": pool.WordCount,
+		"Hints":     pool.Hints,
+		"WordMode":  pool.WordMode,
 
 		"debug": debug,
 	})

@@ -80,8 +80,16 @@ var messageTypeMap = map[int]string{
 	34: "cs__chosen_word",
 }
 
+var AboutText = []string{"scribble is a free online multiplayer drawing and guessing pictionary game.", "A normal game consists of a few rounds, where every round a player has to draw their chosen word and others have to guess it to gain points!", "The person with the most points at the end of the game, will then be crowned as the winner!"}
+
+var HowToSlides = []string{"When it's your turn, choose a word you want to draw!",
+	"Try to draw your choosen word! No spelling!",
+	"Let other players try to guess your drawn word!",
+	"When it's not your turn, try to guess what other players are drawing!",
+	"Score the most points and be crowned the winner at the end!"}
+
 var FormParams = []model.CreateFormParam{
-	{ID: "players", Label: "Players", ImgIdx: 1,
+	{ID: "players", Label: "Players", ImgIdx: 1, Desc: "Number of players in the room",
 		Options: []model.FormOption{
 			{Value: "2", Label: "2"},
 			{Value: "3", Label: "3"},
@@ -93,7 +101,7 @@ var FormParams = []model.CreateFormParam{
 			{Value: "9", Label: "9"},
 			{Value: "10", Label: "10"}}},
 
-	{ID: "drawTime", Label: "Draw time", ImgIdx: 2,
+	{ID: "drawTime", Label: "Draw time", ImgIdx: 2, Desc: "Number of seconds each player gets to sketch",
 		Options: []model.FormOption{
 			{Value: "15", Label: "15"},
 			{Value: "20", Label: "20"},
@@ -110,7 +118,7 @@ var FormParams = []model.CreateFormParam{
 			{Value: "210", Label: "210"},
 			{Value: "240", Label: "240"}}},
 
-	{ID: "rounds", Label: "Rounds", ImgIdx: 3,
+	{ID: "rounds", Label: "Rounds", ImgIdx: 3, Desc: "Number of rounds",
 		Options: []model.FormOption{
 			{Value: "2", Label: "2"},
 			{Value: "3", Label: "3", Selected: true},
@@ -122,13 +130,13 @@ var FormParams = []model.CreateFormParam{
 			{Value: "9", Label: "9"},
 			{Value: "10", Label: "10"}}},
 
-	{ID: "wordMode", Label: "Word mode", ImgIdx: 4,
+	{ID: "wordMode", Label: "Word mode", ImgIdx: 4, Desc: "Word mode, Normal: display number of characters in word, also display hints. Hidden: do not reveal the number of characters, no hints. Combination: combination of two words separated by '+'",
 		Options: []model.FormOption{
 			{Value: "normal", Label: "Normal", Selected: true},
 			{Value: "hidden", Label: "Hidden"},
 			{Value: "combination", Label: "Combination"}}},
 
-	{ID: "wordCount", Label: "Word count", ImgIdx: 5,
+	{ID: "wordCount", Label: "Word count", ImgIdx: 5, Desc: "Number of words the sketcher gets to choose from to sketch",
 		Options: []model.FormOption{
 			{Value: "1", Label: "1"},
 			{Value: "2", Label: "2"},
@@ -136,7 +144,7 @@ var FormParams = []model.CreateFormParam{
 			{Value: "4", Label: "4"},
 			{Value: "5", Label: "5"}}},
 
-	{ID: "hints", Label: "Hints", ImgIdx: 6,
+	{ID: "hints", Label: "Hints", ImgIdx: 6, Desc: "Number of characters in the word to be revealed as hints",
 		Options: []model.FormOption{
 			{Value: "1", Label: "1"},
 			{Value: "2", Label: "2", Selected: true},

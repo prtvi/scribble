@@ -72,8 +72,10 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) (
 		WordCount: wordCount,
 
 		// not implemented yet
-		WordMode: wordMode,
-		Hints:    hints,
+		WordMode:           wordMode,
+		Hints:              hints,
+		CustomWords:        []string{},
+		UseCustomWordsOnly: true,
 
 		Register:       make(chan *Client),
 		Unregister:     make(chan *Client),

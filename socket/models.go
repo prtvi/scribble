@@ -23,12 +23,14 @@ type Client struct {
 type Pool struct {
 	ID string
 
-	Capacity  int
-	DrawTime  time.Duration
-	Rounds    int
-	WordMode  string
-	WordCount int
-	Hints     int
+	Capacity           int
+	DrawTime           time.Duration
+	Rounds             int
+	WordMode           string
+	WordCount          int
+	Hints              int
+	CustomWords        []string
+	UseCustomWordsOnly bool
 
 	JoiningLink string
 	CurrWord    string
