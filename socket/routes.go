@@ -5,6 +5,7 @@ import (
 	"net/http"
 	utils "scribble/utils"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -61,7 +62,6 @@ func HandlerWsConnection(c echo.Context) error {
 
 // GET /
 func Welcome(c echo.Context) error {
-
 	return c.Render(http.StatusOK, "welcome", map[string]any{
 		"StyleSheets": []string{"global"},
 		"AboutText":   AboutText,
@@ -93,15 +93,10 @@ func CreateRoomLink(c echo.Context) error {
 	wordCount, _ := strconv.Atoi(c.FormValue("wordCount"))
 	hints, _ := strconv.Atoi(c.FormValue("hints"))
 	wordMode := c.FormValue("wordMode")
+	customWords := utils.SplitIntoWords(c.FormValue("customWords"))
+	useCustomWordsOnly := (c.FormValue("useCustomWordsOnly") == "on")
 
-	customWords := c.FormValue("customWords")
-	useCustomWordsOnly := c.FormValue("useCustomWordsOnly")
-
-	fmt.Printf("%T %+v\n", customWords, customWords)
-	fmt.Printf("%T %+v\n", useCustomWordsOnly, useCustomWordsOnly)
-
-	// create a new pool with an uuid
-	pool, poolId := newPool(players, drawTime, rounds, wordCount, hints, wordMode)
+	pool, poolId := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
 
 	// append to global Hub map, and start listening to pool connections
 	hub[poolId] = pool
@@ -119,12 +114,14 @@ func CreateRoomLink(c echo.Context) error {
 		"Link":        link,
 
 		// show on submit value submitted on form
-		"Players":   pool.Capacity,
-		"DrawTime":  utils.DurationToSeconds(pool.DrawTime),
-		"Rounds":    pool.Rounds,
-		"WordCount": pool.WordCount,
-		"Hints":     pool.Hints,
-		"WordMode":  pool.WordMode,
+		"Players":            pool.Capacity,
+		"DrawTime":           utils.DurationToSeconds(pool.DrawTime),
+		"Rounds":             pool.Rounds,
+		"WordCount":          pool.WordCount,
+		"Hints":              pool.Hints,
+		"WordMode":           pool.WordMode,
+		"CustomWords":        strings.Join(pool.CustomWords, ","),
+		"UseCustomWordsOnly": pool.UseCustomWordsOnly,
 
 		"debug": debug,
 	})

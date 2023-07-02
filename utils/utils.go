@@ -49,6 +49,21 @@ func GetNrandomWords(arr []string, n int) []string {
 	return ret
 }
 
+func SplitIntoWords(s string) []string {
+	arr := strings.Split(s, ",")
+	trimmed := make([]string, 0)
+
+	for _, val := range arr {
+		trimmedValue := strings.Trim(val, " ")
+
+		if len(trimmedValue) > 0 {
+			trimmed = append(trimmed, trimmedValue)
+		}
+	}
+
+	return trimmed
+}
+
 func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) float64 {
 	return math.Abs(t1.Sub(t2).Seconds())
 }

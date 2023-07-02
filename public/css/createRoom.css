@@ -76,6 +76,7 @@
 }
 .input-checkbox-container input {
 	vertical-align: middle;
+	cursor: pointer;
 }
 
 .form-btn-container {

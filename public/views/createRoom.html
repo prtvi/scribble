@@ -109,6 +109,9 @@
 					document.getElementById('wordCount').value = '{{ .WordCount }}';
 					document.getElementById('hints').value = '{{ .Hints }}';
 					document.getElementById('wordMode').value = '{{ .WordMode }}';
+					document.getElementById('customWords').value = '{{ .CustomWords }}';
+					document.getElementById('useCustomWordsOnly').checked =
+						'{{ .UseCustomWordsOnly }}' === 'true';
 				</script>
 
 				{{ end }}

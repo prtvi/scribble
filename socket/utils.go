@@ -59,7 +59,7 @@ func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
 	}
 }
 
-func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) (*Pool, string) {
+func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) (*Pool, string) {
 	uuid := utils.GenerateUUID()[0:8]
 	now := time.Now()
 	later := now.Add(GameStartDurationInSeconds)
@@ -74,8 +74,8 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) (
 		// not implemented yet
 		WordMode:           wordMode,
 		Hints:              hints,
-		CustomWords:        []string{},
-		UseCustomWordsOnly: true,
+		CustomWords:        customWords,
+		UseCustomWordsOnly: useCustomWordsOnly,
 
 		Register:       make(chan *Client),
 		Unregister:     make(chan *Client),
@@ -140,7 +140,7 @@ func DebugMode() {
 	RenderClientsEvery = time.Second * 30
 	TimeoutForChoosingWord = time.Second * 10
 
-	pool, _ := newPool(4, 15, 3, 4, 2, "normal")
+	pool, _ := newPool(4, 15, 3, 4, 2, "normal", []string{}, true)
 	pool.ID = "debug"
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+pool.ID)
 
