@@ -6,71 +6,76 @@
 
 	<body>
 		<div class="main">
-			<div class="game-content">
-				<!-- status bar -->
-				<div class="status-bar">
-					<div class="round hidden"><span></span></div>
-
-					<div class="word hidden"><span></span></div>
-
-					<div class="time-left">
-						<span>Waiting for the game to start</span>
-					</div>
-
-					<div class="joining-link-div">
-						<button class="btn joining-link-btn">Copy joining link</button>
-					</div>
+			<!-- game bar -->
+			<div class="game-bar">
+				<div class="gb-item timer">
+					<img src="public/assets/images/setting_2.gif" alt="" />
+					<span class="img-sub">0s</span>
 				</div>
 
-				<!-- canvas -->
-				<div class="canvas-container">
-					<div id="overlay">
-						<div class="overlay-content">
-							<div>
-								<p class="overlay-text">
-									Waiting for others to join, starting game in
-									<span class="loading"
-										>{{ .GameStartDurationInSeconds }}s</span
-									>
-								</p>
-							</div>
+				<div class="gb-item round">
+					<img src="public/assets/images/setting_3.gif" alt="" />
+					<span class="img-sub">
+						<span class="curr-round">0</span>/{{ .Rounds }}
+					</span>
+				</div>
 
-							<div>
-								<button class="btn start-game-btn">Start now</button>
-							</div>
+				<div class="gb-item word">
+					<span class="status">Waiting</span>
+					<span class="content">Game will start soon</span>
+				</div>
+
+				<div class="gb-item joining-link-div">
+					<button class="btn joining-link-btn">Copy joining link</button>
+				</div>
+			</div>
+
+			<!-- canvas -->
+			<div class="canvas-container">
+				<div id="overlay">
+					<div class="overlay-content">
+						<div>
+							<p class="overlay-text">
+								Waiting for others to join, starting game in
+								<span class="loading">{{ .GameStartDurationInSeconds }}s</span>
+							</p>
+						</div>
+
+						<div>
+							<button class="btn start-game-btn">Start now</button>
 						</div>
 					</div>
+				</div>
 
-					<canvas class="canv"></canvas>
+				<canvas class="canv"></canvas>
 
-					<div class="painter-utils hidden">
-						<button class="btn clear-canvas">Clear</button>
+				<div class="painter-utils hidden">
+					<button class="btn clear-canvas">Clear</button>
+				</div>
+			</div>
+
+			<!-- members and chat container -->
+			<div class="mc-container">
+				<div class="side members"></div>
+				<div class="side messages"></div>
+			</div>
+
+			<!-- chat box -->
+			<div class="chat-box">
+				<form>
+					<div class="input-wrapper">
+						<input
+							type="text"
+							class="msg"
+							placeholder="Type your guess here"
+							maxlength="50"
+							required
+						/>
+						<span>0</span>
+
+						<button class="btn send-msg">Send</button>
 					</div>
-				</div>
-
-				<!-- members and chat container -->
-				<div class="mc-container">
-					<div class="side members"></div>
-					<div class="side messages"></div>
-				</div>
-
-				<!-- chat box -->
-				<div class="chat-box">
-					<form>
-						<div class="input-wrapper">
-							<input
-								type="text"
-								class="msg"
-								placeholder="Type your guess here"
-								maxlength="50"
-								required
-							/>
-							<span>0</span>
-
-							<button class="btn send-msg">Send</button>
-						</div>
-					</form>
-				</div>
+				</form>
 			</div>
 		</div>
 

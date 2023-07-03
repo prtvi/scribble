@@ -214,17 +214,17 @@ func RegisterToPool(c echo.Context) error {
 	}
 
 	// generate client id and color
-	clientId := utils.GenerateUUID()[0:8]
+	clientId := utils.GenerateUUID()
 	clientColor := pool.getColorForClient()
 
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"StyleSheets": []string{"global", "app"},
-		"JoiningLink": pool.JoiningLink,
 
 		// variables in DOM
 		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),
+		"Rounds":                     pool.Rounds,
 
 		// for rendering title on browser
 		"ClientNameExists": true,
@@ -235,5 +235,6 @@ func RegisterToPool(c echo.Context) error {
 		"ClientName":    clientName,
 		"ClientColor":   clientColor,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
+		"JoiningLink":   pool.JoiningLink,
 	})
 }

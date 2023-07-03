@@ -31,7 +31,8 @@ function revealWordOnOverlayAndChat(socketMessage) {
 	const message = `The word was '${socketMessage.content}'`;
 	displayOverlay(getOverlayHtmlForTextOnly(message));
 	appendChatMsgToDOM(message, '#ffa500');
-	document.querySelector('.word span').textContent = socketMessage.content;
+	document.querySelector('.word span.content').textContent =
+		socketMessage.content;
 }
 
 // 33
@@ -115,17 +116,14 @@ function startGame(socketMessage) {
 
 	// display game started overlay
 	displayOverlay(getOverlayHtmlForTextOnly('Game started!'));
-	document.querySelector('.time-left span').textContent = 'Game started';
+	document.querySelector('.word span.status').textContent = 'Game started';
 }
 
 // 71
 function renderRoundDetails(socketMessage) {
-	const roundDiv = document.querySelector('.round');
-	roundDiv.classList.remove('hidden');
-
-	const text = `Round: ${socketMessage.currRound}`;
-	roundDiv.querySelector('span').textContent = text;
-	displayOverlay(getOverlayHtmlForTextOnly(text));
+	document.querySelector('.round span.curr-round').textContent =
+		socketMessage.currRound;
+	displayOverlay(getOverlayHtmlForTextOnly(`Round ${socketMessage.currRound}`));
 }
 
 // 8
@@ -138,16 +136,14 @@ function beginClientSketchingFlow(socketMessage) {
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
 	// for enabling drawing access if clientId matches
-	const wordDiv = document.querySelector('.word');
-	wordDiv.classList.remove('hidden');
-	const wordSpan = wordDiv.querySelector('span');
-
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.clear-canvas');
 	paintUtils.isAllowedToPaint = true;
 
 	// display the word
-	wordSpan.textContent = socketMessage.currWord;
+	document.querySelector('.word span.status').textContent = 'Draw this!';
+	document.querySelector('.word span.content').textContent =
+		socketMessage.currWord;
 
 	// display painter utils div and add EL for clearing the canvas
 	painterUtilsDiv.classList.remove('hidden');
@@ -171,10 +167,12 @@ function showSketcherBeginDrawing(socketMessage) {
 function showSketcherIsDrawing(socketMessage) {
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
-	const wordDiv = document.querySelector('.word');
-	wordDiv.classList.remove('hidden');
-	const wordSpan = wordDiv.querySelector('span');
-	wordSpan.textContent = `${socketMessage.currWordLen} characters`;
+	let text = '';
+	for (let i = 0; i < socketMessage.currWordLen; i++) text += '_ ';
+	text = text.trim();
+
+	document.querySelector('.word span.status').textContent = 'Guess this!';
+	document.querySelector('.word span.content').textContent = text;
 
 	return wordExpiryCountdown;
 }

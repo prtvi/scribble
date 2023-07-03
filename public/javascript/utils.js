@@ -132,6 +132,7 @@ function adjustOverlay() {
 	const cc = document.querySelector('.canvas-container');
 	overlay.style.top = `${cc.offsetTop}px`;
 	overlay.style.height = `${cc.offsetHeight}px`;
+	overlay.style.width = `${cc.offsetWidth}px`;
 }
 
 function disableSketching() {
@@ -151,7 +152,7 @@ function beginClientSketchingFlowInit(socketMessage) {
 		socketMessage.currWordExpiresAt
 	).getTime();
 
-	const timeLeftSpan = document.querySelector('.time-left span');
+	const timeLeftSpan = document.querySelector('.timer span');
 	timeLeftSpan.textContent = `${timeForEachWordInSeconds}s`;
 	return runTimer(timeLeftSpan, currentWordExpiresAt);
 }
@@ -167,7 +168,7 @@ function runTimer(timerElement, timeoutAt) {
 
 function showZeroOnTimeLeftSpan() {
 	// to display 0s left, in the event that everyone guesses the word before the timeout
-	document.querySelector('.time-left span').textContent = '0s';
+	document.querySelector('.timer span').textContent = '0s';
 }
 
 function removeEventListenersOnGameStart() {
@@ -218,6 +219,19 @@ function initGlobalEventListeners() {
 
 	// adjust overlay position on scroll
 	window.addEventListener('scroll', adjustOverlay);
+
+	// resize canvas on window resize
+	window.addEventListener('resize', function () {
+		const { w, h } = getCanvasSize();
+		canvas.width = w;
+		canvas.height = h;
+
+		const cc = document.querySelector('.canvas-container');
+		cc.style.width = `${w}px`;
+		cc.style.height = `${h}px`;
+
+		adjustOverlay();
+	});
 }
 
 function copyJoiningLinkEL() {

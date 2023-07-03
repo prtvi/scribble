@@ -12,12 +12,11 @@ import (
 )
 
 func GenerateUUID() string {
-	return uuid.New().String()
+	return uuid.New().String()[0:8]
 }
 
 func FormatTimeLong(t time.Time) string {
-	// 2021-12-12T12:23:34.002342369
-	return t.Format(time.RFC3339Nano)
+	return t.Format(time.RFC3339Nano) // 2021-12-12T12:23:34.002342369
 }
 
 func GetTimeString(t time.Time) string {
@@ -31,17 +30,14 @@ func GetSecondsLeftFrom(t time.Time) int {
 func GetRandomWord(arr []string) string {
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Int() % len(arr)
-
 	return arr[n]
 }
 
 func GetNrandomWords(arr []string, n int) []string {
 	ret := make([]string, n)
-
 	for i := 0; i < n; i++ {
 		ret[i] = GetRandomWord(arr)
 	}
-
 	return ret
 }
 
