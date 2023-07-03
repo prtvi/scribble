@@ -26,7 +26,7 @@ func (pool *Pool) start() {
 				go pool.startGameCountdown()
 			}
 
-			pool.printStats("client connected, clientId:", client.ID)
+			// pool.printStats("client connected, clientId:", client.ID)
 			break
 
 		case client := <-pool.Unregister:
@@ -34,7 +34,7 @@ func (pool *Pool) start() {
 			pool.removeClientFromList(client)
 			pool.broadcastClientUnregister(client.ID, client.Name)
 
-			pool.printStats("client disconnected, clientId:", client.ID)
+			// pool.printStats("client disconnected, clientId:", client.ID)
 			break
 
 		case message := <-pool.Broadcast:

@@ -92,35 +92,9 @@
 							><button class="btn join-room-btn">Click here to join!</button></a
 						>
 					</div>
-
-					<div title="Copy joining link">
-						<button class="btn btni copy-link-btn">
-							<div>
-								<div>
-									<span>Copy link</span>
-								</div>
-
-								<div class="img-container">
-									<img
-										src="public/assets/images/setting_0.gif"
-										alt="copy icon"
-										class="copy-link-img"
-									/>
-								</div>
-							</div>
-						</button>
-					</div>
 				</div>
 
 				<script>
-					// copy to clipboard
-					const aTag = document.querySelector('.link');
-					document
-						.querySelector('.copy-link-btn')
-						.addEventListener('click', () =>
-							navigator.clipboard.writeText(aTag.href)
-						);
-
 					// disable create btn
 					document.querySelector('.create-room-btn').disabled = true;
 
@@ -144,6 +118,7 @@
 			<div class="form-container join-room-form">
 				<form action="/app" method="post">
 					<input type="hidden" name="poolId" value="{{ .PoolId }}" />
+					<input type="hidden" name="isOwner" id="isOwner" />
 
 					<div class="join-room-input">
 						<input
@@ -162,6 +137,13 @@
 						<button class="btn play-btn" type="submit">Play!</button>
 					</div>
 				</form>
+
+				<script>
+					// assign isOwner value checking from url
+					const urlParams = new URLSearchParams(location.search);
+					if (urlParams.get('isOwner') === 'true')
+						document.getElementById('isOwner').value = 'true';
+				</script>
 			</div>
 
 			{{ else }}
@@ -183,10 +165,6 @@
 
 		{{ if .debug }}
 		<script>
-			document.querySelector('.link') &&
-				(document.querySelector('.link').href =
-					'http://localhost:1323/app?join=debug');
-
 			document.querySelector('#clientName') &&
 				(document.querySelector('#clientName').value =
 					'doodler_{{ .currentSize }}');

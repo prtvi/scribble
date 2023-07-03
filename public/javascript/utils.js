@@ -236,6 +236,7 @@ function initGlobalEventListeners() {
 
 function copyJoiningLinkEL() {
 	navigator.clipboard.writeText(joiningLink);
+	appendChatMsgToDOM('Copied to clipboard!', '#0043ff');
 }
 
 function startGameEl() {

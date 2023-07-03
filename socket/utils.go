@@ -93,7 +93,7 @@ func Maintainer() {
 
 	for {
 		// TODO - to be tested
-		printHubStatus()
+		// printHubStatus()
 		sleep(DeletePoolAfterGameEndsDuration)
 
 		for poolId, pool := range hub {
@@ -110,7 +110,7 @@ func Maintainer() {
 			}
 		}
 
-		printHubStatus()
+		// printHubStatus()
 	}
 }
 
@@ -122,9 +122,9 @@ func printHubStatus() {
 	// HubSize
 	utils.Cp("white", "HubSize:", utils.Cs("green", fmt.Sprintf("%d", len(hub))))
 
-	for _, pool := range hub {
-		pool.printStats()
-	}
+	// for _, pool := range hub {
+	// pool.printStats()
+	// }
 }
 
 func DebugMode() {

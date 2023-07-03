@@ -23,7 +23,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&clientColor=2def45
+// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&clientColor=2def45&isOwner=true|false
 func HandlerWsConnection(c echo.Context) error {
 	// handle socket connections for the pools
 
@@ -32,6 +32,7 @@ func HandlerWsConnection(c echo.Context) error {
 	clientId := c.QueryParam("clientId")
 	clientName := c.QueryParam("clientName")
 	clientColor := c.QueryParam("clientColor")
+	isOwner := c.QueryParam("isOwner") == "true"
 
 	// register the socket connection from client
 	conn, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
@@ -46,6 +47,7 @@ func HandlerWsConnection(c echo.Context) error {
 		ID:            clientId,
 		Name:          clientName,
 		Color:         clientColor,
+		IsOwner:       isOwner,
 		DoneSketching: false,
 		HasGuessed:    false,
 		Score:         0,
@@ -92,7 +94,7 @@ func CreateRoomLink(c echo.Context) error {
 	hints, _ := strconv.Atoi(c.FormValue("hints"))
 	wordMode := c.FormValue("wordMode")
 	customWords := utils.SplitIntoWords(c.FormValue("customWords"))
-	useCustomWordsOnly := (c.FormValue("useCustomWordsOnly") == "on")
+	useCustomWordsOnly := c.FormValue("useCustomWordsOnly") == "on"
 
 	pool, poolId := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
 
@@ -103,6 +105,7 @@ func CreateRoomLink(c echo.Context) error {
 	// generate link to join the pool
 	link := "/app?join=" + poolId
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
+	link += "&isOwner=true"
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "index", map[string]any{
@@ -193,6 +196,7 @@ func RegisterToPool(c echo.Context) error {
 
 	poolId := c.FormValue("poolId")
 	clientName := c.FormValue("clientName")
+	isOwner := c.FormValue("isOwner") == "true"
 
 	// extra check to prevent user from joining any random pool which does not exist
 	pool, ok := hub[poolId]
@@ -234,6 +238,7 @@ func RegisterToPool(c echo.Context) error {
 		"ClientId":      clientId,
 		"ClientName":    clientName,
 		"ClientColor":   clientColor,
+		"IsOwner":       isOwner,
 		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
 		"JoiningLink":   pool.JoiningLink,
 	})

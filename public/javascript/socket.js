@@ -3,7 +3,7 @@
 function initSocket() {
 	// initialises socket connection and adds corresponding function handlers to the socket
 
-	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}`;
+	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&clientColor=${clientColor}&isOwner=${isOwner}`;
 
 	const socket = new WebSocket(wsUrl);
 

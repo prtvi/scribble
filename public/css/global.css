@@ -475,26 +475,7 @@ input {
 	width: calc(var(--form-width) - 10px);
 }
 .join-room-btn {
-	width: calc((var(--col-width) * 2) - 10px);
-}
-.copy-link-btn {
-	width: calc((var(--col-width) * 1) - 10px);
-}
-.copy-link-btn > div {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	vertical-align: middle;
-}
-.copy-link-btn .img-container {
-	display: flex;
-	align-items: center;
-	vertical-align: middle;
-	margin-left: 6px;
-}
-.copy-link-img {
-	width: 14px;
-	height: 14px;
+	width: calc(var(--form-width) - 10px);
 }
 
 /* join */
