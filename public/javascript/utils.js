@@ -28,11 +28,6 @@ function clearAllIntervals(...ids) {
 	ids.forEach(i => clearInterval(i));
 }
 
-function gameStartTimer() {
-	// start game countdown to show user how much time is left for game to start
-	return runTimer(document.querySelector('.loading'), gameStartTime);
-}
-
 function getClientNameDiv(clientInfo, iteration) {
 	// client name div
 	const clientNameDiv = document.createElement('div');

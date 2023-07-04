@@ -62,7 +62,6 @@ func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) (*Pool, string) {
 	uuid := utils.GenerateUUID()
 	now := time.Now()
-	later := now.Add(GameStartDurationInSeconds)
 
 	return &Pool{
 		ID:        uuid,
@@ -83,7 +82,6 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		Broadcast:      make(chan model.SocketMessage),
 		ColorList:      utils.ShuffleList(utils.COLORS[:10]),
 		CreatedTime:    now,
-		GameStartTime:  later,
 		HasGameStarted: false,
 	}, uuid
 }
@@ -136,7 +134,6 @@ func DebugMode() {
 	debug = true
 	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 
-	GameStartDurationInSeconds = time.Second * 500
 	RenderClientsEvery = time.Second * 30
 	TimeoutForChoosingWord = time.Second * 10
 

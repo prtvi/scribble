@@ -168,6 +168,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 func (pool *Pool) beginBroadcastClientInfo() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
+	pool.HasClientInfoBroadcastStarted = true
 	utils.Cp("yellow", "Broadcasting client info start!")
 
 	for {
@@ -183,6 +184,7 @@ func (pool *Pool) beginBroadcastClientInfo() {
 	}
 }
 
+/*
 // begin the timeout to start the game if not started by the clients
 func (pool *Pool) startGameCountdown() {
 	// as soon as the first player/client joins, start this countdown to start the game, after this timeout, the game begin message will broadcast
@@ -202,11 +204,22 @@ func (pool *Pool) startGameCountdown() {
 	// start game flow
 	go pool.beginGameFlow()
 }
+*/
 
 // begin the game flow as soon as a client requests to start the game
-func (pool *Pool) startGameRequestFromClient() {
+func (pool *Pool) startGameRequestFromClient(clientId string) {
 	// when the client requests to start the game instead of the countdown
 	// start the game and broadcast the same
+
+	if len(pool.Clients) < 2 {
+		pool.sendToClientId(clientId, model.SocketMessage{
+			Type:    69,
+			TypeStr: messageTypeMap[69],
+		})
+
+		return
+	}
+
 	pool.startGameAndBroadcast()
 	utils.Cp("greenBg", "Game started! by client using btn")
 
@@ -332,7 +345,7 @@ func (pool *Pool) printStats(event ...string) {
 
 	w := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
 	fmt.Fprintln(w, "\nPoolId\tCapacity\tSize\tCreatedTime\tGameStartTime\tGameStartedAt")
-	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartTime), utils.GetTimeString(pool.GameStartedAt)))
+	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartedAt)))
 
 	fmt.Fprintln(w, "HasGameStarted\tHasClientInfoBroadcastStarted\tHasGameEnded")
 	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\n", pool.HasGameStarted, pool.HasClientInfoBroadcastStarted, pool.HasGameEnded))

@@ -109,7 +109,6 @@ function startGame(socketMessage) {
 
 	// flag game started
 	paintUtils.hasGameStarted = true;
-	clearAllIntervals(startGameTimerId);
 
 	// remove event listeners
 	removeEventListenersOnGameStart();

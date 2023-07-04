@@ -227,19 +227,17 @@ func RegisterToPool(c echo.Context) error {
 		"StyleSheets": []string{"global", "app"},
 
 		// variables in DOM
-		"GameStartDurationInSeconds": utils.GetSecondsLeftFrom(pool.GameStartTime),
-		"Rounds":                     pool.Rounds,
+		"Rounds": pool.Rounds,
 
 		// for rendering title on browser
 		"ClientNameExists": true,
 
 		// init as js vars
-		"PoolId":        poolId,
-		"ClientId":      clientId,
-		"ClientName":    clientName,
-		"ClientColor":   clientColor,
-		"IsOwner":       isOwner,
-		"GameStartTime": utils.FormatTimeLong(pool.GameStartTime),
-		"JoiningLink":   pool.JoiningLink,
+		"PoolId":      poolId,
+		"ClientId":    clientId,
+		"ClientName":  clientName,
+		"ClientColor": clientColor,
+		"IsOwner":     isOwner,
+		"JoiningLink": pool.JoiningLink,
 	})
 }

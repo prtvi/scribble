@@ -98,6 +98,13 @@ function socketOnMessage(message) {
 			renderClients(socketMessage.content);
 			break;
 
+		case 69:
+			appendChatMsgToDOM(
+				'You need at least two players to start the game',
+				'#457ef4'
+			);
+			break;
+
 		case 70:
 			startGame(socketMessage);
 			break;
@@ -151,7 +158,7 @@ function socketOnClose() {
 	// TODO: show to user when disconnected from server
 	// on socket conn close, stop all timer or intervals
 	log('Socket connection closed, stopping timers and timeouts!');
-	clearAllIntervals(startGameTimerId, wordExpiryTimer);
+	clearAllIntervals(wordExpiryTimer);
 }
 
 function sendViaSocket(socketMsg) {
@@ -169,6 +176,6 @@ function sendViaSocket(socketMsg) {
 			socket.readyState
 		);
 
-		clearAllIntervals(startGameTimerId, wordExpiryTimer);
+		clearAllIntervals(wordExpiryTimer);
 	}
 }

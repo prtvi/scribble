@@ -35,6 +35,17 @@ func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessag
 	}
 }
 
+func (pool *Pool) sendToClientId(clientId string, m model.SocketMessage) {
+	printSocketMsg(m)
+
+	for _, c := range pool.Clients {
+		if c.ID == clientId {
+			c.send(m)
+			break
+		}
+	}
+}
+
 // broadcast the given message to all clients in pool
 func (pool *Pool) broadcast(message model.SocketMessage) {
 	printSocketMsg(message)

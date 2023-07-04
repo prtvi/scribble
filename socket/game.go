@@ -20,10 +20,8 @@ func (pool *Pool) start() {
 				!pool.HasClientInfoBroadcastStarted &&
 				!pool.HasGameStarted {
 
-				// flag the client info broadcast start, run two sep goroutines to begin broadcasting client info at regular intervals and start game countdown
-				pool.HasClientInfoBroadcastStarted = true
+				// run sep goroutine to begin broadcasting client info at regular intervals
 				go pool.beginBroadcastClientInfo()
-				go pool.startGameCountdown()
 			}
 
 			// pool.printStats("client connected, clientId:", client.ID)
@@ -55,7 +53,7 @@ func (pool *Pool) start() {
 
 			case 7:
 				printSocketMsg(message)
-				pool.startGameRequestFromClient()
+				pool.startGameRequestFromClient(message.ClientId)
 
 			case 34:
 				printSocketMsg(message)

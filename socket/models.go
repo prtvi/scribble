@@ -41,7 +41,7 @@ type Pool struct {
 	Clients              []*Client
 	CurrSketcher         *Client
 
-	ColorList                                                    []string
-	CreatedTime, GameStartTime, GameStartedAt, CurrWordExpiresAt time.Time
-	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted  bool
+	ColorList                                                   []string
+	CreatedTime, GameStartedAt, CurrWordExpiresAt               time.Time
+	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted bool
 }

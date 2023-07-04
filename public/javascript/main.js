@@ -20,6 +20,4 @@ let allowLogs;
 
 // init socket connection and check game begin status
 const socket = initSocket();
-const startGameTimerId = gameStartTimer();
-
 initGlobalEventListeners();

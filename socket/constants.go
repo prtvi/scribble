@@ -18,7 +18,6 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	GameStartDurationInSeconds      = time.Second * 600
 	RenderClientsEvery              = time.Second * 5
 	InterGameWaitDuration           = time.Second * 2
 	TimeoutForChoosingWord          = time.Second * 15
@@ -60,6 +59,7 @@ var messageTypeMap = map[int]string{
 	88: "sc__sketcher_drawing",
 
 	// S => C - yellow
+	69: "sc__game_cant_start",
 	8:  "sc__word_assigned",
 	33: "sc__choose_word",
 	81: "sc__disable_sketching",

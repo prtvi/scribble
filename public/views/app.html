@@ -35,10 +35,7 @@
 				<div id="overlay">
 					<div class="overlay-content">
 						<div>
-							<p class="overlay-text">
-								Waiting for others to join, starting game in
-								<span class="loading">{{ .GameStartDurationInSeconds }}s</span>
-							</p>
+							<p class="overlay-text">Waiting for others to join!</p>
 						</div>
 
 						<div>
@@ -85,7 +82,6 @@
 			const clientName = '{{ .ClientName }}';
 			const clientColor = '{{ .ClientColor }}';
 			const isOwner = '{{ .IsOwner }}' === 'true';
-			const gameStartTime = new Date('{{ .GameStartTime }}').getTime();
 			const joiningLink = '{{ .JoiningLink }}';
 		</script>
 
