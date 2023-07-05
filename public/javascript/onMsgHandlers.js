@@ -114,6 +114,8 @@ function startGame(socketMessage) {
 	removeEventListenersOnGameStart();
 
 	// display game started overlay
+	document.querySelector('.word span.content').textContent = 'Game started!';
+
 	displayOverlay(getOverlayHtmlForTextOnly('Game started!'));
 	document.querySelector('.word span.status').textContent = 'Game started';
 }

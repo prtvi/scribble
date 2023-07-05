@@ -12,7 +12,7 @@ import (
 // color string hash value without the #
 
 type Client struct {
-	ID, Name, Color                    string
+	ID, Name                           string
 	IsOwner, DoneSketching, HasGuessed bool
 	Score                              int
 	Conn                               *websocket.Conn
@@ -41,7 +41,6 @@ type Pool struct {
 	Clients              []*Client
 	CurrSketcher         *Client
 
-	ColorList                                                   []string
 	CreatedTime, GameStartedAt, CurrWordExpiresAt               time.Time
 	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted bool
 }

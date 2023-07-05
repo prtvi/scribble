@@ -34,7 +34,6 @@ type SocketMessage struct {
 type ClientInfo struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
-	Color   string `json:"color"`
 	Score   int    `json:"score"`
 	IsOwner bool   `json:"isOwner"`
 }

@@ -41,7 +41,7 @@ function getClientNameDiv(clientInfo, iteration) {
 	// client name span
 	const clientNameSpan = document.createElement('span');
 	clientNameSpan.classList.add('member-name');
-	clientNameSpan.style.color = `#${clientInfo.color}`;
+	clientNameSpan.style.color = `#000`;
 
 	if (clientName === clientInfo.name)
 		clientNameSpan.textContent = `${clientInfo.name} (you)`;
@@ -167,9 +167,10 @@ function showZeroOnTimeLeftSpan() {
 }
 
 function removeEventListenersOnGameStart() {
-	document
-		.querySelector('.start-game-btn')
-		.removeEventListener('click', startGameEl);
+	if (isOwner)
+		document
+			.querySelector('.start-game-btn')
+			.removeEventListener('click', startGameEl);
 
 	document
 		.querySelector('.joining-link-btn')
@@ -208,9 +209,10 @@ function initGlobalEventListeners() {
 		.addEventListener('click', copyJoiningLinkEL);
 
 	// add event listener to start game button to start game
-	document
-		.querySelector('.start-game-btn')
-		.addEventListener('click', startGameEl);
+	if (isOwner)
+		document
+			.querySelector('.start-game-btn')
+			.addEventListener('click', startGameEl);
 
 	// adjust overlay position on scroll
 	window.addEventListener('scroll', adjustOverlay);

@@ -80,7 +80,6 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		Unregister:     make(chan *Client),
 		Clients:        make([]*Client, 0),
 		Broadcast:      make(chan model.SocketMessage),
-		ColorList:      utils.ShuffleList(utils.COLORS[:10]),
 		CreatedTime:    now,
 		HasGameStarted: false,
 	}, uuid

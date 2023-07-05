@@ -6,7 +6,6 @@ const { canvas, ctx, overlay } = initCanvasAndOverlay();
 // utils for painting on canvas
 const paintUtils = {
 	coords: { x: 0, y: 0 },
-	color: `#${clientColor}`,
 	isPainting: false,
 	hasGameStarted: false,
 	isAllowedToPaint: false,

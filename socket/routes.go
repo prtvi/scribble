@@ -23,7 +23,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&clientColor=2def45&isOwner=true|false
+// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&isOwner=true|false
 func HandlerWsConnection(c echo.Context) error {
 	// handle socket connections for the pools
 
@@ -31,7 +31,6 @@ func HandlerWsConnection(c echo.Context) error {
 	poolId := c.QueryParam("poolId")
 	clientId := c.QueryParam("clientId")
 	clientName := c.QueryParam("clientName")
-	clientColor := c.QueryParam("clientColor")
 	isOwner := c.QueryParam("isOwner") == "true"
 
 	// register the socket connection from client
@@ -46,7 +45,6 @@ func HandlerWsConnection(c echo.Context) error {
 	client := &Client{
 		ID:            clientId,
 		Name:          clientName,
-		Color:         clientColor,
 		IsOwner:       isOwner,
 		DoneSketching: false,
 		HasGuessed:    false,
@@ -156,15 +154,6 @@ func App(c echo.Context) error {
 		})
 	}
 
-	// if game has already started then do not render both forms and display message
-	if pool.HasGameStarted {
-		return c.Render(http.StatusOK, "index", map[string]any{
-			"StyleSheets":        []string{"global"},
-			"RenderTemplateName": "error",
-			"Message":            "Oops! The game has already started! 🥹",
-		})
-	}
-
 	// if pool exists, get its capacity and curr size
 	poolCap := pool.Capacity
 	poolCurrSizePlus1 := len(pool.Clients) + 1
@@ -208,18 +197,9 @@ func RegisterToPool(c echo.Context) error {
 		})
 	}
 
-	// if client reloads after game has already started
-	if pool.HasGameStarted {
-		return c.Render(http.StatusOK, "index", map[string]any{
-			"StyleSheets":        []string{"global"},
-			"RenderTemplateName": "error",
-			"Message":            "Oops! The game has already started! 🥹",
-		})
-	}
-
 	// generate client id and color
 	clientId := utils.GenerateUUID()
-	clientColor := pool.getColorForClient()
+	// clientColor := pool.getColorForClient()
 
 	// render ConnectSocket form to establish socket connection
 	// socket connection will start only if "ConnectSocket" form is rendered
@@ -236,7 +216,6 @@ func RegisterToPool(c echo.Context) error {
 		"PoolId":      poolId,
 		"ClientId":    clientId,
 		"ClientName":  clientName,
-		"ClientColor": clientColor,
 		"IsOwner":     isOwner,
 		"JoiningLink": pool.JoiningLink,
 	})

@@ -54,7 +54,6 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 		clientInfoList = append(clientInfoList, model.ClientInfo{
 			ID:      client.ID,
 			Name:    client.Name,
-			Color:   client.Color,
 			Score:   client.Score,
 			IsOwner: client.IsOwner,
 		})
@@ -72,17 +71,10 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 // append the client to the clients list
 func (pool *Pool) appendClientToList(client *Client) {
 	pool.Clients = append(pool.Clients, client)
-
-	// remove the color that was picked in getColorForClient func from the list, the first color was picked from the list
-	pool.ColorList[0] = pool.ColorList[len(pool.ColorList)-1]
-	pool.ColorList = pool.ColorList[:len(pool.ColorList)-1]
 }
 
 // remove the client from the client list
 func (pool *Pool) removeClientFromList(client *Client) {
-	// take the removed client's color and append it to the color list
-	pool.ColorList = append(pool.ColorList, client.Color)
-
 	// remove the client from the list
 	var idxToRemove int
 	for i, c := range pool.Clients {
@@ -106,10 +98,6 @@ func (pool *Pool) flagAllClientsAsNotSketched() {
 	for _, cl := range pool.Clients {
 		cl.DoneSketching = false
 	}
-}
-
-func (pool *Pool) getColorForClient() string {
-	return pool.ColorList[0]
 }
 
 // sleep until the duration, assign any random word to the client if timer runs out

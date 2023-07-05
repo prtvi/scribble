@@ -52,7 +52,7 @@ async function paint(event) {
 
 	ctx.lineWidth = 5;
 	ctx.lineCap = 'round';
-	ctx.strokeStyle = paintUtils.color;
+	ctx.strokeStyle = '#000';
 
 	ctx.moveTo(paintUtils.coords.x, paintUtils.coords.y);
 
