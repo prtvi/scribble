@@ -52,10 +52,9 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 	// append client info into an array
 	for _, client := range pool.Clients {
 		clientInfoList = append(clientInfoList, model.ClientInfo{
-			ID:      client.ID,
-			Name:    client.Name,
-			Score:   client.Score,
-			IsOwner: client.IsOwner,
+			ID:    client.ID,
+			Name:  client.Name,
+			Score: client.Score,
 		})
 	}
 

@@ -31,11 +31,23 @@ type SocketMessage struct {
 	TimeoutAfter      string `json:"timeoutAfter,omitempty"`
 }
 
+type Coords struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
+type AvatarConfig struct {
+	Color     Coords `json:"color"`
+	Eyes      Coords `json:"eyes"`
+	Mouth     Coords `json:"mouth"`
+	IsOwner   bool   `json:"isOwner"`
+	IsCrowned bool   `json:"isCrowned"`
+}
+
 type ClientInfo struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Score   int    `json:"score"`
-	IsOwner bool   `json:"isOwner"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Score int    `json:"score"`
 }
 
 type SharedConfig struct {

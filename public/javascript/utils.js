@@ -167,6 +167,7 @@ function showZeroOnTimeLeftSpan() {
 }
 
 function removeEventListenersOnGameStart() {
+	const isOwner = JSON.parse(getFromLocalStorage('avatarConfig')).isOwner;
 	if (isOwner)
 		document
 			.querySelector('.start-game-btn')
@@ -209,10 +210,11 @@ function initGlobalEventListeners() {
 		.addEventListener('click', copyJoiningLinkEL);
 
 	// add event listener to start game button to start game
-	if (isOwner)
-		document
-			.querySelector('.start-game-btn')
-			.addEventListener('click', startGameEl);
+	const isOwner = JSON.parse(getFromLocalStorage('avatarConfig')).isOwner;
+	const startGameBtn = document.querySelector('.start-game-btn');
+
+	if (isOwner) startGameBtn.addEventListener('click', startGameEl);
+	else startGameBtn.classList.add('hidden');
 
 	// adjust overlay position on scroll
 	window.addEventListener('scroll', adjustOverlay);

@@ -38,11 +38,9 @@
 							<p class="overlay-text">Waiting for others to join!</p>
 						</div>
 
-						{{ if .IsOwner }}
 						<div>
 							<button class="btn start-game-btn">Start now</button>
 						</div>
-						{{ end }}
 					</div>
 				</div>
 
@@ -82,7 +80,6 @@
 			const poolId = '{{ .PoolId }}';
 			const clientId = '{{ .ClientId }}';
 			const clientName = '{{ .ClientName }}';
-			const isOwner = '{{ .IsOwner }}' === 'true';
 			const joiningLink = '{{ .JoiningLink }}';
 		</script>
 

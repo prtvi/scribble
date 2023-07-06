@@ -1,8 +1,10 @@
 package socket
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"scribble/model"
 	utils "scribble/utils"
 	"strconv"
 	"strings"
@@ -23,43 +25,6 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&isOwner=true|false
-func HandlerWsConnection(c echo.Context) error {
-	// handle socket connections for the pools
-
-	// get the query params
-	poolId := c.QueryParam("poolId")
-	clientId := c.QueryParam("clientId")
-	clientName := c.QueryParam("clientName")
-	isOwner := c.QueryParam("isOwner") == "true"
-
-	// register the socket connection from client
-	conn, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
-	if err != nil {
-		fmt.Fprintf(c.Response().Writer, "%+v\n", err)
-	}
-
-	pool := hub[poolId]
-
-	// create a new client to append to Pool.Clients map
-	client := &Client{
-		ID:            clientId,
-		Name:          clientName,
-		IsOwner:       isOwner,
-		DoneSketching: false,
-		HasGuessed:    false,
-		Score:         0,
-		Conn:          conn,
-		Pool:          pool,
-	}
-
-	// register and notify other clients
-	pool.Register <- client
-	client.read()
-
-	return nil
-}
-
 // GET /
 func Welcome(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", map[string]any{
@@ -67,8 +32,6 @@ func Welcome(c echo.Context) error {
 		"RenderTemplateName": "home",
 	})
 }
-
-// -----------------------------------------------------------------------------
 
 // GET /create-room
 func CreateRoom(c echo.Context) error {
@@ -124,8 +87,6 @@ func CreateRoomLink(c echo.Context) error {
 		"UseCustomWordsOnly": pool.UseCustomWordsOnly,
 	})
 }
-
-// -----------------------------------------------------------------------------
 
 // GET /app
 func App(c echo.Context) error {
@@ -185,7 +146,6 @@ func RegisterToPool(c echo.Context) error {
 
 	poolId := c.FormValue("poolId")
 	clientName := c.FormValue("clientName")
-	isOwner := c.FormValue("isOwner") == "true"
 
 	// extra check to prevent user from joining any random pool which does not exist
 	pool, ok := hub[poolId]
@@ -197,12 +157,6 @@ func RegisterToPool(c echo.Context) error {
 		})
 	}
 
-	// generate client id and color
-	clientId := utils.GenerateUUID()
-	// clientColor := pool.getColorForClient()
-
-	// render ConnectSocket form to establish socket connection
-	// socket connection will start only if "ConnectSocket" form is rendered
 	return c.Render(http.StatusOK, "app", map[string]any{
 		"StyleSheets": []string{"global", "app"},
 
@@ -214,9 +168,46 @@ func RegisterToPool(c echo.Context) error {
 
 		// init as js vars
 		"PoolId":      poolId,
-		"ClientId":    clientId,
+		"ClientId":    utils.GenerateUUID(),
 		"ClientName":  clientName,
-		"IsOwner":     isOwner,
 		"JoiningLink": pool.JoiningLink,
 	})
+}
+
+// GET /ws?poolId=234bkj&clientId=123123&clientName=joy&avatarConfig='{}'
+func HandlerWsConnection(c echo.Context) error {
+	// get query params
+	poolId := c.QueryParam("poolId")
+	clientId := c.QueryParam("clientId")
+	clientName := c.QueryParam("clientName")
+	avatarConfig := c.QueryParam("avatarConfig")
+
+	var avatarConfigObj model.AvatarConfig
+	json.Unmarshal([]byte(avatarConfig), &avatarConfigObj)
+
+	// register the socket connection from client
+	conn, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
+	if err != nil {
+		fmt.Fprintf(c.Response().Writer, "%+v\n", err)
+	}
+
+	pool := hub[poolId]
+
+	// create a new client to append to Pool.Clients map
+	client := &Client{
+		ID:            clientId,
+		Name:          clientName,
+		AvatarConfig:  avatarConfigObj,
+		DoneSketching: false,
+		HasGuessed:    false,
+		Score:         0,
+		Conn:          conn,
+		Pool:          pool,
+	}
+
+	// register and notify other clients
+	pool.Register <- client
+	client.read()
+
+	return nil
 }

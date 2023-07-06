@@ -118,7 +118,6 @@
 			<div class="form-container join-room-form">
 				<form action="/app" method="post">
 					<input type="hidden" name="poolId" value="{{ .PoolId }}" />
-					<input type="hidden" name="isOwner" id="isOwner" />
 
 					<div class="join-room-input">
 						<input
@@ -137,13 +136,6 @@
 						<button class="btn play-btn" type="submit">Play!</button>
 					</div>
 				</form>
-
-				<script>
-					// assign isOwner value checking from url
-					const urlParams = new URLSearchParams(location.search);
-					if (urlParams.get('isOwner') === 'true')
-						document.getElementById('isOwner').value = 'true';
-				</script>
 			</div>
 
 			{{ else }}

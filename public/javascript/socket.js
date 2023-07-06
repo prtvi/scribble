@@ -1,9 +1,19 @@
 'use strict';
 
+function saveToLocalStorage(key, value) {
+	window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getFromLocalStorage(key) {
+	return window.localStorage.getItem(key);
+}
+
 function initSocket() {
 	// initialises socket connection and adds corresponding function handlers to the socket
 
-	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&isOwner=${isOwner}`;
+	const avatarConfig = getFromLocalStorage('avatarConfig');
+
+	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
 
 	const socket = new WebSocket(wsUrl);
 

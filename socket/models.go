@@ -8,16 +8,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Client.Color: string
-// color string hash value without the #
-
 type Client struct {
-	ID, Name                           string
-	IsOwner, DoneSketching, HasGuessed bool
-	Score                              int
-	Conn                               *websocket.Conn
-	Pool                               *Pool
-	mu                                 sync.Mutex
+	ID, Name                  string
+	AvatarConfig              model.AvatarConfig
+	DoneSketching, HasGuessed bool
+	Score                     int
+	Conn                      *websocket.Conn
+	Pool                      *Pool
+	mu                        sync.Mutex
 }
 
 type Pool struct {

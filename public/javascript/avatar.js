@@ -8,10 +8,12 @@ const scaleBy = 3;
 const offset = 48 * scaleBy;
 const rows = 10;
 
-const positions = {
+const avatarConfig = {
 	color: { x: 0, y: 0 },
 	eyes: { x: 0, y: 0 },
 	mouth: { x: 0, y: 0 },
+	isOwner: false,
+	isCrowned: false,
 };
 
 const boundaries = {
@@ -70,23 +72,24 @@ function rightEL(e) {
 	if (elem.style.backgroundPositionX === '')
 		elem.style.backgroundPositionX = '0px';
 
-	positions[name].x = getCurrPosition(elem.style.backgroundPositionX) + 1;
+	avatarConfig[name].x = getCurrPosition(elem.style.backgroundPositionX) + 1;
 
-	if (positions[name].x >= rows) {
-		positions[name].y += 1;
-		positions[name].x = 0;
+	if (avatarConfig[name].x >= rows) {
+		avatarConfig[name].y += 1;
+		avatarConfig[name].x = 0;
 	}
 
 	if (
-		positions[name].x > boundaries[name].x &&
-		positions[name].y === boundaries[name].y
+		avatarConfig[name].x > boundaries[name].x &&
+		avatarConfig[name].y === boundaries[name].y
 	) {
-		positions[name].x = 0;
-		positions[name].y = 0;
+		avatarConfig[name].x = 0;
+		avatarConfig[name].y = 0;
 	}
 
-	setBgPosition(elem, positions[name].x, positions[name].y);
-	// saveToLocalStorage('avatar_config', positions);
+	setBgPosition(elem, avatarConfig[name].x, avatarConfig[name].y);
+	setIfOwner();
+	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
 function leftEL(e) {
@@ -96,34 +99,36 @@ function leftEL(e) {
 	if (elem.style.backgroundPositionX === '')
 		elem.style.backgroundPositionX = '0px';
 
-	positions[name].x = getCurrPosition(elem.style.backgroundPositionX) - 1;
+	avatarConfig[name].x = getCurrPosition(elem.style.backgroundPositionX) - 1;
 
-	if (positions[name].x < 0 && positions[name].y > 0) {
-		positions[name].y -= 1;
-		positions[name].x = rows - 1;
+	if (avatarConfig[name].x < 0 && avatarConfig[name].y > 0) {
+		avatarConfig[name].y -= 1;
+		avatarConfig[name].x = rows - 1;
 	}
 
-	if (positions[name].x < 0 && positions[name].y === 0) {
-		positions[name].x = boundaries[name].x;
-		positions[name].y = boundaries[name].y;
+	if (avatarConfig[name].x < 0 && avatarConfig[name].y === 0) {
+		avatarConfig[name].x = boundaries[name].x;
+		avatarConfig[name].y = boundaries[name].y;
 	}
 
-	setBgPosition(elem, positions[name].x, positions[name].y);
-	// saveToLocalStorage('avatar_config', positions);
+	setBgPosition(elem, avatarConfig[name].x, avatarConfig[name].y);
+	setIfOwner();
+	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
 function randomizeAvatar() {
 	const coords = getRandomizedAvatarCoords();
 
-	positions.color = coords.color;
-	positions.eyes = coords.eyes;
-	positions.mouth = coords.mouth;
+	avatarConfig.color = coords.color;
+	avatarConfig.eyes = coords.eyes;
+	avatarConfig.mouth = coords.mouth;
 
 	setBgPosition(color, coords.color.x, coords.color.y);
 	setBgPosition(eyes, coords.eyes.x, coords.eyes.y);
 	setBgPosition(mouth, coords.mouth.x, coords.mouth.y);
 
-	// saveToLocalStorage('avatar_config', positions);
+	setIfOwner();
+	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
 function getRandomValue(arr) {
@@ -161,6 +166,15 @@ function initValidCoords(prop) {
 	return coords;
 }
 
+function setIfOwner() {
+	const urlParams = new URLSearchParams(location.search);
+	if (urlParams.get('isOwner') === 'true') avatarConfig.isOwner = true;
+}
+
 function saveToLocalStorage(key, value) {
 	window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getFromLocalStorage(key) {
+	return window.localStorage.getItem(key);
 }
