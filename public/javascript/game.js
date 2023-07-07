@@ -1,6 +1,6 @@
 'use strict';
 
-// ---------------- UTILS -------------------
+// -------------------------------- UTILS --------------------------------
 
 function log(...args) {
 	if (allowLogs) console.log(...args);
@@ -94,8 +94,6 @@ function getOverlayHtmlForTextOnly(overlayText) {
 		</div>
 	</div>`;
 }
-
-const overlayFadeInAnimationDuration = 300; // to be configured in css file too, #overlay{}, render animation/transition for changing innerHTML - https://stackoverflow.com/questions/29640486
 
 function displayOverlay(html) {
 	// display overlay after some delay to render fade in animation
@@ -239,6 +237,16 @@ function initGlobalEventListeners() {
 
 		adjustOverlay();
 	});
+
+	const modal = document.getElementById('modal');
+	document
+		.querySelector('.close-modal')
+		.addEventListener('click', () => (modal.style.display = 'none'));
+
+	window.addEventListener('click', e => {
+		if (e.target === modal && modal.style.display != 'none')
+			modal.style.display = 'none';
+	});
 }
 
 function copyJoiningLinkEL() {
@@ -276,7 +284,7 @@ function wordChooseEL(e) {
 	sendViaSocket(socketMsg);
 }
 
-// ------------ CANVAS -------------
+// -------------------------------- CANVAS --------------------------------
 
 function initCanvasAndOverlay() {
 	const canvas = document.querySelector('.canv');
@@ -343,8 +351,6 @@ async function paint(event) {
 	sendImgData();
 }
 
-// clear canvas
-
 function requestCanvasClear() {
 	// clear canvas and request clear on rest of the clients
 	clearCanvas();
@@ -361,8 +367,6 @@ function requestCanvasClear() {
 	sendViaSocket(socketMsg);
 }
 
-// send image data
-
 function sendImgData() {
 	// called by paint function
 	const socketMsg = {
@@ -378,7 +382,7 @@ function sendImgData() {
 	sendViaSocket(socketMsg);
 }
 
-// --------------- ON MESSAGE HANDLERS ----------------
+// -------------------------------- ON MESSAGE HANDLERS --------------------------------
 
 // 1, 2, 3, 31, 312, 313
 function appendChatMsgToDOM(msg, formatColor) {
@@ -621,7 +625,7 @@ function makeMessageTypeMapGlobal(socketMessage) {
 	keys.forEach(k => messageTypeMap.set(Number(k), m[k]));
 }
 
-// ---------------- SOCKET ---------------
+// -------------------------------- SOCKET --------------------------------
 
 function initSocket() {
 	// initialises socket connection and adds corresponding function handlers to the socket
@@ -784,6 +788,8 @@ function socketOnClose() {
 	// on socket conn close, stop all timer or intervals
 	log('Socket connection closed, stopping timers and timeouts!');
 	clearAllIntervals(wordExpiryTimer);
+
+	document.getElementById('modal').style.display = 'flex';
 }
 
 function sendViaSocket(socketMsg) {
@@ -805,6 +811,11 @@ function sendViaSocket(socketMsg) {
 	}
 }
 
+// -------------------------------- MAIN --------------------------------
+
+// to be configured in css file too, #overlay{}, render animation/transition for changing innerHTML - https://stackoverflow.com/questions/29640486
+const overlayFadeInAnimationDuration = 300;
+
 // canvas, canvas ctx and overlay init
 const { canvas, ctx, overlay } = initCanvasAndOverlay();
 
@@ -816,11 +827,11 @@ const paintUtils = {
 	isAllowedToPaint: false,
 };
 
-let messageTypeMap;
-let timeForEachWordInSeconds;
-let timeForChoosingWordInSeconds;
-let wordExpiryTimer;
-let allowLogs;
+let messageTypeMap,
+	timeForEachWordInSeconds,
+	timeForChoosingWordInSeconds,
+	wordExpiryTimer,
+	allowLogs;
 
 // init socket connection and check game begin status
 const socket = initSocket();

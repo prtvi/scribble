@@ -5,6 +5,18 @@
 	{{ template "header" .}}
 
 	<body>
+		<div id="modal" class="modal">
+			<div class="modal-content">
+				<span class="close-modal">&times;</span>
+
+				<p class="modal-title">Connection lost!</p>
+
+				<div class="btn-container">
+					<a href="/"><button class="btn">Go to home page</button></a>
+				</div>
+			</div>
+		</div>
+
 		<div class="main">
 			<!-- game bar -->
 			<div class="game-bar">
@@ -82,7 +94,7 @@
 			const clientName = '{{ .ClientName }}';
 			const joiningLink = '{{ .JoiningLink }}';
 		</script>
-		<script src="public/javascript/main.js"></script>
+		<script src="public/javascript/game.js"></script>
 	</body>
 </html>
 

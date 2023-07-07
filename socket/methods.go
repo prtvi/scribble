@@ -75,16 +75,15 @@ func (pool *Pool) appendClientToList(client *Client) {
 // remove the client from the client list
 func (pool *Pool) removeClientFromList(client *Client) {
 	// remove the client from the list
-	var idxToRemove int
+	var idx int
 	for i, c := range pool.Clients {
 		if c == client {
-			idxToRemove = i
+			idx = i
 			break
 		}
 	}
 
-	pool.Clients[idxToRemove] = pool.Clients[len(pool.Clients)-1]
-	pool.Clients = pool.Clients[:len(pool.Clients)-1]
+	pool.Clients = append(pool.Clients[:idx], pool.Clients[idx+1:]...)
 }
 
 func (pool *Pool) flagAllClientsAsNotGuessed() {
@@ -170,28 +169,6 @@ func (pool *Pool) beginBroadcastClientInfo() {
 		}
 	}
 }
-
-/*
-// begin the timeout to start the game if not started by the clients
-func (pool *Pool) startGameCountdown() {
-	// as soon as the first player/client joins, start this countdown to start the game, after this timeout, the game begin message will broadcast
-
-	// sleep until its the game starting time
-	sleep(pool.GameStartTime.Sub(time.Now()))
-
-	// if the game has already started by the client using the button then exit the countdown
-	if pool.HasGameStarted {
-		return
-	}
-
-	// else start the game and broadcast the start game message
-	pool.startGameAndBroadcast()
-	utils.Cp("greenBg", "Game started! by server countdown")
-
-	// start game flow
-	go pool.beginGameFlow()
-}
-*/
 
 // begin the game flow as soon as a client requests to start the game
 func (pool *Pool) startGameRequestFromClient(clientId string) {
