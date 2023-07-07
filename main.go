@@ -19,15 +19,15 @@ func main() {
 
 	ee := e.Group("", socket.Logger)
 
-	ee.GET("/", socket.Welcome)
+	ee.GET("/", socket.Index)
 
-	ee.GET("/create-room", socket.CreateRoom)
-	ee.POST("/create-room", socket.CreateRoomLink)
+	ee.GET("/create-room", socket.CreateRoomForm)
+	ee.POST("/create-room", socket.CreateRoom)
 
-	ee.GET("/app", socket.App)
-	ee.POST("/app", socket.RegisterToPool)
+	ee.GET("/app", socket.JoinPool)
+	ee.POST("/app", socket.EnterPool)
 
-	ee.GET("/ws", socket.HandlerWsConnection)
+	ee.GET("/ws", socket.WsConnect)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

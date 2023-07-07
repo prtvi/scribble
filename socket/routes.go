@@ -26,7 +26,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 // GET /
-func Welcome(c echo.Context) error {
+func Index(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", map[string]any{
 		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "home",
@@ -34,7 +34,7 @@ func Welcome(c echo.Context) error {
 }
 
 // GET /create-room
-func CreateRoom(c echo.Context) error {
+func CreateRoomForm(c echo.Context) error {
 	// render a form to create a new pool
 	return c.Render(http.StatusOK, "index", map[string]any{
 		"StyleSheets":        []string{"global"},
@@ -45,7 +45,7 @@ func CreateRoom(c echo.Context) error {
 }
 
 // POST /create-room
-func CreateRoomLink(c echo.Context) error {
+func CreateRoom(c echo.Context) error {
 	// on post request to this route, create a new pool, start listening to connections on that pool, render the link to join this pool
 
 	players, _ := strconv.Atoi(c.FormValue("players"))
@@ -89,7 +89,7 @@ func CreateRoomLink(c echo.Context) error {
 }
 
 // GET /app
-func App(c echo.Context) error {
+func JoinPool(c echo.Context) error {
 	// if /app?join=poolId, then render the playing areax
 	// if /app          , then render message
 
@@ -141,7 +141,7 @@ func App(c echo.Context) error {
 }
 
 // POST /app
-func RegisterToPool(c echo.Context) error {
+func EnterPool(c echo.Context) error {
 	// on post request made to this route to capture clientName from "RegisterToPool" post form
 
 	poolId := c.FormValue("poolId")
@@ -175,7 +175,7 @@ func RegisterToPool(c echo.Context) error {
 }
 
 // GET /ws?poolId=234bkj&clientId=123123&clientName=joy&avatarConfig='{}'
-func HandlerWsConnection(c echo.Context) error {
+func WsConnect(c echo.Context) error {
 	// get query params
 	poolId := c.QueryParam("poolId")
 	clientId := c.QueryParam("clientId")
