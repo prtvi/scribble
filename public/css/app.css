@@ -3,6 +3,8 @@
 	--overlay-transition: opacity 0.3s ease-in-out;
 
 	--game-bar-item-width: 24px;
+
+	--scale-avatar-by: 0.5;
 }
 
 .btn {
@@ -217,7 +219,7 @@ canvas {
 
 /* overlay pseudo classes */
 
-.mc-container {
+.pc-container {
 	height: 250px;
 	display: flex;
 	justify-content: center;
@@ -236,35 +238,39 @@ canvas {
 }
 
 .side .message:nth-child(even),
-.side .member:nth-child(even) {
+.side .player:nth-child(even) {
 	background-color: #f2f2f2;
 }
 
-/* mc pseudo classes */
+/* pc pseudo classes */
 
-.member {
+.player {
 	background-color: rgb(240, 217, 188);
-	padding: 7px;
+	padding: 5px;
 	display: flex;
 	justify-content: space-between;
 }
 
-.member-num {
+.player-num {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-11);
 }
 
-.member-name {
-	font-family: l300, var(--ff);
-	font-weight: var(--fw-300);
+.player-name {
+	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
 	font-size: var(--fs-10);
+	display: block;
+	clear: both;
 }
 
-.member-score {
+.player-score {
 	font-family: xl200, var(--ff);
 	font-weight: var(--fw-200);
-	font-size: var(--fs-10);
+	font-size: var(--fs-9);
+	display: block;
+	line-height: calc(var(--fs-10) - 2px);
 }
 
 .message {

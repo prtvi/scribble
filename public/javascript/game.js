@@ -30,36 +30,91 @@ function clearAllIntervals(...ids) {
 	ids.forEach(i => clearInterval(i));
 }
 
-function getClientNameDiv(clientInfo, iteration) {
-	// client name div
-	const clientNameDiv = document.createElement('div');
-	clientNameDiv.classList.add('member');
+function getClientNameDiv(playerInfo, iteration) {
+	function setBgPosition(element, x, y) {
+		const scaleBy = 0.5;
+		const offset = 48 * scaleBy;
 
-	// client num span
-	const clientNumSpan = document.createElement('span');
-	clientNumSpan.classList.add('member-num');
-	clientNumSpan.textContent = `#${iteration + 1}`;
+		element.style.backgroundPositionX = `-${x * offset}px`;
+		element.style.backgroundPositionY = `-${y * offset}px`;
+	}
 
-	// client name span
-	const clientNameSpan = document.createElement('span');
-	clientNameSpan.classList.add('member-name');
-	clientNameSpan.style.color = `#000`;
+	// player name div
+	const player = document.createElement('div');
+	player.classList.add('player');
 
-	if (clientName === clientInfo.name)
-		clientNameSpan.textContent = `${clientInfo.name} (you)`;
-	else clientNameSpan.textContent = clientInfo.name;
+	// player num span
+	const playerNum = document.createElement('span');
+	playerNum.classList.add('player-num');
+	playerNum.textContent = `#${iteration + 1}`;
 
-	// client score span
-	const clientScoreSpan = document.createElement('span');
-	clientScoreSpan.classList.add('member-score');
-	clientScoreSpan.textContent = `${clientInfo.score} points`;
+	// player name span
+	const playerName = document.createElement('span');
+	playerName.classList.add('player-name');
+	playerName.style.color = `#000`;
 
-	// append everything to client name div
-	clientNameDiv.appendChild(clientNumSpan);
-	clientNameDiv.appendChild(clientNameSpan);
-	clientNameDiv.appendChild(clientScoreSpan);
+	if (clientId === playerInfo.id)
+		playerName.textContent = `${playerInfo.name} (you)`;
+	else playerName.textContent = playerInfo.name;
 
-	return clientNameDiv;
+	// player score span
+	const playerScore = document.createElement('span');
+	playerScore.classList.add('player-score');
+	playerScore.textContent = `${playerInfo.score} points`;
+
+	const playerNameAndScore = document.createElement('div');
+	playerNameAndScore.classList.add('ns');
+	playerNameAndScore.appendChild(playerName);
+	playerNameAndScore.appendChild(playerScore);
+
+	// player avatar
+	const playerAvatar = document.createElement('div');
+	playerAvatar.classList.add('avatar', 'player-avatar');
+
+	const pColor = document.createElement('div');
+	pColor.classList.add('color');
+	setBgPosition(
+		pColor,
+		playerInfo.avatarConfig.color.x,
+		playerInfo.avatarConfig.color.y
+	);
+
+	const pEyes = document.createElement('div');
+	pEyes.classList.add('eyes');
+	setBgPosition(
+		pEyes,
+		playerInfo.avatarConfig.eyes.x,
+		playerInfo.avatarConfig.eyes.y
+	);
+
+	const pMouth = document.createElement('div');
+	pMouth.classList.add('mouth');
+	setBgPosition(
+		pMouth,
+		playerInfo.avatarConfig.mouth.x,
+		playerInfo.avatarConfig.mouth.y
+	);
+
+	const pOwner = document.createElement('div');
+	pOwner.classList.add('owner');
+	if (playerInfo.avatarConfig.isOwner) pOwner.classList.add('active');
+
+	const pCrowned = document.createElement('div');
+	pCrowned.classList.add('crowned');
+	if (playerInfo.avatarConfig.isCrowned) pCrowned.classList.add('active');
+
+	playerAvatar.appendChild(pColor);
+	playerAvatar.appendChild(pEyes);
+	playerAvatar.appendChild(pMouth);
+	playerAvatar.appendChild(pOwner);
+	playerAvatar.appendChild(pCrowned);
+
+	// append everything to player div
+	player.appendChild(playerNum);
+	player.appendChild(playerNameAndScore);
+	player.appendChild(playerAvatar);
+
+	return player;
 }
 
 function sendChatMsgBtnEL(e) {
@@ -474,7 +529,7 @@ function renderClients(allClients) {
 
 	if (allClients.length === 0) return;
 
-	const membersDiv = document.querySelector('.members');
+	const membersDiv = document.querySelector('.players');
 	membersDiv.innerHTML = '';
 
 	// parse array of objects into json

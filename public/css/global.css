@@ -167,7 +167,7 @@ input {
 }
 
 .owner,
-.special {
+.crowned {
 	position: absolute;
 	top: calc((var(--avatar-size) / 4) * -1);
 	left: 0;
@@ -190,7 +190,7 @@ input {
 	background-image: url('../assets/images/owner.gif');
 	rotate: -30deg;
 }
-.special.active {
+.crowned.active {
 	background-image: url('../assets/images/crown.gif');
 }
 

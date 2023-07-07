@@ -45,9 +45,10 @@ type AvatarConfig struct {
 }
 
 type ClientInfo struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Score int    `json:"score"`
+	ID           string       `json:"id"`
+	Name         string       `json:"name"`
+	Score        int          `json:"score"`
+	AvatarConfig AvatarConfig `json:"avatarConfig"`
 }
 
 type SharedConfig struct {
