@@ -183,7 +183,7 @@ function getFromLocalStorage(key) {
 
 function disableSketching() {
 	const painterUtilsDiv = document.querySelector('.painter-utils');
-	const clearCanvasBtn = document.querySelector('.clear-canvas');
+	const clearCanvasBtn = document.querySelector('.pu.clear');
 
 	paintUtils.isAllowedToPaint = false;
 
@@ -255,6 +255,19 @@ function initGlobalEventListeners() {
 		document.addEventListener('mousemove', paint);
 	});
 
+	// resize canvas on window resize
+	window.addEventListener('resize', function () {
+		const { w, h } = getCanvasSize();
+		canvas.width = w;
+		canvas.height = h;
+
+		const cc = document.querySelector('.canvas-container');
+		cc.style.width = `${w}px`;
+		cc.style.height = `${h}px`;
+
+		adjustOverlay();
+	});
+
 	// copy joining link
 	document
 		.querySelector('.joining-link-btn')
@@ -270,19 +283,7 @@ function initGlobalEventListeners() {
 	// adjust overlay position on scroll
 	window.addEventListener('scroll', adjustOverlay);
 
-	// resize canvas on window resize
-	window.addEventListener('resize', function () {
-		const { w, h } = getCanvasSize();
-		canvas.width = w;
-		canvas.height = h;
-
-		const cc = document.querySelector('.canvas-container');
-		cc.style.width = `${w}px`;
-		cc.style.height = `${h}px`;
-
-		adjustOverlay();
-	});
-
+	// modal
 	const modal = document.getElementById('modal');
 	document
 		.querySelector('.close-modal')
@@ -567,7 +568,7 @@ function beginClientSketchingFlow(socketMessage) {
 
 	// for enabling drawing access if clientId matches
 	const painterUtilsDiv = document.querySelector('.painter-utils');
-	const clearCanvasBtn = document.querySelector('.clear-canvas');
+	const clearCanvasBtn = document.querySelector('.pu.clear');
 	paintUtils.isAllowedToPaint = true;
 
 	// display the word

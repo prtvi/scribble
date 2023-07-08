@@ -162,24 +162,15 @@ canvas {
 	transition: var(--overlay-transition);
 }
 
-.painter-utils {
-	position: absolute;
-	right: 2px;
-	/* status bar height + 2*padding (5px) + 5px margin for canvas */
-	top: calc(var(--game-bar-h) + 17px);
-}
-
 /* overlay pseudo classes */
 
 .overlay-content {
 	padding: 10px;
 	margin: 0 auto;
 }
-
 .overlay-content > div:not(:last-child) {
 	margin-bottom: 15px;
 }
-
 .overlay-text {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
@@ -191,7 +182,6 @@ canvas {
 	justify-content: space-around;
 	align-items: center;
 }
-
 .word-option {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
@@ -202,11 +192,9 @@ canvas {
 	margin: 5px;
 	border: 1px solid grey;
 }
-
 .word-option:hover {
 	border: 1px solid var(--white);
 }
-
 .word-choose-timer {
 	font-family: l300, var(--ff);
 	font-weight: var(--fw-300);
@@ -221,8 +209,64 @@ canvas {
 	border-radius: 5px;
 }
 
-/* overlay pseudo classes */
+/* painter utils */
 
+.painter-utils {
+	height: 30px;
+	margin-bottom: 4px;
+	display: flex;
+	justify-content: space-between;
+}
+.painter-utils > div {
+	width: 70px;
+	height: 30px;
+	display: flex;
+	justify-content: space-around;
+}
+
+.pu {
+	width: 30px;
+	height: 30px;
+	background-size: 30px;
+	background-color: var(--white);
+	border-radius: 2px;
+	position: relative;
+	cursor: pointer;
+}
+.pu.active {
+	background-color: var(--bg);
+}
+.pu.active span {
+	color: var(--white);
+}
+
+.pu span {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-8);
+	position: absolute;
+	top: 0;
+	left: 2px;
+}
+.pu img {
+	width: 30px;
+	position: absolute;
+	top: 0;
+	left: 2px;
+}
+.pu img:active {
+	transform: translateY(2px);
+}
+
+.painter-utils .color-select {
+	background-color: black;
+}
+
+.painter-utils .brush-stroke-select {
+	background-color: black;
+}
+
+/* overlay pseudo classes */
 .pc-container {
 	height: 300px;
 	display: flex;
@@ -322,4 +366,8 @@ canvas {
 .input-wrapper .btn {
 	padding: 6px;
 	width: 50px;
+}
+
+.hidden {
+	display: none;
 }

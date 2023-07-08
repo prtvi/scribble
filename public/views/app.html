@@ -21,12 +21,15 @@
 			<!-- game bar -->
 			<div class="game-bar">
 				<div class="gb-item timer">
-					<img src="public/assets/images/setting_2.gif" alt="" />
+					<img src="public/assets/images/setting_2.gif" alt="timer icon" />
 					<span class="img-sub">0s</span>
 				</div>
 
 				<div class="gb-item round">
-					<img src="public/assets/images/setting_3.gif" alt="" />
+					<img
+						src="public/assets/images/setting_3.gif"
+						alt="current round icon"
+					/>
 					<span class="img-sub">
 						<span class="curr-round">0</span>/{{ .Rounds }}
 					</span>
@@ -57,9 +60,35 @@
 				</div>
 
 				<canvas class="canv"></canvas>
+			</div>
 
-				<div class="painter-utils hidden">
-					<button class="btn clear-canvas">Clear</button>
+			<!-- painter utils -->
+			<div class="painter-utils hidden">
+				<div>
+					<div class="pu color-select"></div>
+					<div class="pu brush-stroke-select"></div>
+				</div>
+
+				<div>
+					<div class="pu brush">
+						<span>B</span>
+						<img src="public/assets/images/pen.gif" alt="pen icon" />
+					</div>
+					<div class="pu fill">
+						<span>F</span>
+						<img src="public/assets/images/fill.gif" alt="fill bucket icon" />
+					</div>
+				</div>
+
+				<div>
+					<div class="pu undo">
+						<span>U</span>
+						<img src="public/assets/images/undo.gif" alt="undo arrow icon" />
+					</div>
+					<div class="pu clear">
+						<span>C</span>
+						<img src="public/assets/images/clear.gif" alt="clear/delete icon" />
+					</div>
 				</div>
 			</div>
 
