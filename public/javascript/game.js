@@ -185,13 +185,18 @@ function disableSketching() {
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
 	const undoBtn = document.querySelector('.pu.undo');
+	const strokes = document.querySelector('.strokes');
+	const brushStrokeSelect = document.querySelector('.pu.brush-stroke-select');
 
 	paintUtils.isAllowedToPaint = false;
 
 	// display painter utils div and remove EL
 	painterUtilsDiv.classList.add('hidden');
+
 	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
 	undoBtn.removeEventListener('click', undo);
+	strokes.removeEventListener('click', selectStrokeEL);
+	brushStrokeSelect.removeEventListener('click', openBrushStrokeSelect);
 }
 
 function beginClientSketchingFlowInit(socketMessage) {
@@ -332,6 +337,32 @@ function wordChooseEL(e) {
 	sendViaSocket(socketMsg);
 }
 
+function selectStrokeEL(e) {
+	if (!e.target.classList.contains('stroke')) return;
+
+	const strokeElems = document.getElementsByClassName('stroke');
+	Array.from(strokeElems).forEach(ele => ele.classList.remove('active'));
+	e.target.classList.add('active');
+
+	const size = +e.target.id.slice(1);
+	paintUtils.lineWidth = size * 2;
+
+	const viewImg = document.querySelector('.brush-stroke-select img');
+	viewImg.style.width = `${size * minBrushStrokeSizeForImg}px`;
+	viewImg.style.height = `${size * minBrushStrokeSizeForImg}px`;
+
+	const strokeSelectMenu = document.querySelector('.stroke-select');
+	setTimeout(() => strokeSelectMenu.classList.add('hidden'), 100);
+}
+
+function openBrushStrokeSelect() {
+	const strokeSelectMenu = document.querySelector('.stroke-select');
+	strokeSelectMenu.classList.remove('hidden');
+
+	const strokes = document.querySelector('.strokes');
+	strokes.addEventListener('click', selectStrokeEL);
+}
+
 // -------------------------------- CANVAS --------------------------------
 
 function initCanvasAndOverlay() {
@@ -394,10 +425,10 @@ async function paint(event) {
 	if (!paintUtils.hasGameStarted) return;
 	if (!paintUtils.isAllowedToPaint) return;
 
-	ctx.lineWidth = 2;
-	ctx.lineCap = 'round';
-	ctx.lineJoin = 'round';
-	ctx.strokeStyle = '#000';
+	ctx.lineWidth = paintUtils.lineWidth;
+	ctx.lineCap = paintUtils.lineCap;
+	ctx.lineJoin = paintUtils.lineJoin;
+	ctx.strokeStyle = paintUtils.strokeStyle;
 
 	paintUtils.prevMouse = {
 		x: paintUtils.mouse.x,
@@ -633,6 +664,7 @@ function beginClientSketchingFlow(socketMessage) {
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
 	const undoBtn = document.querySelector('.pu.undo');
+	const brushStrokeSelect = document.querySelector('.pu.brush-stroke-select');
 
 	paintUtils.isAllowedToPaint = true;
 
@@ -645,6 +677,7 @@ function beginClientSketchingFlow(socketMessage) {
 	painterUtilsDiv.classList.remove('hidden');
 	clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	undoBtn.addEventListener('click', undo);
+	brushStrokeSelect.addEventListener('click', openBrushStrokeSelect);
 
 	return wordExpiryCountdown;
 }
@@ -933,6 +966,7 @@ function sendViaSocket(socketMsg) {
 // to be configured in css file too, #overlay{}, render animation/transition for changing innerHTML - https://stackoverflow.com/questions/29640486
 const overlayFadeInAnimationDuration = 300;
 const scaleAvatarBy = 0.5;
+const minBrushStrokeSizeForImg = 6;
 
 // canvas, canvas ctx and overlay init
 const { canvas, ctx, overlay } = initCanvasAndOverlay();
@@ -946,6 +980,10 @@ const paintUtils = {
 	pointsHistory: [],
 	mouse: { x: 0, y: 0 },
 	prevMouse: { x: 0, y: 0 },
+	lineWidth: 2,
+	lineCap: 'round',
+	lineJoin: 'round',
+	strokeStyle: '#000',
 };
 
 let messageTypeMap,

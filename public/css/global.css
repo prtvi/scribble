@@ -38,6 +38,8 @@
 	--btn-inv-color: #e8e8e8;
 	--btn-inv-color-hover: #656565;
 
+	--drop-shadow: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
+
 	--scale-avatar-by: 3;
 	--randomize-icon-size: 36px;
 	--avatar-size: calc(var(--scale-avatar-by) * 48px);
@@ -70,7 +72,7 @@ input {
 }
 
 img {
-	filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
+	filter: var(--drop-shadow);
 }
 
 .btn {
@@ -131,7 +133,6 @@ img {
 .logo img {
 	width: 100%;
 	margin: auto;
-	filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
 }
 
 .start {
