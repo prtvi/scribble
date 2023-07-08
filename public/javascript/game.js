@@ -392,8 +392,6 @@ function getCanvasSize() {
 	return { w: cw, h: ch };
 }
 
-// drawing on canvas
-
 function getMousePos(event) {
 	const clientRect = canvas.getBoundingClientRect();
 	return {
@@ -412,12 +410,15 @@ function startPainting(event) {
 	paintUtils.mouse = getMousePos(event);
 
 	paintUtils.points = [];
-	paintUtils.points.push(paintUtils.mouse);
+	paintUtils.points.push({
+		coords: paintUtils.mouse,
+		lineWidth: paintUtils.lineWidth,
+	});
 }
 
 function stopPainting() {
 	paintUtils.isPainting = false;
-	paintUtils.pointsHistory.push(paintUtils.points);
+	paintUtils.paths.push(paintUtils.points);
 }
 
 async function paint(event) {
@@ -435,7 +436,11 @@ async function paint(event) {
 		y: paintUtils.mouse.y,
 	};
 	paintUtils.mouse = getMousePos(event);
-	paintUtils.points.push(paintUtils.mouse);
+
+	paintUtils.points.push({
+		coords: paintUtils.mouse,
+		lineWidth: paintUtils.lineWidth,
+	});
 
 	ctx.beginPath();
 	ctx.moveTo(paintUtils.prevMouse.x, paintUtils.prevMouse.y);
@@ -449,20 +454,23 @@ async function paint(event) {
 function drawPaths() {
 	clearCanvas();
 
-	paintUtils.pointsHistory.forEach(path => {
+	paintUtils.paths.forEach(path => {
 		if (path.length === 0) return;
 
-		ctx.beginPath();
-		ctx.moveTo(path[0].x, path[0].y);
+		ctx.lineWidth = path[0].lineWidth;
 
-		for (let i = 1; i < path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+		ctx.beginPath();
+		ctx.moveTo(path[0].coords.x, path[0].coords.y);
+
+		for (let i = 1; i < path.length; i++)
+			ctx.lineTo(path[i].coords.x, path[i].coords.y);
 
 		ctx.stroke();
 	});
 }
 
 function undo() {
-	paintUtils.pointsHistory.splice(-1, 1);
+	paintUtils.paths.splice(-1, 1);
 	drawPaths();
 	sendImgDataForUndoAction();
 }
@@ -472,7 +480,7 @@ function requestCanvasClear() {
 	clearCanvas();
 
 	paintUtils.points = [];
-	paintUtils.pointsHistory = [];
+	paintUtils.paths = [];
 
 	// broadcast clear canvas
 	const socketMsg = {
@@ -977,7 +985,7 @@ const paintUtils = {
 	hasGameStarted: false,
 	isAllowedToPaint: false,
 	points: [],
-	pointsHistory: [],
+	paths: [],
 	mouse: { x: 0, y: 0 },
 	prevMouse: { x: 0, y: 0 },
 	lineWidth: 2,
