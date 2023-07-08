@@ -69,6 +69,10 @@ input {
 	text-align: center;
 }
 
+img {
+	filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
+}
+
 .btn {
 	font-family: sb600, var(--ff);
 	font-weight: var(--fw-600);

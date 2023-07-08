@@ -31,6 +31,7 @@ func (pool *Pool) start() {
 			// on client disconnect, delete the client from Pool.Client slice and broadcast the unregister
 			pool.removeClientFromList(client)
 			pool.broadcastClientUnregister(client.ID, client.Name)
+			pool.broadcastClientInfoList()
 
 			// pool.printStats("client disconnected, clientId:", client.ID)
 			break

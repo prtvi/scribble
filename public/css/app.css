@@ -116,6 +116,10 @@
 	text-transform: uppercase;
 }
 
+.gb-item.word span.content {
+	font-family: monospace;
+}
+
 .gb-item.joining-link-div {
 	position: absolute;
 	right: 5px;
@@ -220,55 +224,53 @@ canvas {
 /* overlay pseudo classes */
 
 .pc-container {
-	height: 250px;
+	height: 300px;
 	display: flex;
 	justify-content: center;
 }
-
 .side {
 	width: 48%;
 	margin-left: 2px;
 	margin-right: 2px;
 	background-color: var(--white);
-	height: calc(inherit - 10px);
+	height: inherit;
 	text-align: center;
 	vertical-align: middle;
 	overflow-y: auto;
 	border-radius: 3px;
 }
-
+.side.players {
+	height: 250px;
+}
 .side .message:nth-child(even),
 .side .player:nth-child(even) {
-	background-color: #f2f2f2;
+	background-color: var(--white);
 }
 
 /* pc pseudo classes */
 
 .player {
-	background-color: rgb(240, 217, 188);
-	padding: 5px;
+	background-color: #aaa;
+	padding: 2px 5px;
 	display: flex;
 	justify-content: space-between;
 }
-
-.player-num {
-	font-family: r400, var(--ff);
-	font-weight: var(--fw-400);
-	font-size: var(--fs-11);
-}
-
-.player-name {
+.player .num {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-10);
+}
+.player .name {
+	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
+	font-size: var(--fs-9);
 	display: block;
 	clear: both;
 }
-
-.player-score {
-	font-family: xl200, var(--ff);
-	font-weight: var(--fw-200);
-	font-size: var(--fs-9);
+.player .score {
+	font-family: l300, var(--ff);
+	font-weight: var(--fw-300);
+	font-size: var(--fs-8);
 	display: block;
 	line-height: calc(var(--fs-10) - 2px);
 }
@@ -276,17 +278,16 @@ canvas {
 .message {
 	font-family: l300, var(--ff);
 	font-weight: var(--fw-300);
-	font-size: var(--fs-10);
+	font-size: var(--fs-8);
 	background-color: lightgrey;
 	padding: 4px;
 	text-align: left;
 	overflow-x: hidden;
 }
-
 .message strong {
 	font-family: m500, var(--ff);
 	font-weight: var(--fw-500);
-	font-size: var(--fs-10);
+	font-size: var(--fs-8);
 }
 
 /* mc pseudo classes */
@@ -297,31 +298,28 @@ canvas {
 	justify-content: center;
 	height: fit-content;
 }
-
 .input-wrapper {
 	position: relative;
 }
-
-.chat-box input {
-	height: 25px;
+.input-wrapper input {
+	height: 20px;
 	width: 180px;
 	padding: 3px 30px 3px 10px;
-	font-size: var(--fs-12);
+	font-size: var(--fs-10);
 	border-radius: 8px;
 	text-align: left;
+	border: none;
 }
-
 .input-wrapper span {
-	font-family: t100, var(--ff);
-	font-weight: var(--fw-100);
-	font-size: var(--fs-11);
+	font-family: l200, var(--ff);
+	font-weight: var(--fw-200);
+	font-size: var(--fs-9);
 	position: absolute;
 	right: 62px;
-	top: 3px;
-	line-height: 25px;
+	top: 4px;
+	line-height: 20px;
 }
-
-.chat-box .btn {
+.input-wrapper .btn {
 	padding: 6px;
 	width: 50px;
 }

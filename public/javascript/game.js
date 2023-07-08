@@ -30,84 +30,74 @@ function clearAllIntervals(...ids) {
 	ids.forEach(i => clearInterval(i));
 }
 
-function getClientNameDiv(playerInfo, iteration) {
+function getAvatarDom(avatarConfig) {
 	function setBgPosition(element, x, y) {
-		const scaleBy = 0.5;
-		const offset = 48 * scaleBy;
+		const offset = 48 * scaleAvatarBy;
 
 		element.style.backgroundPositionX = `-${x * offset}px`;
 		element.style.backgroundPositionY = `-${y * offset}px`;
 	}
 
-	// player name div
-	const player = document.createElement('div');
-	player.classList.add('player');
-
-	// player num span
-	const playerNum = document.createElement('span');
-	playerNum.classList.add('player-num');
-	playerNum.textContent = `#${iteration + 1}`;
-
-	// player name span
-	const playerName = document.createElement('span');
-	playerName.classList.add('player-name');
-	playerName.style.color = `#000`;
-
-	if (clientId === playerInfo.id)
-		playerName.textContent = `${playerInfo.name} (you)`;
-	else playerName.textContent = playerInfo.name;
-
-	// player score span
-	const playerScore = document.createElement('span');
-	playerScore.classList.add('player-score');
-	playerScore.textContent = `${playerInfo.score} points`;
-
-	const playerNameAndScore = document.createElement('div');
-	playerNameAndScore.classList.add('ns');
-	playerNameAndScore.appendChild(playerName);
-	playerNameAndScore.appendChild(playerScore);
-
-	// player avatar
 	const playerAvatar = document.createElement('div');
 	playerAvatar.classList.add('avatar', 'player-avatar');
 
 	const pColor = document.createElement('div');
 	pColor.classList.add('color');
-	setBgPosition(
-		pColor,
-		playerInfo.avatarConfig.color.x,
-		playerInfo.avatarConfig.color.y
-	);
+	setBgPosition(pColor, avatarConfig.color.x, avatarConfig.color.y);
 
 	const pEyes = document.createElement('div');
 	pEyes.classList.add('eyes');
-	setBgPosition(
-		pEyes,
-		playerInfo.avatarConfig.eyes.x,
-		playerInfo.avatarConfig.eyes.y
-	);
+	setBgPosition(pEyes, avatarConfig.eyes.x, avatarConfig.eyes.y);
 
 	const pMouth = document.createElement('div');
 	pMouth.classList.add('mouth');
-	setBgPosition(
-		pMouth,
-		playerInfo.avatarConfig.mouth.x,
-		playerInfo.avatarConfig.mouth.y
-	);
+	setBgPosition(pMouth, avatarConfig.mouth.x, avatarConfig.mouth.y);
 
 	const pOwner = document.createElement('div');
 	pOwner.classList.add('owner');
-	if (playerInfo.avatarConfig.isOwner) pOwner.classList.add('active');
+	if (avatarConfig.isOwner) pOwner.classList.add('active');
 
 	const pCrowned = document.createElement('div');
 	pCrowned.classList.add('crowned');
-	if (playerInfo.avatarConfig.isCrowned) pCrowned.classList.add('active');
+	if (avatarConfig.isCrowned) pCrowned.classList.add('active');
 
 	playerAvatar.appendChild(pColor);
 	playerAvatar.appendChild(pEyes);
 	playerAvatar.appendChild(pMouth);
 	playerAvatar.appendChild(pOwner);
 	playerAvatar.appendChild(pCrowned);
+
+	return playerAvatar;
+}
+
+function getPlayerDom(playerInfo, iteration) {
+	// player name div
+	const player = document.createElement('div');
+	player.classList.add('player');
+
+	// player num span
+	const playerNum = document.createElement('span');
+	playerNum.classList.add('num');
+	playerNum.textContent = `#${iteration + 1}`;
+
+	// player name span
+	const playerName = document.createElement('span');
+	playerName.classList.add('name');
+
+	playerName.textContent = playerInfo.name;
+	if (clientId === playerInfo.id) playerName.textContent += ' (you)';
+
+	// player score span
+	const playerScore = document.createElement('span');
+	playerScore.classList.add('score');
+	playerScore.textContent = `${playerInfo.score} points`;
+
+	const playerNameAndScore = document.createElement('div');
+	playerNameAndScore.appendChild(playerName);
+	playerNameAndScore.appendChild(playerScore);
+
+	// player avatar
+	const playerAvatar = getAvatarDom(playerInfo.avatarConfig);
 
 	// append everything to player div
 	player.appendChild(playerNum);
@@ -536,7 +526,7 @@ function renderClients(allClients) {
 	allClients = JSON.parse(allClients);
 
 	// render
-	allClients.forEach((n, i) => membersDiv.appendChild(getClientNameDiv(n, i)));
+	allClients.forEach((n, i) => membersDiv.appendChild(getPlayerDom(n, i)));
 }
 
 // 70
@@ -870,6 +860,7 @@ function sendViaSocket(socketMsg) {
 
 // to be configured in css file too, #overlay{}, render animation/transition for changing innerHTML - https://stackoverflow.com/questions/29640486
 const overlayFadeInAnimationDuration = 300;
+const scaleAvatarBy = 0.5;
 
 // canvas, canvas ctx and overlay init
 const { canvas, ctx, overlay } = initCanvasAndOverlay();

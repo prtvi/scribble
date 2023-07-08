@@ -21,9 +21,9 @@ func printSocketMsg(m model.SocketMessage) {
 	var msgTypeColor string
 
 	switch m.Type {
-	case 35, 82:
+	case 35, 82, 84, 87, 88:
 		msgTypeColor = "cyan"
-	case 8, 33, 81, 88:
+	case 69, 8, 33, 81, 83:
 		msgTypeColor = "yellow"
 	case 1, 2, 3:
 		msgTypeColor = "blue"

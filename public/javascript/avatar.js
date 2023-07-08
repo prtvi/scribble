@@ -4,8 +4,8 @@ const color = document.querySelector('.avatar .color');
 const eyes = document.querySelector('.avatar .eyes');
 const mouth = document.querySelector('.avatar .mouth');
 
-const scaleBy = 3;
-const offset = 48 * scaleBy;
+const scaleAvatarBy = 3;
+const offset = 48 * scaleAvatarBy;
 const rows = 10;
 
 const avatarConfig = {
