@@ -350,7 +350,7 @@ canvas {
 	width: 180px;
 	padding: 3px 30px 3px 10px;
 	font-size: var(--fs-10);
-	border-radius: 8px;
+	border-radius: 4px;
 	text-align: left;
 	border: none;
 }

@@ -184,12 +184,14 @@ function getFromLocalStorage(key) {
 function disableSketching() {
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
+	const undoBtn = document.querySelector('.pu.undo');
 
 	paintUtils.isAllowedToPaint = false;
 
 	// display painter utils div and remove EL
 	painterUtilsDiv.classList.add('hidden');
 	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
+	undoBtn.removeEventListener('click', undo);
 }
 
 function beginClientSketchingFlowInit(socketMessage) {
@@ -250,9 +252,9 @@ function initGlobalEventListeners() {
 
 	// event listeners for drawing
 	window.addEventListener('load', () => {
-		document.addEventListener('mousedown', startPainting);
-		document.addEventListener('mouseup', stopPainting);
-		document.addEventListener('mousemove', paint);
+		canvas.addEventListener('mousedown', startPainting);
+		canvas.addEventListener('mouseup', stopPainting);
+		canvas.addEventListener('mousemove', paint);
 	});
 
 	// resize canvas on window resize
@@ -361,18 +363,30 @@ function getCanvasSize() {
 
 // drawing on canvas
 
-function updatePositionCanvas(event) {
-	paintUtils.coords.x = event.clientX - canvas.offsetLeft;
-	paintUtils.coords.y = event.clientY - canvas.offsetTop;
+function getMousePos(event) {
+	const clientRect = canvas.getBoundingClientRect();
+	return {
+		x: Math.round(event.clientX - clientRect.left),
+		y: Math.round(event.clientY - clientRect.top),
+	};
 }
 
 function startPainting(event) {
 	paintUtils.isPainting = true;
-	updatePositionCanvas(event);
+
+	paintUtils.prevMouse = {
+		x: paintUtils.mouse.x,
+		y: paintUtils.mouse.y,
+	};
+	paintUtils.mouse = getMousePos(event);
+
+	paintUtils.points = [];
+	paintUtils.points.push(paintUtils.mouse);
 }
 
 function stopPainting() {
 	paintUtils.isPainting = false;
+	paintUtils.pointsHistory.push(paintUtils.points);
 }
 
 async function paint(event) {
@@ -380,26 +394,54 @@ async function paint(event) {
 	if (!paintUtils.hasGameStarted) return;
 	if (!paintUtils.isAllowedToPaint) return;
 
-	ctx.beginPath();
-
-	ctx.lineWidth = 5;
+	ctx.lineWidth = 2;
 	ctx.lineCap = 'round';
+	ctx.lineJoin = 'round';
 	ctx.strokeStyle = '#000';
 
-	ctx.moveTo(paintUtils.coords.x, paintUtils.coords.y);
+	paintUtils.prevMouse = {
+		x: paintUtils.mouse.x,
+		y: paintUtils.mouse.y,
+	};
+	paintUtils.mouse = getMousePos(event);
+	paintUtils.points.push(paintUtils.mouse);
 
-	updatePositionCanvas(event);
-
-	ctx.lineTo(paintUtils.coords.x, paintUtils.coords.y);
+	ctx.beginPath();
+	ctx.moveTo(paintUtils.prevMouse.x, paintUtils.prevMouse.y);
+	ctx.lineTo(paintUtils.mouse.x, paintUtils.mouse.y);
 	ctx.stroke();
 
 	await wait(500);
 	sendImgData();
 }
 
+function drawPaths() {
+	clearCanvas();
+
+	paintUtils.pointsHistory.forEach(path => {
+		if (path.length === 0) return;
+
+		ctx.beginPath();
+		ctx.moveTo(path[0].x, path[0].y);
+
+		for (let i = 1; i < path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+
+		ctx.stroke();
+	});
+}
+
+function undo() {
+	paintUtils.pointsHistory.splice(-1, 1);
+	drawPaths();
+	sendImgDataForUndoAction();
+}
+
 function requestCanvasClear() {
 	// clear canvas and request clear on rest of the clients
 	clearCanvas();
+
+	paintUtils.points = [];
+	paintUtils.pointsHistory = [];
 
 	// broadcast clear canvas
 	const socketMsg = {
@@ -418,6 +460,21 @@ function sendImgData() {
 	const socketMsg = {
 		type: 4,
 		typeStr: messageTypeMap.get(4),
+		content: String(canvas.toDataURL('img/png')),
+		clientName,
+		clientId,
+		poolId,
+	};
+
+	// sending canvas data
+	sendViaSocket(socketMsg);
+}
+
+function sendImgDataForUndoAction() {
+	// called by undo function
+	const socketMsg = {
+		type: 41,
+		typeStr: messageTypeMap.get(41),
 		content: String(canvas.toDataURL('img/png')),
 		clientName,
 		clientId,
@@ -509,6 +566,12 @@ function displayImgOnCanvas(socketMessage) {
 	img.setAttribute('src', socketMessage.content);
 }
 
+// 41
+function displayUndoCanvas(socketMessage) {
+	clearCanvas();
+	displayImgOnCanvas(socketMessage);
+}
+
 // 5
 function clearCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -569,6 +632,8 @@ function beginClientSketchingFlow(socketMessage) {
 	// for enabling drawing access if clientId matches
 	const painterUtilsDiv = document.querySelector('.painter-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
+	const undoBtn = document.querySelector('.pu.undo');
+
 	paintUtils.isAllowedToPaint = true;
 
 	// display the word
@@ -579,6 +644,7 @@ function beginClientSketchingFlow(socketMessage) {
 	// display painter utils div and add EL for clearing the canvas
 	painterUtilsDiv.classList.remove('hidden');
 	clearCanvasBtn.addEventListener('click', requestCanvasClear);
+	undoBtn.addEventListener('click', undo);
 
 	return wordExpiryCountdown;
 }
@@ -764,6 +830,10 @@ function socketOnMessage(message) {
 			displayImgOnCanvas(socketMessage);
 			break;
 
+		case 41:
+			displayUndoCanvas(socketMessage);
+			break;
+
 		case 5:
 		case 51:
 			clearCanvas();
@@ -854,6 +924,7 @@ function sendViaSocket(socketMsg) {
 		);
 
 		clearAllIntervals(wordExpiryTimer);
+		document.getElementById('modal').style.display = 'flex';
 	}
 }
 
@@ -868,10 +939,13 @@ const { canvas, ctx, overlay } = initCanvasAndOverlay();
 
 // utils for painting on canvas
 const paintUtils = {
-	coords: { x: 0, y: 0 },
 	isPainting: false,
 	hasGameStarted: false,
 	isAllowedToPaint: false,
+	points: [],
+	pointsHistory: [],
+	mouse: { x: 0, y: 0 },
+	prevMouse: { x: 0, y: 0 },
 };
 
 let messageTypeMap,

@@ -45,7 +45,7 @@ func (pool *Pool) start() {
 				message := pool.updateScore(message)
 				pool.broadcast(message)
 
-			case 4, 5:
+			case 4, 41, 5:
 				if pool.CurrSketcher == nil {
 					break
 				}

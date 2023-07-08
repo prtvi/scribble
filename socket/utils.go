@@ -27,7 +27,7 @@ func printSocketMsg(m model.SocketMessage) {
 		msgTypeColor = "yellow"
 	case 1, 2, 3:
 		msgTypeColor = "blue"
-	case 4, 5:
+	case 4, 41, 5:
 		msgTypeColor = "purple"
 	case 7, 34:
 		msgTypeColor = "red"
@@ -136,7 +136,7 @@ func DebugMode() {
 	RenderClientsEvery = time.Second * 30
 	TimeoutForChoosingWord = time.Second * 10
 
-	pool, _ := newPool(5, 30, 6, 2, 2, "normal", []string{}, false)
+	pool, _ := newPool(5, 30, 6, 5, 2, "normal", []string{}, false)
 	pool.ID = "debug"
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+pool.ID)
 

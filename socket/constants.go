@@ -71,8 +71,9 @@ var messageTypeMap = map[int]string{
 	3: "csc__text_msg",
 
 	// C => S b=> Cs - red
-	4: "csc__canvas_data",
-	5: "csc__clear_canvas",
+	4:  "csc__canvas_data",
+	41: "csc__undo_draw",
+	5:  "csc__clear_canvas",
 
 	// C => S - purple
 	7:  "cs__req_start_game",
