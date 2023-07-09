@@ -157,9 +157,9 @@ img {
 	image-rendering: pixelated; /* does not blur the image on resizing */
 }
 
-.color,
-.eyes,
-.mouth {
+.avatar .color,
+.avatar .eyes,
+.avatar .mouth {
 	width: var(--avatar-size);
 	height: var(--avatar-size);
 	position: absolute;
@@ -171,8 +171,8 @@ img {
 	); /* x10 because the atlas contains 10*10 images */
 }
 
-.owner,
-.crowned {
+.avatar .owner,
+.avatar .crowned {
 	position: absolute;
 	top: calc((var(--avatar-size) / 4) * -1);
 	left: 0;
@@ -182,20 +182,20 @@ img {
 	background-size: calc(var(--avatar-size) / 2);
 }
 
-.color {
+.avatar .color {
 	background-image: url('../assets/images/avatar/color_atlas.gif');
 }
-.eyes {
+.avatar .eyes {
 	background-image: url('../assets/images/avatar/eyes_atlas.gif');
 }
-.mouth {
+.avatar .mouth {
 	background-image: url('../assets/images/avatar/mouth_atlas.gif');
 }
-.owner.active {
+.avatar .owner.active {
 	background-image: url('../assets/images/owner.gif');
 	rotate: -30deg;
 }
-.crowned.active {
+.avatar .crowned.active {
 	background-image: url('../assets/images/crown.gif');
 }
 

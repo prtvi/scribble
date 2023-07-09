@@ -162,6 +162,7 @@ func EnterPool(c echo.Context) error {
 
 		// variables in DOM
 		"Rounds": pool.Rounds,
+		"Colors": utils.COLORS_FOR_DRAWING,
 
 		// for rendering title on browser
 		"ClientNameExists": true,

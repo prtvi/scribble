@@ -62,10 +62,24 @@
 				<canvas class="canv"></canvas>
 			</div>
 
-			<!-- painter utils -->
-			<div class="painter-utils hidden">
+			<!-- paint utils -->
+			<div class="paint-utils hidden">
 				<div>
-					<div class="pu color-select"></div>
+					<div class="pu brush-color-select">
+						<div class="color-select hidden">
+							<div class="colors">
+								{{ range $i, $val := .Colors }}
+								<div
+									class="color"
+									id="c{{$i}}"
+									style="background-color: {{$val}};"
+								></div>
+								{{ end }}
+							</div>
+							<div class="arrow-down"></div>
+						</div>
+					</div>
+
 					<div class="pu brush-stroke-select">
 						<div>
 							<img src="public/assets/images/size.gif" alt="size icon" />

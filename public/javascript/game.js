@@ -182,21 +182,29 @@ function getFromLocalStorage(key) {
 }
 
 function disableSketching() {
-	const painterUtilsDiv = document.querySelector('.painter-utils');
+	const paintUtilsDiv = document.querySelector('.paint-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
 	const undoBtn = document.querySelector('.pu.undo');
+
 	const strokes = document.querySelector('.strokes');
 	const brushStrokeSelect = document.querySelector('.pu.brush-stroke-select');
 
+	const colorSelect = document.querySelector('.pu.brush-color-select');
+	const colors = document.querySelector('.colors');
+
 	paintUtils.isAllowedToPaint = false;
 
-	// display painter utils div and remove EL
-	painterUtilsDiv.classList.add('hidden');
+	// display paint utils div and remove ELs
+	paintUtilsDiv.classList.add('hidden');
 
 	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
 	undoBtn.removeEventListener('click', undo);
+
 	strokes.removeEventListener('click', selectStrokeEL);
 	brushStrokeSelect.removeEventListener('click', openBrushStrokeSelect);
+
+	colors.removeEventListener('click', selectColorEL);
+	colorSelect.removeEventListener('click', openColorSelect);
 }
 
 function beginClientSketchingFlowInit(socketMessage) {
@@ -363,6 +371,31 @@ function openBrushStrokeSelect() {
 	strokes.addEventListener('click', selectStrokeEL);
 }
 
+function selectColorEL(e) {
+	if (!e.target.classList.contains('color')) return;
+
+	const allColors = document.getElementsByClassName('color');
+	Array.from(allColors).forEach(ele => ele.classList.remove('active'));
+	e.target.classList.add('active');
+
+	const selectedColor = e.target.style.backgroundColor;
+	paintUtils.strokeStyle = selectedColor;
+
+	const viewColor = document.querySelector('.brush-color-select');
+	viewColor.style.backgroundColor = selectedColor;
+
+	const colorSelectMenu = document.querySelector('.color-select');
+	setTimeout(() => colorSelectMenu.classList.add('hidden'), 100);
+}
+
+function openColorSelect() {
+	const colorSelectMenu = document.querySelector('.color-select');
+	colorSelectMenu.classList.remove('hidden');
+
+	const colors = document.querySelector('.colors');
+	colors.addEventListener('click', selectColorEL);
+}
+
 // -------------------------------- CANVAS --------------------------------
 
 function initCanvasAndOverlay() {
@@ -413,6 +446,7 @@ function startPainting(event) {
 	paintUtils.points.push({
 		coords: paintUtils.mouse,
 		lineWidth: paintUtils.lineWidth,
+		strokeStyle: paintUtils.strokeStyle,
 	});
 }
 
@@ -440,6 +474,7 @@ async function paint(event) {
 	paintUtils.points.push({
 		coords: paintUtils.mouse,
 		lineWidth: paintUtils.lineWidth,
+		strokeStyle: paintUtils.strokeStyle,
 	});
 
 	ctx.beginPath();
@@ -458,6 +493,7 @@ function drawPaths() {
 		if (path.length === 0) return;
 
 		ctx.lineWidth = path[0].lineWidth;
+		ctx.strokeStyle = path[0].strokeStyle;
 
 		ctx.beginPath();
 		ctx.moveTo(path[0].coords.x, path[0].coords.y);
@@ -669,10 +705,11 @@ function beginClientSketchingFlow(socketMessage) {
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
 	// for enabling drawing access if clientId matches
-	const painterUtilsDiv = document.querySelector('.painter-utils');
+	const paintUtilsDiv = document.querySelector('.paint-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
 	const undoBtn = document.querySelector('.pu.undo');
 	const brushStrokeSelect = document.querySelector('.pu.brush-stroke-select');
+	const colorSelect = document.querySelector('.pu.brush-color-select');
 
 	paintUtils.isAllowedToPaint = true;
 
@@ -682,10 +719,11 @@ function beginClientSketchingFlow(socketMessage) {
 		socketMessage.currWord;
 
 	// display painter utils div and add EL for clearing the canvas
-	painterUtilsDiv.classList.remove('hidden');
+	paintUtilsDiv.classList.remove('hidden');
 	clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	undoBtn.addEventListener('click', undo);
 	brushStrokeSelect.addEventListener('click', openBrushStrokeSelect);
+	colorSelect.addEventListener('click', openColorSelect);
 
 	return wordExpiryCountdown;
 }

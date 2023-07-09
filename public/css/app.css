@@ -6,6 +6,7 @@
 
 	--scale-avatar-by: 0.5;
 	--min-brush-stroke-size: 6px;
+	--pu-size: 30px;
 }
 
 .btn {
@@ -212,25 +213,25 @@ canvas {
 	border-radius: 5px;
 }
 
-/* painter utils */
+/* paint utils */
 
-.painter-utils {
-	height: 30px;
+.paint-utils {
+	height: var(--pu-size);
 	margin-bottom: 4px;
 	display: flex;
 	justify-content: space-between;
 }
-.painter-utils > div {
-	width: 70px;
-	height: 30px;
+.paint-utils > div {
+	width: calc(var(--pu-size) * 2 + 10px);
+	height: var(--pu-size);
 	display: flex;
 	justify-content: space-around;
 }
 
 .pu {
-	width: 30px;
-	height: 30px;
-	background-size: 30px;
+	width: var(--pu-size);
+	height: var(--pu-size);
+	background-size: var(--pu-size);
 	background-color: var(--white);
 	border-radius: 2px;
 	position: relative;
@@ -252,18 +253,47 @@ canvas {
 	left: 2px;
 }
 .pu img.pu-img {
-	width: 30px;
+	width: var(--pu-size);
 	position: absolute;
 	top: 0;
 	left: 2px;
+	filter: grayscale(75%) var(--drop-shadow);
+}
+.pu:hover img.pu-img {
+	filter: var(--drop-shadow);
 }
 .pu:active img {
 	transform: translateY(2px);
 }
 
-.painter-utils .color-select {
+/* brush color select */
+
+.brush-color-select {
 	background-color: black;
+	position: relative;
 }
+.colors {
+	position: absolute;
+	top: calc((var(--pu-size) * 2 + 15px) * -1);
+	left: 0;
+	z-index: 3;
+	display: grid;
+	grid-template-columns: repeat(13, 1fr);
+	grid-template-rows: auto;
+}
+.color {
+	width: var(--pu-size);
+	height: var(--pu-size);
+}
+.color.active,
+.color:hover {
+	box-sizing: border-box;
+	border: 2.5px solid #53e236;
+	border-radius: 2px;
+	transform: scale(1.05);
+}
+
+/* brush stroke width select */
 
 .brush-stroke-select {
 	position: relative;
@@ -271,17 +301,15 @@ canvas {
 	justify-content: center;
 	align-items: center;
 }
-
 .brush-stroke-select img {
 	filter: invert(100%) var(--drop-shadow);
 	height: 6px;
 	width: 6px;
 }
-
 .strokes {
 	position: absolute;
 	z-index: 3;
-	top: -165px;
+	top: calc((var(--pu-size) * 5 + 15px) * -1);
 	left: 0;
 	background-color: #aaa;
 	display: flex-end;
@@ -290,17 +318,15 @@ canvas {
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 }
-
 .stroke {
-	width: 30px;
-	height: 30px;
-	background-size: 30px;
+	width: var(--pu-size);
+	height: var(--pu-size);
+	background-size: var(--pu-size);
 	background-image: url('../assets/images/size.gif');
 	background-repeat: no-repeat;
 	background-position: center;
 	filter: invert(100%);
 }
-
 .stroke#s1 {
 	background-size: var(--min-brush-stroke-size);
 }
@@ -316,11 +342,9 @@ canvas {
 .stroke#s5 {
 	background-size: calc(var(--min-brush-stroke-size) * 5);
 }
-
 .stroke.active {
 	background-color: purple;
 }
-
 .arrow-down {
 	width: 0;
 	height: 0;
@@ -330,7 +354,7 @@ canvas {
 	position: absolute;
 	top: -15px;
 	left: 0;
-	z-index: 2;
+	z-index: 3;
 }
 
 /* overlay pseudo classes */
