@@ -29,7 +29,6 @@
 	--fs-24: 24px;
 
 	--bg: #133695;
-
 	--black: #1d1d1f;
 	--white: #f5f5f7;
 	--gray: #808080;
@@ -37,15 +36,13 @@
 	--btn-primary-color: #53e236;
 	--btn-inv-color: #e8e8e8;
 	--btn-inv-color-hover: #656565;
-
 	--drop-shadow: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
 
 	--scale-avatar-by: 3;
-	--randomize-icon-size: 36px;
 	--avatar-size: calc(var(--scale-avatar-by) * 48px);
 	--avc-btn-size: calc(var(--scale-avatar-by) * 12px);
 
-	--form-width: 360px;
+	--form-width: 340px;
 	--col-width: calc(var(--form-width) / 3);
 }
 
@@ -117,10 +114,10 @@ img {
 
 .container {
 	margin: 50px 10px;
+	padding: 30px 20px;
 	border-radius: 8px;
 	background-color: var(--bg);
 	color: var(--white);
-	padding: 30px 20px;
 }
 
 .logo {
@@ -250,9 +247,9 @@ img {
 .randomize {
 	position: absolute;
 	background-image: url('../assets/images/randomize.gif');
-	width: var(--randomize-icon-size);
-	height: var(--randomize-icon-size);
-	background-size: var(--randomize-icon-size);
+	width: 36px;
+	height: 36px;
+	background-size: 36px;
 	top: -10px;
 	right: 0;
 	cursor: pointer;
@@ -310,12 +307,13 @@ img {
 	margin-bottom: 15px;
 	text-align: center;
 	display: flex;
-	justify-content: space-between;
-}
-.title-text {
-	margin: 0 auto 0 auto;
+	justify-content: center;
+	position: relative;
 }
 .title-image-container {
+	position: absolute;
+	top: 0;
+	left: 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -396,7 +394,7 @@ img {
 .form-content-grid {
 	width: var(--form-width);
 	display: grid;
-	grid-template-columns: var(--col-width) var(--col-width) var(--col-width);
+	grid-template-columns: repeat(3, var(--col-width));
 	grid-template-rows: auto;
 	margin: 0 auto;
 }
@@ -486,7 +484,7 @@ img {
 /* join */
 
 .join-room-form form > div:not(:last-child) {
-	width: var(--form-width);
+	width: calc(var(--form-width) - 10px);
 	margin: 0 auto 10px auto;
 	text-align: center;
 }
@@ -494,5 +492,26 @@ img {
 	margin-top: 15px;
 }
 .form-btn-container .play-btn {
-	width: var(--form-width);
+	width: calc(var(--form-width) - 10px);
+}
+
+/* larger than 580px */
+
+@media screen and (min-width: 580px) {
+	:root {
+		--form-width: 450px;
+	}
+
+	.container {
+		padding: 30px 50px;
+		margin: 50px 30px;
+	}
+
+	.logo img {
+		width: 90%;
+	}
+
+	.start .subtext {
+		font-size: var(--fs-24);
+	}
 }

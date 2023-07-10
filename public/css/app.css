@@ -33,7 +33,6 @@
 	justify-content: center;
 	align-items: center;
 }
-
 .modal-content {
 	background-color: var(--bg);
 	margin: auto;
@@ -43,7 +42,6 @@
 	text-align: center;
 	position: relative;
 }
-
 .modal-title {
 	color: var(--white);
 	font-family: r400, var(--ff);
@@ -51,7 +49,6 @@
 	font-size: var(--fs-18);
 	margin-bottom: 15px;
 }
-
 .close-modal {
 	position: absolute;
 	right: 15px;
@@ -60,7 +57,6 @@
 	font-size: var(--fs-20);
 	font-weight: bold;
 }
-
 .close-modal:hover,
 .close-modal:focus {
 	color: var(--white);

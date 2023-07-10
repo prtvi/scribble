@@ -21,14 +21,14 @@
 
 				<div>
 					<a href="/create-room"
-						><button class="btn play">Create private room</button></a
+						><button class="btn play">Create a private room</button></a
 					>
 				</div>
 			</div>
 
 			{{ else if eq .RenderTemplateName "createRoom" }}
 
-			<div class="form-container">
+			<div class="container form-container">
 				<form action="/create-room" method="post">
 					<div class="form-content-grid">
 						{{ range .FormParams }}
