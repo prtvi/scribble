@@ -35,6 +35,7 @@ func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessag
 	}
 }
 
+// sends the message to the given client id
 func (pool *Pool) sendToClientId(clientId string, m model.SocketMessage) {
 	printSocketMsg(m)
 
@@ -50,7 +51,6 @@ func (pool *Pool) sendToClientId(clientId string, m model.SocketMessage) {
 func (pool *Pool) broadcast(message model.SocketMessage) {
 	printSocketMsg(message)
 
-	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
 		c.send(message)
 	}
@@ -154,6 +154,7 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 	}
 
+	// send sketcher is now drawing event to everyone except the sketcher
 	pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 		Type:             87,
 		TypeStr:          messageTypeMap[87],

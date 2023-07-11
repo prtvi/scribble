@@ -1,14 +1,3 @@
-:root {
-	--game-bar-h: 36px;
-	--overlay-transition: opacity 0.3s ease-in-out;
-
-	--game-bar-item-width: 24px;
-
-	--scale-avatar-by: 0.5;
-	--min-brush-stroke-size: 6px;
-	--pu-size: 30px;
-}
-
 .btn {
 	font-size: var(--fs-10);
 	padding: 6px 8px 6px 8px;

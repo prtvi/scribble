@@ -27,6 +27,10 @@ func GetSecondsLeftFrom(t time.Time) int {
 	return int(t.Sub(time.Now()).Seconds())
 }
 
+func CalcScore(scoreForCorrectGuess, currRound int, currWordExpiresAt time.Time) int {
+	return scoreForCorrectGuess*currRound*GetDiffBetweenTimesInSeconds(time.Now(), currWordExpiresAt) + scoreForCorrectGuess
+}
+
 func GetRandomWord(arr []string) string {
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Int() % len(arr)
@@ -55,8 +59,8 @@ func SplitIntoWords(s string) []string {
 	return trimmed
 }
 
-func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) float64 {
-	return math.Abs(t1.Sub(t2).Seconds())
+func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) int {
+	return int(math.Abs(t1.Sub(t2).Seconds()))
 }
 
 func ShuffleList(list []string) []string {

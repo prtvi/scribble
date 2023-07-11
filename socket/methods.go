@@ -143,7 +143,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	// start a timeout for assigning word if not chosen by client
 	go pool.wordChooseCountdown(words)
 
-	// run an infinite loop until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func), or initialised in wordChooseCountdown goroutine
+	// run an infinite loop until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func), or initialised in word choose countdown goroutine
 	for pool.CurrWord == "" {
 	}
 
@@ -186,7 +186,7 @@ func (pool *Pool) startGameRequestFromClient(clientId string) {
 	}
 
 	pool.startGameAndBroadcast()
-	utils.Cp("greenBg", "Game started! by client using btn")
+	utils.Cp("greenBg", "Game started!")
 
 	// start game flow
 	go pool.beginGameFlow()
@@ -230,7 +230,7 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 
 		// increment score and flag as guessed
 		guesserClient.HasGuessed = true
-		guesserClient.Score += ScoreForCorrectGuess * int(utils.GetDiffBetweenTimesInSeconds(time.Now(), pool.CurrWordExpiresAt))
+		guesserClient.Score += utils.CalcScore(ScoreForCorrectGuess, pool.CurrRound, pool.CurrWordExpiresAt)
 
 		// broadcast client info list to update score on UI immediately
 		pool.broadcastClientInfoList()
@@ -284,7 +284,7 @@ func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 
 // 9, flag and broadcast game end
 func (pool *Pool) endGame() {
-	utils.Cp("yellowBg", "All players done playing!")
+	utils.Cp("greenBg", "All players done playing!")
 
 	pool.HasGameEnded = true
 	pool.broadcast(model.SocketMessage{

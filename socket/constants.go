@@ -23,7 +23,7 @@ var (
 	TimeoutForChoosingWord          = time.Second * 15
 	DeletePoolAfterGameEndsDuration = time.Minute * 10
 	RemovePoolAfterGameNotStarted   = time.Minute * 20
-	ScoreForCorrectGuess            = 25
+	ScoreForCorrectGuess            = 50
 
 	debug = false
 )

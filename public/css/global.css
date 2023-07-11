@@ -44,6 +44,16 @@
 
 	--form-width: 340px;
 	--col-width: calc(var(--form-width) / 3);
+
+	/*  */
+	--game-bar-h: 36px;
+	--overlay-transition: opacity 0.3s ease-in-out;
+
+	--game-bar-item-width: 24px;
+
+	--scale-avatar-by: 0.5;
+	--min-brush-stroke-size: 6px;
+	--pu-size: 30px;
 }
 
 * {
