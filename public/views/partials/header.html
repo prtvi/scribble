@@ -25,16 +25,8 @@
 		type="image/x-icon"
 	/>
 
-	{{ range $val := .StyleSheets }}
-	<link rel="stylesheet" href="public/css/{{ $val }}.css" />
-	{{ end }}
-
-	<!-- display client name on title of the browser -->
-	{{ if .ClientNameExists }}
-	<title>scribble · {{ .ClientName }}</title>
-	{{ else }}
-	<title>scribble</title>
-	{{ end }}
+	<link rel="stylesheet" href="public/css/global.css" />
+	<title>skribble</title>
 </head>
 
 {{ end }}

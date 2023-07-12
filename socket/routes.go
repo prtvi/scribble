@@ -28,7 +28,6 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 // GET /
 func Index(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "home",
 	})
 }
@@ -37,7 +36,6 @@ func Index(c echo.Context) error {
 func CreateRoomForm(c echo.Context) error {
 	// render a form to create a new pool
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "createRoom",
 		"FormParams":         utils.FormParams,
 		"RoomCreated":        false,
@@ -70,7 +68,6 @@ func CreateRoom(c echo.Context) error {
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "createRoom",
 		"FormParams":         utils.FormParams,
 		"RoomCreated":        true,
@@ -98,7 +95,6 @@ func JoinPool(c echo.Context) error {
 	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" || len(poolId) == 0 {
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"StyleSheets":        []string{"global"},
 			"RenderTemplateName": "error",
 			"Message":            "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
 		})
@@ -109,7 +105,6 @@ func JoinPool(c echo.Context) error {
 	if !ok {
 		// if not then do not render both forms and display message
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"StyleSheets":        []string{"global"},
 			"RenderTemplateName": "error",
 			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
 		})
@@ -122,7 +117,6 @@ func JoinPool(c echo.Context) error {
 	if poolCurrSizePlus1 > poolCap {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"StyleSheets":        []string{"global"},
 			"RenderTemplateName": "error",
 			"Message":            "Your party is full! Maximum room capacity reached! 😃",
 		})
@@ -130,7 +124,6 @@ func JoinPool(c echo.Context) error {
 
 	// else if every check, checks out then render "RegisterToPool" form
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"StyleSheets":        []string{"global"},
 		"RenderTemplateName": "join",
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
@@ -151,21 +144,14 @@ func EnterPool(c echo.Context) error {
 	pool, ok := hub[poolId]
 	if !ok {
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"StyleSheets":        []string{"global"},
 			"RenderTemplateName": "error",
 			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
 		})
 	}
 
 	return c.Render(http.StatusOK, "app", map[string]any{
-		"StyleSheets": []string{"global", "app"},
-
-		// variables in DOM
 		"Rounds": pool.Rounds,
 		"Colors": utils.COLORS_FOR_DRAWING,
-
-		// for rendering title on browser
-		"ClientNameExists": true,
 
 		// init as js vars
 		"PoolId":      poolId,
