@@ -27,6 +27,7 @@ type Pool struct {
 	WordMode           string
 	WordCount          int
 	Hints              int
+	HintsRevealed      int
 	CustomWords        []string
 	UseCustomWordsOnly bool
 

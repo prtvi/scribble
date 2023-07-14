@@ -31,16 +31,22 @@ func CalcScore(scoreForCorrectGuess, currRound int, currWordExpiresAt time.Time)
 	return scoreForCorrectGuess*currRound*GetDiffBetweenTimesInSeconds(time.Now(), currWordExpiresAt) + scoreForCorrectGuess
 }
 
-func GetRandomWord(arr []string) string {
+func GetRandomItem(arr []string) string {
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Int() % len(arr)
 	return arr[n]
 }
 
+func GetRandomItemWithIdx(arr []string) (string, int) {
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Int() % len(arr)
+	return arr[n], n
+}
+
 func GetNrandomWords(arr []string, n int) []string {
 	ret := make([]string, n)
 	for i := 0; i < n; i++ {
-		ret[i] = GetRandomWord(arr)
+		ret[i] = GetRandomItem(arr)
 	}
 	return ret
 }

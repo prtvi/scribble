@@ -1223,6 +1223,11 @@ function socketOnMessage(message) {
 			wordExpiryTimer = showSketcherIsDrawing(socketMessage);
 			break;
 
+		case 89:
+			document.querySelector('.word span.content').textContent =
+				socketMessage.content;
+			break;
+
 		case 81:
 			disableSketchingTurnOver();
 			break;

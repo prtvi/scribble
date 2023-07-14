@@ -5,6 +5,7 @@ import (
 	"os"
 	model "scribble/model"
 	utils "scribble/utils"
+	"text/tabwriter"
 	"time"
 )
 
@@ -57,6 +58,41 @@ func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
 	case <-time.After(d):
 		return false
 	}
+}
+
+func calculateMaxHintsAllowedForWord(currWord string, nHintsPref int) int {
+	currWordLen := len(currWord)
+	var maxHintsAllowed int = 0
+
+	if currWordLen%2 == 0 {
+		maxHintsAllowed = currWordLen / 2
+	} else {
+		maxHintsAllowed = (currWordLen / 2) + 1
+	}
+
+	if nHintsPref <= maxHintsAllowed {
+		maxHintsAllowed = nHintsPref
+	}
+
+	return maxHintsAllowed
+}
+
+func pickRandomCharacter(chars [](string)) ([]string, string) {
+	charPicked, idx := utils.GetRandomItemWithIdx(chars)
+	chars = append(chars[:idx], chars[idx+1:]...)
+	return chars, charPicked
+}
+
+func getHintString(word, char, revealString string) string {
+	for i, c := range word {
+		// issue exists for repeating chars for words like aPPle
+		if string(c) == char {
+			revealString = revealString[:i] + string(word[i]) + revealString[i+1:]
+			break
+		}
+	}
+
+	return revealString
 }
 
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) (*Pool, string) {
@@ -143,4 +179,34 @@ func DebugMode() {
 	hub[pool.ID] = pool
 
 	go pool.start()
+}
+
+func (pool *Pool) printStats(event ...string) {
+	if !debug {
+		return
+	}
+
+	// poolId, capacity, size, createdTime, gameStartTime
+	// hasGameStarted, hasGameEnded, hasClientInfoBroadcastStarted
+	// currRound, currWord, currSketcherName, currWordExpiresAt
+
+	utils.Cp("green", "--------------------------------------------------------------")
+	if len(event) != 0 {
+		utils.Cp("red", event...)
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
+	fmt.Fprintln(w, "\nPoolId\tCapacity\tSize\tCreatedTime\tGameStartTime\tGameStartedAt")
+	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartedAt)))
+
+	fmt.Fprintln(w, "HasGameStarted\tHasClientInfoBroadcastStarted\tHasGameEnded")
+	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\n", pool.HasGameStarted, pool.HasClientInfoBroadcastStarted, pool.HasGameEnded))
+
+	if pool.CurrSketcher != nil && pool.HasGameStarted {
+		fmt.Fprintln(w, "CurrRound\tCurrWord\tCurrSketcherName")
+		fmt.Fprintln(w, fmt.Sprintf("%d\t%s\t%v\n", pool.CurrRound, pool.CurrWord, pool.CurrSketcher.Name))
+	}
+
+	w.Flush()
+	utils.Cp("green", "--------------------------------------------------------------")
 }

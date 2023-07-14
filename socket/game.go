@@ -91,6 +91,7 @@ func (pool *Pool) beginGameFlow() {
 			// broadcast current word, current sketcher and other details to all clients
 			pool.clientWordAssignmentFlow(c)
 			pool.broadcastCurrentWordDetails()
+			// pool.broadcastHintsForWord() // UNCOMMENT THIS!!
 
 			// start a timer with interrupt, create a channel to use it to interrupt the timer if required
 			// and run a go routine and pass this channel to pass data on this chan on all clients guess

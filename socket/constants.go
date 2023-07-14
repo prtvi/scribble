@@ -57,6 +57,7 @@ var messageTypeMap = map[int]string{
 	84: "sc__turn_over_all_guessed",
 	87: "sc__sketcher_begin_drawing",
 	88: "sc__sketcher_drawing",
+	89: "sc__hint",
 
 	// S => C - yellow
 	69: "sc__game_cant_start",

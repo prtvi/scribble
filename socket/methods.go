@@ -3,11 +3,9 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	model "scribble/model"
 	utils "scribble/utils"
 	"strings"
-	"text/tabwriter"
 	"time"
 )
 
@@ -104,7 +102,7 @@ func (pool *Pool) wordChooseCountdown(words []string) {
 	sleep(TimeoutForChoosingWord)
 
 	if pool.CurrWord == "" {
-		pool.CurrWord = utils.GetRandomWord(words)
+		pool.CurrWord = utils.GetRandomItem(words)
 	}
 }
 
@@ -282,6 +280,45 @@ func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 	}
 }
 
+func (pool *Pool) broadcastHintsForWord() {
+	maxHintsAllowed := calculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
+	revealHintsEvery := time.Duration(utils.DurationToSeconds(pool.DrawTime) / maxHintsAllowed)
+
+	var word string = pool.CurrWord
+	var charsLeft []string = strings.Split(word, "")
+	var charPicked string
+	var hintString string = func(word string) string {
+		var res string
+		for i := 0; i < len(word); i++ {
+			res += "_"
+		}
+		return res
+	}(word)
+
+	go func() {
+		for pool.HintsRevealed < pool.Hints {
+			sleep(revealHintsEvery)
+
+			if pool.CurrSketcher == nil || pool.CurrSketcher.DoneSketching { // better ways to break this loop
+				break
+			}
+
+			charsLeft, charPicked = pickRandomCharacter(charsLeft)
+			hintString = getHintString(word, charPicked, hintString)
+
+			pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
+				Type:    89,
+				TypeStr: messageTypeMap[89],
+				Content: hintString,
+			})
+
+			pool.HintsRevealed += 1
+		}
+
+		fmt.Println("hint broadcast stop!")
+	}()
+}
+
 // 9, flag and broadcast game end
 func (pool *Pool) endGame() {
 	utils.Cp("greenBg", "All players done playing!")
@@ -292,34 +329,4 @@ func (pool *Pool) endGame() {
 		TypeStr: messageTypeMap[9],
 		Content: pool.getClientInfoList().Content,
 	})
-}
-
-func (pool *Pool) printStats(event ...string) {
-	if !debug {
-		return
-	}
-
-	// poolId, capacity, size, createdTime, gameStartTime
-	// hasGameStarted, hasGameEnded, hasClientInfoBroadcastStarted
-	// currRound, currWord, currSketcherName, currWordExpiresAt
-
-	utils.Cp("green", "--------------------------------------------------------------")
-	if len(event) != 0 {
-		utils.Cp("red", event...)
-	}
-
-	w := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
-	fmt.Fprintln(w, "\nPoolId\tCapacity\tSize\tCreatedTime\tGameStartTime\tGameStartedAt")
-	fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%d\t%s\t%s\t%s\n", pool.ID, pool.Capacity, len(pool.Clients), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.CreatedTime), utils.GetTimeString(pool.GameStartedAt)))
-
-	fmt.Fprintln(w, "HasGameStarted\tHasClientInfoBroadcastStarted\tHasGameEnded")
-	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\n", pool.HasGameStarted, pool.HasClientInfoBroadcastStarted, pool.HasGameEnded))
-
-	if pool.CurrSketcher != nil && pool.HasGameStarted {
-		fmt.Fprintln(w, "CurrRound\tCurrWord\tCurrSketcherName")
-		fmt.Fprintln(w, fmt.Sprintf("%d\t%s\t%v\n", pool.CurrRound, pool.CurrWord, pool.CurrSketcher.Name))
-	}
-
-	w.Flush()
-	utils.Cp("green", "--------------------------------------------------------------")
 }
