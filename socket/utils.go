@@ -62,12 +62,10 @@ func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
 
 func calculateMaxHintsAllowedForWord(currWord string, nHintsPref int) int {
 	currWordLen := len(currWord)
-	var maxHintsAllowed int = 0
+	maxHintsAllowed := currWordLen / 2
 
-	if currWordLen%2 == 0 {
-		maxHintsAllowed = currWordLen / 2
-	} else {
-		maxHintsAllowed = (currWordLen / 2) + 1
+	if currWordLen%2 != 0 {
+		maxHintsAllowed += 1
 	}
 
 	if nHintsPref <= maxHintsAllowed {
@@ -83,16 +81,16 @@ func pickRandomCharacter(chars [](string)) ([]string, string) {
 	return chars, charPicked
 }
 
-func getHintString(word, char, revealString string) string {
+func getHintString(word, char, hintString string) string {
 	for i, c := range word {
-		// issue exists for repeating chars for words like aPPle
-		if string(c) == char {
-			revealString = revealString[:i] + string(word[i]) + revealString[i+1:]
+		charString := string(c)
+		if charString == char && string(hintString[i]) == "_" {
+			hintString = hintString[:i] + charString + hintString[i+1:]
 			break
 		}
 	}
 
-	return revealString
+	return hintString
 }
 
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) (*Pool, string) {

@@ -97,22 +97,17 @@ func (pool *Pool) flagAllClientsAsNotSketched() {
 	}
 }
 
-// sleep until the duration, assign any random word to the client if timer runs out
-func (pool *Pool) wordChooseCountdown(words []string) {
-	sleep(TimeoutForChoosingWord)
-
-	if pool.CurrWord == "" {
-		pool.CurrWord = utils.GetRandomItem(words)
-	}
-}
-
 // flag the client's turn as over and return the current word
-func (pool *Pool) turnOver(c *Client) string {
+func (pool *Pool) turnOver(c *Client, stopTimers ...chan bool) string {
 	currWord := pool.CurrWord
 
 	c.DoneSketching = true
 	pool.CurrWord = ""
 	pool.CurrSketcher = nil
+
+	for _, t := range stopTimers {
+		t <- true
+	}
 
 	return currWord
 }
@@ -139,7 +134,14 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	pool.broadcastWordList(words)
 
 	// start a timeout for assigning word if not chosen by client
-	go pool.wordChooseCountdown(words)
+	go func() {
+		// sleep until the duration, assign any random word to the client if timer runs out
+		sleep(TimeoutForChoosingWord)
+
+		if pool.CurrWord == "" {
+			pool.CurrWord = utils.GetRandomItem(words)
+		}
+	}()
 
 	// run an infinite loop until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func), or initialised in word choose countdown goroutine
 	for pool.CurrWord == "" {
@@ -280,7 +282,7 @@ func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 	}
 }
 
-func (pool *Pool) broadcastHintsForWord() {
+func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 	maxHintsAllowed := calculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
 	revealHintsEvery := time.Duration(utils.DurationToSeconds(pool.DrawTime) / maxHintsAllowed)
 
@@ -297,9 +299,12 @@ func (pool *Pool) broadcastHintsForWord() {
 
 	go func() {
 		for pool.HintsRevealed < pool.Hints {
-			sleep(revealHintsEvery)
+			interrupted := sleepWithInterrupt(revealHintsEvery, stopHints)
+			if interrupted {
+				break
+			}
 
-			if pool.CurrSketcher == nil || pool.CurrSketcher.DoneSketching { // better ways to break this loop
+			if pool.CurrSketcher == nil || pool.CurrSketcher.DoneSketching {
 				break
 			}
 
@@ -316,6 +321,7 @@ func (pool *Pool) broadcastHintsForWord() {
 		}
 
 		fmt.Println("hint broadcast stop!")
+		pool.HintsRevealed = 0
 	}()
 }
 
