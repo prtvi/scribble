@@ -11,8 +11,49 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func LoadEnv() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		Cp("redBg", "Error loading .env file")
+	}
+}
+
 func GenerateUUID() string {
 	return uuid.New().String()[0:8]
+}
+
+func SplitIntoWords(s string) []string {
+	arr := strings.Split(s, ",")
+	trimmed := make([]string, 0)
+
+	for _, val := range arr {
+		trimmedValue := strings.Trim(val, " ")
+		if len(trimmedValue) > 0 {
+			trimmed = append(trimmed, trimmedValue)
+		}
+	}
+
+	return trimmed
+}
+
+// time utils
+
+func Sleep(d time.Duration) {
+	time.Sleep(d)
+}
+
+func SleepWithInterrupt(d time.Duration, stop chan bool) bool {
+	// this func can be used to sleep for d duration, with an interuppt if any to stop this sleep
+	// to achieve this interrupt before timeout, pass a channel bool, which will be used to break this timeout
+	// this chan needs to be used to pass acknowledgement for stopping this timeout
+	// returns boolean whether the timeout was interrupted or not, if interrupted then returns true
+
+	select {
+	case <-stop:
+		return true
+	case <-time.After(d):
+		return false
+	}
 }
 
 func FormatTimeLong(t time.Time) string {
@@ -27,9 +68,45 @@ func GetSecondsLeftFrom(t time.Time) int {
 	return int(t.Sub(time.Now()).Seconds())
 }
 
+func DurationToSeconds(t time.Duration) int {
+	return int(t.Seconds())
+}
+
+func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) int {
+	return int(math.Abs(t1.Sub(t2).Seconds()))
+}
+
+// game logic/calculations
+
 func CalcScore(scoreForCorrectGuess, currRound int, currWordExpiresAt time.Time) int {
 	return scoreForCorrectGuess*currRound*GetDiffBetweenTimesInSeconds(time.Now(), currWordExpiresAt) + scoreForCorrectGuess
 }
+
+func CalculateMaxHintsAllowedForWord(currWord string, nHintsPref int) int {
+	maxHintsAllowed := len(currWord) / 2
+	if nHintsPref <= maxHintsAllowed {
+		maxHintsAllowed = nHintsPref
+	}
+
+	fmt.Println("hintsPref", nHintsPref)
+	fmt.Println("maxHintsAllowed", maxHintsAllowed)
+
+	return maxHintsAllowed
+}
+
+func GetHintString(word, char, hintString string) string {
+	for i, c := range word {
+		charString := string(c)
+		if charString == char && string(hintString[i]) == "_" {
+			hintString = hintString[:i] + charString + hintString[i+1:]
+			break
+		}
+	}
+
+	return hintString
+}
+
+// randomise
 
 func GetRandomItem(arr []string) string {
 	rand.Seed(time.Now().UnixNano())
@@ -51,22 +128,10 @@ func GetNrandomWords(arr []string, n int) []string {
 	return ret
 }
 
-func SplitIntoWords(s string) []string {
-	arr := strings.Split(s, ",")
-	trimmed := make([]string, 0)
-
-	for _, val := range arr {
-		trimmedValue := strings.Trim(val, " ")
-		if len(trimmedValue) > 0 {
-			trimmed = append(trimmed, trimmedValue)
-		}
-	}
-
-	return trimmed
-}
-
-func GetDiffBetweenTimesInSeconds(t1, t2 time.Time) int {
-	return int(math.Abs(t1.Sub(t2).Seconds()))
+func PickRandomCharacter(chars [](string)) ([]string, string) {
+	charPicked, idx := GetRandomItemWithIdx(chars)
+	chars = append(chars[:idx], chars[idx+1:]...)
+	return chars, charPicked
 }
 
 func ShuffleList(list []string) []string {
@@ -76,16 +141,7 @@ func ShuffleList(list []string) []string {
 	return list
 }
 
-func LoadEnv() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		Cp("redBg", "Error loading .env file")
-	}
-}
-
-func DurationToSeconds(t time.Duration) int {
-	return int(t.Seconds())
-}
+// color printing
 
 func getColor(color string) string {
 	if c, ok := colorMap[color]; ok {

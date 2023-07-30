@@ -98,16 +98,12 @@ func (pool *Pool) flagAllClientsAsNotSketched() {
 }
 
 // flag the client's turn as over and return the current word
-func (pool *Pool) turnOver(c *Client, stopTimers ...chan bool) string {
+func (pool *Pool) turnOver(c *Client) string {
 	currWord := pool.CurrWord
 
 	c.DoneSketching = true
 	pool.CurrWord = ""
 	pool.CurrSketcher = nil
-
-	for _, t := range stopTimers {
-		t <- true
-	}
 
 	return currWord
 }
@@ -136,7 +132,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	// start a timeout for assigning word if not chosen by client
 	go func() {
 		// sleep until the duration, assign any random word to the client if timer runs out
-		sleep(TimeoutForChoosingWord)
+		utils.Sleep(TimeoutForChoosingWord)
 
 		if pool.CurrWord == "" {
 			pool.CurrWord = utils.GetRandomItem(words)
@@ -149,6 +145,8 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 
 	// add the word expiry
 	pool.CurrWordExpiresAt = time.Now().Add(pool.DrawTime)
+	// reinit hints revealed
+	pool.HintsRevealed = 0
 }
 
 // begin clientInfo broadcast
@@ -159,7 +157,7 @@ func (pool *Pool) beginBroadcastClientInfo() {
 	utils.Cp("yellow", "Broadcasting client info start!")
 
 	for {
-		sleep(RenderClientsEvery)
+		utils.Sleep(RenderClientsEvery)
 		pool.broadcastClientInfoList()
 
 		// stop broadcasting when game ends
@@ -255,12 +253,12 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 }
 
 // checks if all the clients have guessed the word and acknowledges it on the stopTimer channel
-func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
+func (pool *Pool) checkIfAllGuessed(stopTimer, stopHints chan bool) {
 	// to be run as a separate goroutine
 	// every second, check if all clients have guessed the word
 	// if yes, then acknowledge the same on the channel and break this loop
 	for {
-		sleep(time.Second * 1)
+		utils.Sleep(time.Second * 1)
 
 		var count int = 0
 		for _, c := range pool.Clients {
@@ -272,6 +270,7 @@ func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 		// if gussed clients is everyone except the sketcher
 		if count != 0 && count == len(pool.Clients)-1 {
 			stopTimer <- true // write to channel and break
+			stopHints <- true
 			break
 		}
 
@@ -283,8 +282,9 @@ func (pool *Pool) checkIfAllGuessed(stopTimer chan bool) {
 }
 
 func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
-	maxHintsAllowed := calculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
-	revealHintsEvery := time.Duration(utils.DurationToSeconds(pool.DrawTime) / maxHintsAllowed)
+	pool.HintsForCurrWord = utils.CalculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
+	revealDurationParts := pool.HintsForCurrWord + 2
+	revealHintsEvery := time.Duration(utils.DurationToSeconds(pool.DrawTime)/revealDurationParts) * time.Second
 
 	var word string = pool.CurrWord
 	var charsLeft []string = strings.Split(word, "")
@@ -298,18 +298,14 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 	}(word)
 
 	go func() {
-		for pool.HintsRevealed < pool.Hints {
-			interrupted := sleepWithInterrupt(revealHintsEvery, stopHints)
+		for pool.HintsRevealed < pool.HintsForCurrWord {
+			interrupted := utils.SleepWithInterrupt(revealHintsEvery, stopHints)
 			if interrupted {
 				break
 			}
 
-			if pool.CurrSketcher == nil || pool.CurrSketcher.DoneSketching {
-				break
-			}
-
-			charsLeft, charPicked = pickRandomCharacter(charsLeft)
-			hintString = getHintString(word, charPicked, hintString)
+			charsLeft, charPicked = utils.PickRandomCharacter(charsLeft)
+			hintString = utils.GetHintString(word, charPicked, hintString)
 
 			pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 				Type:    89,
@@ -319,9 +315,6 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 
 			pool.HintsRevealed += 1
 		}
-
-		fmt.Println("hint broadcast stop!")
-		pool.HintsRevealed = 0
 	}()
 }
 

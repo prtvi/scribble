@@ -42,71 +42,17 @@ func printSocketMsg(m model.SocketMessage) {
 		utils.Cs(msgTypeColor, messageTypeMap[m.Type]))
 }
 
-func sleep(d time.Duration) {
-	time.Sleep(d)
-}
-
-func sleepWithInterrupt(d time.Duration, stop chan bool) bool {
-	// this func can be used to sleep for d duration, with an interuppt if any to stop this sleep
-	// to achieve this interrupt before timeout, pass a channel bool, which will be used to break this timeout
-	// this chan needs to be used to pass acknowledgement for stopping this timeout
-	// returns boolean whether the timeout was interrupted or not, if interrupted then returns true
-
-	select {
-	case <-stop:
-		return true
-	case <-time.After(d):
-		return false
-	}
-}
-
-func calculateMaxHintsAllowedForWord(currWord string, nHintsPref int) int {
-	currWordLen := len(currWord)
-	maxHintsAllowed := currWordLen / 2
-
-	if currWordLen%2 != 0 {
-		maxHintsAllowed += 1
-	}
-
-	if nHintsPref <= maxHintsAllowed {
-		maxHintsAllowed = nHintsPref
-	}
-
-	return maxHintsAllowed
-}
-
-func pickRandomCharacter(chars [](string)) ([]string, string) {
-	charPicked, idx := utils.GetRandomItemWithIdx(chars)
-	chars = append(chars[:idx], chars[idx+1:]...)
-	return chars, charPicked
-}
-
-func getHintString(word, char, hintString string) string {
-	for i, c := range word {
-		charString := string(c)
-		if charString == char && string(hintString[i]) == "_" {
-			hintString = hintString[:i] + charString + hintString[i+1:]
-			break
-		}
-	}
-
-	return hintString
-}
-
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) (*Pool, string) {
-	uuid := utils.GenerateUUID()
-	now := time.Now()
-
-	return &Pool{
-		ID:        uuid,
+	pool := Pool{
+		ID:        utils.GenerateUUID(),
 		Capacity:  players,
 		DrawTime:  time.Duration(time.Second * time.Duration(drawTime)),
 		Rounds:    rounds,
 		WordCount: wordCount,
+		Hints:     hints,
 
 		// not implemented yet
 		WordMode:           wordMode,
-		Hints:              hints,
 		CustomWords:        customWords,
 		UseCustomWordsOnly: useCustomWordsOnly,
 
@@ -114,9 +60,11 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		Unregister:     make(chan *Client),
 		Clients:        make([]*Client, 0),
 		Broadcast:      make(chan model.SocketMessage),
-		CreatedTime:    now,
+		CreatedTime:    time.Now(),
 		HasGameStarted: false,
-	}, uuid
+	}
+
+	return &pool, pool.ID
 }
 
 func Maintainer() {
@@ -125,7 +73,7 @@ func Maintainer() {
 	for {
 		// TODO - to be tested
 		// printHubStatus()
-		sleep(DeletePoolAfterGameEndsDuration)
+		utils.Sleep(DeletePoolAfterGameEndsDuration)
 
 		for poolId, pool := range hub {
 			// if pool exists and game has ended
@@ -168,7 +116,6 @@ func DebugMode() {
 	utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 
 	RenderClientsEvery = time.Second * 30
-	TimeoutForChoosingWord = time.Second * 10
 
 	pool, _ := newPool(5, 30, 6, 5, 2, "normal", []string{}, false)
 	pool.ID = "debug"

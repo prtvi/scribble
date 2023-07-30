@@ -998,6 +998,22 @@ function showSketcherIsDrawing(socketMessage) {
 }
 
 /**
+ * EVENT: 89
+ * Display the hint string with space separator
+ * @param {Object} socketMessage
+ */
+function displayHintString(socketMessage) {
+	const hintString = socketMessage.content;
+
+	let strToDisplay = '';
+	for (let i = 0; i < hintString.length; i++)
+		strToDisplay += hintString.at(i) + ' ';
+
+	document.querySelector('.word span.content').textContent =
+		strToDisplay.trim();
+}
+
+/**
  * EVENT: 81
  * Turn over event for sketcher, disable all sketching and display time up on overlay
  */
@@ -1224,8 +1240,7 @@ function socketOnMessage(message) {
 			break;
 
 		case 89:
-			document.querySelector('.word span.content').textContent =
-				socketMessage.content;
+			displayHintString(socketMessage);
 			break;
 
 		case 81:

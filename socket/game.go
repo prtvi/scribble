@@ -1,6 +1,7 @@
 package socket
 
 import (
+	utils "scribble/utils"
 	"time"
 )
 
@@ -72,7 +73,7 @@ func (pool *Pool) start() {
 // begin game flow by scheduling schedule timers
 func (pool *Pool) beginGameFlow() {
 	// wait for the "game started" overlay
-	sleep(InterGameWaitDuration)
+	utils.Sleep(InterGameWaitDuration)
 
 	// loop over the number of rounds
 	for i := 0; i < pool.Rounds; i++ {
@@ -80,7 +81,7 @@ func (pool *Pool) beginGameFlow() {
 
 		// broadcast round number and wait
 		pool.broadcastRoundNumber()
-		sleep(InterGameWaitDuration)
+		utils.Sleep(InterGameWaitDuration)
 
 		// loop over all clients and assign words to each client and sleep until next client's turn
 		for _, c := range pool.Clients {
@@ -91,14 +92,15 @@ func (pool *Pool) beginGameFlow() {
 			// broadcast current word, current sketcher and other details to all clients
 			pool.clientWordAssignmentFlow(c)
 			pool.broadcastCurrentWordDetails()
+
 			stopHints := make(chan bool)
 			pool.broadcastHintsForWord(stopHints)
 
 			// start a timer with interrupt, create a channel to use it to interrupt the timer if required
 			// and run a go routine and pass this channel to pass data on this chan on all clients guess
 			stopSleep := make(chan bool)
-			go pool.checkIfAllGuessed(stopSleep)
-			interrupted := sleepWithInterrupt(pool.CurrWordExpiresAt.Sub(time.Now()), stopSleep)
+			go pool.checkIfAllGuessed(stopSleep, stopHints)
+			interrupted := utils.SleepWithInterrupt(pool.CurrWordExpiresAt.Sub(time.Now()), stopSleep)
 
 			// broadcast turn_over, reveal the word and clear canvas
 			if interrupted {
@@ -108,10 +110,12 @@ func (pool *Pool) beginGameFlow() {
 			}
 
 			// flag sketching done, clear the current word and sketcher
-			currWord := pool.turnOver(c, stopHints, stopSleep)
-			sleep(InterGameWaitDuration)
+			currWord := pool.turnOver(c)
+
+			utils.Sleep(InterGameWaitDuration)
 			pool.broadcastWordReveal(currWord)
-			sleep(InterGameWaitDuration)
+
+			utils.Sleep(InterGameWaitDuration)
 			pool.broadcastClearCanvasEvent()
 		}
 

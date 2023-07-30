@@ -19,27 +19,32 @@ type Client struct {
 }
 
 type Pool struct {
-	ID string
-
+	ID                 string
 	Capacity           int
-	DrawTime           time.Duration
 	Rounds             int
-	WordMode           string
 	WordCount          int
+	DrawTime           time.Duration
 	Hints              int
+	HintsForCurrWord   int
 	HintsRevealed      int
+	WordMode           string
 	CustomWords        []string
 	UseCustomWordsOnly bool
 
-	JoiningLink string
-	CurrWord    string
-	CurrRound   int
+	Register   chan *Client
+	Unregister chan *Client
+	Clients    []*Client
+	Broadcast  chan model.SocketMessage
 
-	Register, Unregister chan *Client
-	Broadcast            chan model.SocketMessage
-	Clients              []*Client
-	CurrSketcher         *Client
+	CurrWord                      string
+	CurrRound                     int
+	CurrSketcher                  *Client
+	CurrWordExpiresAt             time.Time
+	HasGameStarted                bool
+	HasGameEnded                  bool
+	HasClientInfoBroadcastStarted bool
 
-	CreatedTime, GameStartedAt, CurrWordExpiresAt               time.Time
-	HasGameStarted, HasGameEnded, HasClientInfoBroadcastStarted bool
+	JoiningLink   string
+	CreatedTime   time.Time
+	GameStartedAt time.Time
 }
