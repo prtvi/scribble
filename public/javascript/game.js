@@ -93,7 +93,7 @@ function getAvatarDom(avatarConfig) {
  * @returns player DOM with rank, name, score and avatar
  */
 function getPlayerDom(playerInfo, iteration) {
-	// player name div
+	// player div
 	const player = document.createElement('div');
 	player.classList.add('player');
 
@@ -124,6 +124,16 @@ function getPlayerDom(playerInfo, iteration) {
 	// append everything to player div
 	player.appendChild(playerNum);
 	player.appendChild(playerNameAndScore);
+
+	if (playerInfo.isSketching) {
+		const playerIsSketching = document.createElement('div');
+		const isSketchingImg = document.createElement('img');
+		isSketchingImg.src = 'public/assets/images/pen.gif';
+		isSketchingImg.width = 36 * scaleAvatarBy;
+		playerIsSketching.appendChild(isSketchingImg);
+		player.appendChild(playerIsSketching);
+	}
+
 	player.appendChild(playerAvatar);
 
 	return player;
@@ -988,7 +998,7 @@ function showSketcherIsDrawing(socketMessage) {
 
 	let text = '';
 	for (let i = 0; i < socketMessage.currWordLen; i++) text += '_ ';
-	text = text.trim();
+	text = text + text.length / 2;
 
 	// show the word to be guessed - stats on the game bar
 	document.querySelector('.word span.status').textContent = 'Guess this!';
@@ -1010,7 +1020,7 @@ function displayHintString(socketMessage) {
 		strToDisplay += hintString.at(i) + ' ';
 
 	document.querySelector('.word span.content').textContent =
-		strToDisplay.trim();
+		strToDisplay + strToDisplay.length / 2;
 }
 
 /**

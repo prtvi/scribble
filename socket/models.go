@@ -9,13 +9,16 @@ import (
 )
 
 type Client struct {
-	ID, Name                  string
-	AvatarConfig              model.AvatarConfig
-	DoneSketching, HasGuessed bool
-	Score                     int
-	Conn                      *websocket.Conn
-	Pool                      *Pool
-	mu                        sync.Mutex
+	ID            string
+	Name          string
+	AvatarConfig  model.AvatarConfig
+	IsSketching   bool
+	DoneSketching bool
+	HasGuessed    bool
+	Score         int
+	Conn          *websocket.Conn
+	Pool          *Pool
+	mu            sync.Mutex
 }
 
 type Pool struct {
@@ -25,8 +28,6 @@ type Pool struct {
 	WordCount          int
 	DrawTime           time.Duration
 	Hints              int
-	HintsForCurrWord   int
-	HintsRevealed      int
 	WordMode           string
 	CustomWords        []string
 	UseCustomWordsOnly bool
@@ -36,10 +37,14 @@ type Pool struct {
 	Clients    []*Client
 	Broadcast  chan model.SocketMessage
 
-	CurrWord                      string
-	CurrRound                     int
-	CurrSketcher                  *Client
-	CurrWordExpiresAt             time.Time
+	CurrWord            string
+	NumHintsForCurrWord int
+	NumHintsRevealed    int
+
+	CurrRound         int
+	CurrSketcher      *Client
+	CurrWordExpiresAt time.Time
+
 	HasGameStarted                bool
 	HasGameEnded                  bool
 	HasClientInfoBroadcastStarted bool

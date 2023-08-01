@@ -55,14 +55,18 @@ func CreateRoom(c echo.Context) error {
 	customWords := utils.SplitIntoWords(c.FormValue("customWords"))
 	useCustomWordsOnly := c.FormValue("useCustomWordsOnly") == "on"
 
-	pool, poolId := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
+	pool := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
+
+	if debug {
+		pool.ID = "debug"
+	}
 
 	// append to global Hub map, and start listening to pool connections
-	hub[poolId] = pool
+	hub[pool.ID] = pool
 	go pool.start()
 
 	// generate link to join the pool
-	link := "/app?join=" + poolId
+	link := "/app?join=" + pool.ID
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
 	link += "&isOwner=true"
 
@@ -185,6 +189,7 @@ func WsConnect(c echo.Context) error {
 		ID:            clientId,
 		Name:          clientName,
 		AvatarConfig:  avatarConfigObj,
+		IsSketching:   false,
 		DoneSketching: false,
 		HasGuessed:    false,
 		Score:         0,

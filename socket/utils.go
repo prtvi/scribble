@@ -42,8 +42,8 @@ func printSocketMsg(m model.SocketMessage) {
 		utils.Cs(msgTypeColor, messageTypeMap[m.Type]))
 }
 
-func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) (*Pool, string) {
-	pool := Pool{
+func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) *Pool {
+	return &Pool{
 		ID:        utils.GenerateUUID(),
 		Capacity:  players,
 		DrawTime:  time.Duration(time.Second * time.Duration(drawTime)),
@@ -63,8 +63,6 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		CreatedTime:    time.Now(),
 		HasGameStarted: false,
 	}
-
-	return &pool, pool.ID
 }
 
 func Maintainer() {
@@ -117,7 +115,7 @@ func DebugMode() {
 
 	RenderClientsEvery = time.Second * 30
 
-	pool, _ := newPool(5, 30, 6, 5, 2, "normal", []string{}, false)
+	pool := newPool(5, 30, 6, 5, 2, "normal", []string{}, false)
 	pool.ID = "debug"
 	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", "/app?join="+pool.ID)
 

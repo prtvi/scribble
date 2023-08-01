@@ -5,6 +5,7 @@ import (
 	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
+	"sort"
 	"strings"
 	"time"
 )
@@ -53,9 +54,14 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 			ID:           client.ID,
 			Name:         client.Name,
 			Score:        client.Score,
+			IsSketching:  client.IsSketching,
 			AvatarConfig: client.AvatarConfig,
 		})
 	}
+
+	sort.Slice(clientInfoList, func(i, j int) bool {
+		return clientInfoList[i].Score < clientInfoList[j].Score
+	})
 
 	// marshall array in byte and init as string
 	byteInfo, _ := json.Marshal(clientInfoList)
@@ -101,6 +107,7 @@ func (pool *Pool) flagAllClientsAsNotSketched() {
 func (pool *Pool) turnOver(c *Client) string {
 	currWord := pool.CurrWord
 
+	c.IsSketching = false
 	c.DoneSketching = true
 	pool.CurrWord = ""
 	pool.CurrSketcher = nil
@@ -124,6 +131,7 @@ func (pool *Pool) startGameAndBroadcast() {
 func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	// select the client
 	pool.CurrSketcher = client
+	client.IsSketching = true
 
 	// create a list of words for client to choose
 	words := utils.GetNrandomWords(utils.WORDS, pool.WordCount)
@@ -146,7 +154,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	// add the word expiry
 	pool.CurrWordExpiresAt = time.Now().Add(pool.DrawTime)
 	// reinit hints revealed
-	pool.HintsRevealed = 0
+	pool.NumHintsRevealed = 0
 }
 
 // begin clientInfo broadcast
@@ -253,7 +261,7 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 }
 
 // checks if all the clients have guessed the word and acknowledges it on the stopTimer channel
-func (pool *Pool) checkIfAllGuessed(stopTimer, stopHints chan bool) {
+func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
 	// to be run as a separate goroutine
 	// every second, check if all clients have guessed the word
 	// if yes, then acknowledge the same on the channel and break this loop
@@ -269,7 +277,7 @@ func (pool *Pool) checkIfAllGuessed(stopTimer, stopHints chan bool) {
 
 		// if gussed clients is everyone except the sketcher
 		if count != 0 && count == len(pool.Clients)-1 {
-			stopTimer <- true // write to channel and break
+			stopSketching <- true // write to channel and break
 			stopHints <- true
 			break
 		}
@@ -282,8 +290,8 @@ func (pool *Pool) checkIfAllGuessed(stopTimer, stopHints chan bool) {
 }
 
 func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
-	pool.HintsForCurrWord = utils.CalculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
-	revealDurationParts := pool.HintsForCurrWord + 2
+	pool.NumHintsForCurrWord = utils.CalculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
+	revealDurationParts := pool.NumHintsForCurrWord + 2
 	revealHintsEvery := time.Duration(utils.DurationToSeconds(pool.DrawTime)/revealDurationParts) * time.Second
 
 	var word string = pool.CurrWord
@@ -298,7 +306,7 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 	}(word)
 
 	go func() {
-		for pool.HintsRevealed < pool.HintsForCurrWord {
+		for pool.NumHintsRevealed < pool.NumHintsForCurrWord {
 			interrupted := utils.SleepWithInterrupt(revealHintsEvery, stopHints)
 			if interrupted {
 				break
@@ -313,7 +321,7 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 				Content: hintString,
 			})
 
-			pool.HintsRevealed += 1
+			pool.NumHintsRevealed += 1
 		}
 	}()
 }

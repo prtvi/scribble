@@ -88,9 +88,6 @@ func CalculateMaxHintsAllowedForWord(currWord string, nHintsPref int) int {
 		maxHintsAllowed = nHintsPref
 	}
 
-	fmt.Println("hintsPref", nHintsPref)
-	fmt.Println("maxHintsAllowed", maxHintsAllowed)
-
 	return maxHintsAllowed
 }
 
