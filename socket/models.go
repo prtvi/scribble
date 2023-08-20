@@ -37,13 +37,14 @@ type Pool struct {
 	Clients    []*Client
 	Broadcast  chan model.SocketMessage
 
-	CurrWord            string
-	NumHintsForCurrWord int
-	NumHintsRevealed    int
-
-	CurrRound         int
-	CurrSketcher      *Client
-	CurrWordExpiresAt time.Time
+	CurrWord             string
+	HintString           string
+	NumHintsForCurrWord  int
+	NumHintsRevealed     int
+	CurrRound            int
+	CurrSketcher         *Client
+	CurrWordExpiresAt    time.Time
+	SleepingForSketching bool
 
 	HasGameStarted                bool
 	HasGameEnded                  bool

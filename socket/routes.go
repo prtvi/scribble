@@ -154,8 +154,9 @@ func EnterPool(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "app", map[string]any{
-		"Rounds": pool.Rounds,
-		"Colors": utils.COLORS_FOR_DRAWING,
+		"Rounds":         pool.Rounds,
+		"Colors":         utils.COLORS_FOR_DRAWING,
+		"HasGameStarted": pool.HasGameStarted,
 
 		// init as js vars
 		"PoolId":      poolId,

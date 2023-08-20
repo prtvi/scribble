@@ -124,6 +124,7 @@ func (pool *Pool) startGameAndBroadcast() {
 		Type:    70,
 		TypeStr: messageTypeMap[70],
 		Success: true,
+		Content: "Game started!",
 	})
 }
 
@@ -298,7 +299,7 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 	var word string = pool.CurrWord
 	var charsLeft []string = strings.Split(word, "")
 	var charPicked string
-	var hintString string = func(word string) string {
+	pool.HintString = func(word string) string {
 		var res string
 		for i := 0; i < len(word); i++ {
 			res += "_"
@@ -314,16 +315,18 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 			}
 
 			charsLeft, charPicked = utils.PickRandomCharacter(charsLeft)
-			hintString = utils.GetHintString(word, charPicked, hintString)
+			pool.HintString = utils.GetHintString(word, charPicked, pool.HintString)
 
 			pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 				Type:    89,
 				TypeStr: messageTypeMap[89],
-				Content: hintString,
+				Content: pool.HintString,
 			})
 
 			pool.NumHintsRevealed += 1
 		}
+
+		pool.HintString = ""
 	}()
 }
 

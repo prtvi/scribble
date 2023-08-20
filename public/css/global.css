@@ -904,7 +904,6 @@ canvas {
 	display: block;
 	line-height: calc(var(--fs-10) - 2px);
 }
-
 .player-sketching {
 	position: absolute;
 	right: 30px;

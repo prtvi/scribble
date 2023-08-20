@@ -1,6 +1,7 @@
 package socket
 
 import (
+	model "scribble/model"
 	utils "scribble/utils"
 	"time"
 )
@@ -15,6 +16,41 @@ func (pool *Pool) start() {
 			pool.broadcastConfigs()
 			pool.broadcastClientRegister(client.ID, client.Name)
 			pool.broadcastClientInfoList()
+
+			if pool.HasGameStarted {
+				// to trigger event 70 for mid game joinee,
+				client.send(model.SocketMessage{
+					Type:          70,
+					TypeStr:       messageTypeMap[70],
+					Success:       true,
+					Content:       "Game has started!",
+					MidGameJoinee: true,
+				})
+
+				// trigger round info,
+				client.send(model.SocketMessage{
+					Type:          71,
+					TypeStr:       messageTypeMap[71],
+					CurrRound:     pool.CurrRound,
+					MidGameJoinee: true,
+				})
+
+				if pool.SleepingForSketching {
+					// trigger word stat
+					client.send(model.SocketMessage{
+						Type:    89,
+						TypeStr: messageTypeMap[89],
+						Content: pool.HintString,
+					})
+
+					// trigger timer info
+					client.send(model.SocketMessage{
+						Type:              86,
+						TypeStr:           messageTypeMap[86],
+						CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
+					})
+				}
+			}
 
 			// start broadcasting client info list on first client join
 			if len(pool.Clients) == 1 &&
@@ -102,7 +138,10 @@ func (pool *Pool) beginGameFlow() {
 			stopSketchingTime := make(chan bool)
 			go pool.checkIfAllGuessed(stopSketchingTime, stopRevealingHints)
 
+			pool.SleepingForSketching = true
 			interrupted := utils.SleepWithInterrupt(pool.CurrWordExpiresAt.Sub(time.Now()), stopSketchingTime)
+			pool.SleepingForSketching = false
+
 			// broadcast turn_over, reveal the word and clear canvas
 			if interrupted {
 				pool.broadcastTurnOverBeforeTimeout()

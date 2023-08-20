@@ -65,6 +65,7 @@ var messageTypeMap = map[int]string{
 	33: "sc__choose_word",
 	81: "sc__disable_sketching",
 	83: "sc__disable_sketching_all_guessed",
+	86: "sc__midgame_timer",
 
 	// C => S B=> Cs - blue
 	1: "csc__client_connect",

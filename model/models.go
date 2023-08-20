@@ -19,6 +19,7 @@ type SocketMessage struct {
 	TypeStr           string `json:"typeStr"`
 	Content           string `json:"content,omitempty"`
 	Success           bool   `json:"success,omitempty"`
+	MidGameJoinee     bool   `json:"midGameJoinee,omitempty"`
 	ClientId          string `json:"clientId,omitempty"`
 	ClientName        string `json:"clientName,omitempty"`
 	PoolId            string `json:"poolId,omitempty"`

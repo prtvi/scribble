@@ -274,6 +274,7 @@ function disableSketching() {
 }
 
 /**
+ * EVENT: 86
  * Begins the player sketching process by starting the timer
  * @param {Object} socketMessage
  * @returns Number, the timer id from the setInterval function
@@ -285,7 +286,7 @@ function beginClientSketchingFlowInit(socketMessage) {
 	).getTime();
 
 	const timeLeftSpan = document.querySelector('.timer span');
-	timeLeftSpan.textContent = `${timeForEachWordInSeconds}s`;
+	setGbTimerStat(timeForEachWordInSeconds);
 	return runTimer(timeLeftSpan, currentWordExpiresAt);
 }
 
@@ -305,21 +306,14 @@ function runTimer(timerElement, timeoutAt) {
 }
 
 /**
- * To display 0s left, in the event that everyone guesses the word before the timeout
- */
-function showZeroOnTimeLeftSpan() {
-	document.querySelector('.timer span').textContent = '0s';
-}
-
-/**
  * Remove event listeners on game start and hide joining link btn
  */
 function removeEventListenersOnGameStart() {
 	const isOwner = JSON.parse(getFromLocalStorage('avatarConfig')).isOwner;
-	if (isOwner)
-		document
-			.querySelector('.start-game-btn')
-			.removeEventListener('click', startGameEl);
+	if (isOwner) {
+		const startGameBtn = document.querySelector('.start-game-btn');
+		startGameBtn && startGameBtn.removeEventListener('click', startGameEl);
+	}
 
 	document
 		.querySelector('.joining-link-btn')
@@ -375,8 +369,9 @@ function initGlobalEventListeners() {
 	const isOwner = JSON.parse(getFromLocalStorage('avatarConfig')).isOwner;
 	const startGameBtn = document.querySelector('.start-game-btn');
 
-	if (isOwner) startGameBtn.addEventListener('click', startGameEl);
-	else startGameBtn.classList.add('hidden');
+	if (isOwner && startGameBtn)
+		startGameBtn.addEventListener('click', startGameEl);
+	else if (startGameBtn) startGameBtn.classList.add('hidden');
 
 	// adjust overlay position on scroll
 	window.addEventListener('scroll', adjustOverlay);
@@ -518,6 +513,33 @@ function openColorSelect() {
 	// add EL to the colors elements and check for click events
 	const colors = document.querySelector('.colors');
 	colors.addEventListener('click', selectColorEL);
+}
+
+/**
+ * Sets the word status on the game bar
+ * @param {String} status display the status on game bar
+ * @param {String} content display the content on game bar
+ */
+function setGbWordStatus(status, content) {
+	const word = document.querySelector('.word');
+	word.querySelector('span.status').textContent = status;
+	word.querySelector('span.content').textContent = content;
+}
+
+/**
+ * Sets the number of rounds on the game bar
+ * @param {Number} num current round number
+ */
+function setGbRoundNum(num) {
+	document.querySelector('.round span.curr-round').textContent = num;
+}
+
+/**
+ * Sets the number of seconds left on the timer display element
+ * @param {Number} seconds seconds left
+ */
+function setGbTimerStat(seconds) {
+	document.querySelector('.timer span').textContent = `${seconds}s`;
 }
 
 // -------------------------------- CANVAS --------------------------------
@@ -793,8 +815,7 @@ function revealWordOnOverlayAndChat(socketMessage) {
 	const message = `The word was '${socketMessage.content}'`;
 	displayOverlay(getOverlayHtmlForTextOnly(message));
 	appendChatMsgToDOM(message, '#ffa500');
-	document.querySelector('.word span.content').textContent =
-		socketMessage.content;
+	setGbWordStatus('The word was', socketMessage.content);
 }
 
 /**
@@ -913,11 +934,12 @@ function startGame(socketMessage) {
 	removeEventListenersOnGameStart();
 
 	// display game started overlay
-	displayOverlay(getOverlayHtmlForTextOnly('Game started!'));
+	displayOverlay(getOverlayHtmlForTextOnly(socketMessage.content));
 
 	// show game started on game bar
-	document.querySelector('.word span.status').textContent = 'Game started';
-	document.querySelector('.word span.content').textContent = 'Game started!';
+	setGbWordStatus(socketMessage.content, socketMessage.content);
+
+	if (socketMessage.midGameJoinee) hideOverlay();
 }
 
 /**
@@ -926,11 +948,12 @@ function startGame(socketMessage) {
  * @param {Object} socketMessage
  */
 function renderRoundDetails(socketMessage) {
-	document.querySelector('.round span.curr-round').textContent =
-		socketMessage.currRound;
-	displayOverlay(
-		getOverlayHtmlForTextOnly(`Round ${socketMessage.currRound}`)
-	);
+	setGbRoundNum(socketMessage.currRound);
+
+	if (!socketMessage.midGameJoinee)
+		displayOverlay(
+			getOverlayHtmlForTextOnly(`Round ${socketMessage.currRound}`)
+		);
 }
 
 /**
@@ -967,9 +990,7 @@ function beginClientSketchingFlow(socketMessage) {
 	paintUtils.isAllowedToPaint = true;
 
 	// display the word to be sketched
-	document.querySelector('.word span.status').textContent = 'Draw this!';
-	document.querySelector('.word span.content').textContent =
-		socketMessage.currWord;
+	setGbWordStatus('Draw this!', socketMessage.currWord);
 
 	return wordExpiryCountdown;
 }
@@ -1004,8 +1025,7 @@ function showSketcherIsDrawing(socketMessage) {
 	text = text + text.length / 2;
 
 	// show the word to be guessed - stats on the game bar
-	document.querySelector('.word span.status').textContent = 'Guess this!';
-	document.querySelector('.word span.content').textContent = text;
+	setGbWordStatus('Guess this!', text);
 
 	return wordExpiryCountdown;
 }
@@ -1022,8 +1042,7 @@ function displayHintString(socketMessage) {
 	for (let i = 0; i < hintString.length; i++)
 		strToDisplay += hintString.at(i) + ' ';
 
-	document.querySelector('.word span.content').textContent =
-		strToDisplay + strToDisplay.length / 2;
+	setGbWordStatus('Guess this!', strToDisplay + strToDisplay.length / 2);
 }
 
 /**
@@ -1041,7 +1060,7 @@ function disableSketchingTurnOver() {
  * Turn over event for non-sketcher, display time up on overlay
  */
 function showTimeUp() {
-	showZeroOnTimeLeftSpan();
+	setGbTimerStat(0);
 	clearAllIntervals(wordExpiryTimer);
 	displayOverlay(getOverlayHtmlForTextOnly('Time up!'));
 }
@@ -1061,7 +1080,7 @@ function disableSketchingAllGuessed() {
  * Turn over for non-sketchers, all guessed, show everyone guessed on overlay
  */
 function showAllHaveGuessed() {
-	showZeroOnTimeLeftSpan();
+	setGbTimerStat(0);
 	clearAllIntervals(wordExpiryTimer);
 	displayOverlay(getOverlayHtmlForTextOnly('Everyone guessed the word!'));
 }
@@ -1243,6 +1262,10 @@ function socketOnMessage(message) {
 
 		case 8:
 			wordExpiryTimer = beginClientSketchingFlow(socketMessage);
+			break;
+
+		case 86:
+			wordExpiryTimer = beginClientSketchingFlowInit(socketMessage);
 			break;
 
 		case 87:

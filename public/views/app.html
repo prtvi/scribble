@@ -27,7 +27,10 @@
 			<!-- game bar -->
 			<div class="game-bar">
 				<div class="gb-item timer">
-					<img src="public/assets/images/setting_2.gif" alt="timer icon" />
+					<img
+						src="public/assets/images/setting_2.gif"
+						alt="timer icon"
+					/>
 					<span class="img-sub">0s</span>
 				</div>
 
@@ -47,7 +50,9 @@
 				</div>
 
 				<div class="gb-item joining-link-div">
-					<button class="btn joining-link-btn">Copy joining link</button>
+					<button class="btn joining-link-btn">
+						Copy joining link
+					</button>
 				</div>
 			</div>
 
@@ -55,13 +60,23 @@
 			<div class="canvas-container">
 				<div id="overlay">
 					<div class="overlay-content">
+						{{ if .HasGameStarted }}
 						<div>
-							<p class="overlay-text">Waiting for others to join!</p>
+							<p class="overlay-text">Game has started!</p>
+						</div>
+						{{ else }}
+						<div>
+							<p class="overlay-text">
+								Waiting for others to join!
+							</p>
 						</div>
 
 						<div>
-							<button class="btn start-game-btn">Start now</button>
+							<button class="btn start-game-btn">
+								Start now
+							</button>
 						</div>
+						{{ end }}
 					</div>
 				</div>
 
@@ -88,7 +103,10 @@
 
 					<div class="pu brush-stroke-select">
 						<div>
-							<img src="public/assets/images/size.gif" alt="size icon" />
+							<img
+								src="public/assets/images/size.gif"
+								alt="size icon"
+							/>
 						</div>
 
 						<div class="stroke-select hidden">
