@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func printSocketMsg(m model.SocketMessage) {
+func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 	if !debug {
 		return
 	}
@@ -22,7 +22,7 @@ func printSocketMsg(m model.SocketMessage) {
 	var msgTypeColor string
 
 	switch m.Type {
-	case 35, 82, 84, 87, 88:
+	case 35, 82, 84, 87, 88, 89:
 		msgTypeColor = "cyan"
 	case 69, 8, 33, 81, 83:
 		msgTypeColor = "yellow"
@@ -36,9 +36,9 @@ func printSocketMsg(m model.SocketMessage) {
 		msgTypeColor = "green"
 	}
 
-	utils.Cp("white",
+	utils.Cp("reset", "pool id:", utils.Cs("green", pool.ID),
 		"from:", utils.Cs(msgTypeColor, fmt.Sprintf("%-15s ", from)),
-		utils.Cs("white", "msg type: "), utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
+		"msg type:", utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
 		utils.Cs(msgTypeColor, messageTypeMap[m.Type]))
 }
 

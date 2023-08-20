@@ -54,11 +54,11 @@ func (pool *Pool) start() {
 				pool.sendExcludingClientId(pool.CurrSketcher.ID, message) // avoid sending canvas data and clear canvas event to the curr sketcher
 
 			case 7:
-				printSocketMsg(message)
+				pool.printSocketMsg(message)
 				pool.startGameRequestFromClient(message.ClientId)
 
 			case 34:
-				printSocketMsg(message)
+				pool.printSocketMsg(message)
 				pool.CurrWord = message.Content // client choosing word
 
 			default:

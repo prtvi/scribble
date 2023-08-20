@@ -9,7 +9,7 @@ import (
 
 // sends the given message to every client except the client with excludeId
 func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMessage) {
-	printSocketMsg(message)
+	pool.printSocketMsg(message)
 
 	// broadcasts the given message to all clients in the pool
 	for _, c := range pool.Clients {
@@ -23,8 +23,8 @@ func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMe
 
 // sends m1: message to client with id -> id1, sends m: message to rest of the clients
 func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessage) {
-	printSocketMsg(m1)
-	printSocketMsg(m)
+	pool.printSocketMsg(m1)
+	pool.printSocketMsg(m)
 
 	for _, c := range pool.Clients {
 		if c.ID == id1 {
@@ -37,7 +37,7 @@ func (pool *Pool) sendCorrespondingMessages(id1 string, m1, m model.SocketMessag
 
 // sends the message to the given client id
 func (pool *Pool) sendToClientId(clientId string, m model.SocketMessage) {
-	printSocketMsg(m)
+	pool.printSocketMsg(m)
 
 	for _, c := range pool.Clients {
 		if c.ID == clientId {
@@ -49,7 +49,7 @@ func (pool *Pool) sendToClientId(clientId string, m model.SocketMessage) {
 
 // broadcast the given message to all clients in pool
 func (pool *Pool) broadcast(message model.SocketMessage) {
-	printSocketMsg(message)
+	pool.printSocketMsg(message)
 
 	for _, c := range pool.Clients {
 		c.send(message)

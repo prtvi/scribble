@@ -102,24 +102,22 @@ function getPlayerDom(playerInfo, iteration) {
 	playerNum.classList.add('num');
 	playerNum.textContent = `#${iteration + 1}`;
 
-	// player name span
+	// name span
 	const playerName = document.createElement('span');
 	playerName.classList.add('name');
 
 	playerName.textContent = playerInfo.name;
 	if (clientId === playerInfo.id) playerName.textContent += ' (you)';
 
-	// player score span
+	// score span
 	const playerScore = document.createElement('span');
 	playerScore.classList.add('score');
 	playerScore.textContent = `${playerInfo.score} points`;
 
+	// player name and score div
 	const playerNameAndScore = document.createElement('div');
 	playerNameAndScore.appendChild(playerName);
 	playerNameAndScore.appendChild(playerScore);
-
-	// player avatar
-	const playerAvatar = getAvatarDom(playerInfo.avatarConfig);
 
 	// append everything to player div
 	player.appendChild(playerNum);
@@ -127,6 +125,7 @@ function getPlayerDom(playerInfo, iteration) {
 
 	if (playerInfo.isSketching) {
 		const playerIsSketching = document.createElement('div');
+		playerIsSketching.classList.add('player-sketching');
 		const isSketchingImg = document.createElement('img');
 		isSketchingImg.src = 'public/assets/images/pen.gif';
 		isSketchingImg.width = 36 * scaleAvatarBy;
@@ -134,6 +133,8 @@ function getPlayerDom(playerInfo, iteration) {
 		player.appendChild(playerIsSketching);
 	}
 
+	// player avatar
+	const playerAvatar = getAvatarDom(playerInfo.avatarConfig);
 	player.appendChild(playerAvatar);
 
 	return player;
@@ -927,7 +928,9 @@ function startGame(socketMessage) {
 function renderRoundDetails(socketMessage) {
 	document.querySelector('.round span.curr-round').textContent =
 		socketMessage.currRound;
-	displayOverlay(getOverlayHtmlForTextOnly(`Round ${socketMessage.currRound}`));
+	displayOverlay(
+		getOverlayHtmlForTextOnly(`Round ${socketMessage.currRound}`)
+	);
 }
 
 /**
@@ -1141,7 +1144,8 @@ function socketOnMessage(message) {
 	// parse json string into json object
 	const socketMessage = JSON.parse(message.data);
 
-	if (socketMessage.type !== 4) log(socketMessage.type, socketMessage.typeStr);
+	if (socketMessage.type !== 4)
+		log(socketMessage.type, socketMessage.typeStr);
 
 	switch (socketMessage.type) {
 		case 1:
@@ -1307,7 +1311,8 @@ function sendViaSocket(socketMsg) {
 	*/
 
 	// if socket is in open state then send the message
-	if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(socketMsg));
+	if (socket.readyState === socket.OPEN)
+		socket.send(JSON.stringify(socketMsg));
 	else {
 		// clear any intervals and show connection lost
 		log('socket current state:', socket.readyState);

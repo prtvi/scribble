@@ -20,7 +20,7 @@ var upgrader = websocket.Upgrader{
 var (
 	RenderClientsEvery              = time.Second * 5
 	InterGameWaitDuration           = time.Second * 2
-	TimeoutForChoosingWord          = time.Second * 15
+	TimeoutForChoosingWord          = time.Second * 20
 	DeletePoolAfterGameEndsDuration = time.Minute * 10
 	RemovePoolAfterGameNotStarted   = time.Minute * 20
 	ScoreForCorrectGuess            = 50
@@ -71,12 +71,12 @@ var messageTypeMap = map[int]string{
 	2: "csc__client_disconnect",
 	3: "csc__text_msg",
 
-	// C => S b=> Cs - red
+	// C => S b=> Cs - purple
 	4:  "csc__canvas_data",
 	41: "csc__undo_draw",
 	5:  "csc__clear_canvas",
 
-	// C => S - purple
+	// C => S - red
 	7:  "cs__req_start_game",
 	34: "cs__chosen_word",
 }

@@ -174,7 +174,3 @@ function setIfOwner() {
 function saveToLocalStorage(key, value) {
 	window.localStorage.setItem(key, JSON.stringify(value));
 }
-
-function getFromLocalStorage(key) {
-	return window.localStorage.getItem(key);
-}

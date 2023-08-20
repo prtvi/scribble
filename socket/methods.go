@@ -247,6 +247,7 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 		return message
 	}
 
+	// if the sketcher is the guesser, then the guesserClient will be nil, hence check if guesserClient is nil
 	// check if the text message contains the word, word exists in message
 	// send this response only if client has already guessed the current word
 	if guesserClient != nil &&

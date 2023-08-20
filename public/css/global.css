@@ -883,6 +883,7 @@ canvas {
 	padding: 2px 5px;
 	display: flex;
 	justify-content: space-between;
+	position: relative;
 }
 .player .num {
 	font-family: r400, var(--ff);
@@ -902,6 +903,11 @@ canvas {
 	font-size: var(--fs-8);
 	display: block;
 	line-height: calc(var(--fs-10) - 2px);
+}
+
+.player-sketching {
+	position: absolute;
+	right: 30px;
 }
 
 .message {
