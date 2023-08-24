@@ -327,6 +327,7 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 		}
 
 		pool.HintString = ""
+		pool.NumHintsRevealed = 0
 	}()
 }
 

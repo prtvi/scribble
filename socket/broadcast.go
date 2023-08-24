@@ -150,7 +150,6 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 		Type:              88,
 		TypeStr:           messageTypeMap[88],
 		CurrWordLen:       len(pool.CurrWord),
-		CurrSketcherName:  pool.CurrSketcher.Name,
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 	}
 
@@ -200,5 +199,47 @@ func (pool *Pool) broadcastWordReveal(word string) {
 		Type:    32,
 		TypeStr: messageTypeMap[32],
 		Content: word,
+	})
+}
+
+func (pool *Pool) triggerCurrentGameStatsToMidGameJoinee(c *Client) {
+	if !pool.HasGameStarted {
+		return
+	}
+
+	// send game started event
+	c.send(model.SocketMessage{
+		Type:          70,
+		TypeStr:       messageTypeMap[70],
+		Success:       true,
+		Content:       "Game has started!",
+		MidGameJoinee: true,
+	})
+
+	// send current round info
+	c.send(model.SocketMessage{
+		Type:          71,
+		TypeStr:       messageTypeMap[71],
+		CurrRound:     pool.CurrRound,
+		MidGameJoinee: true,
+	})
+
+	// if not currently in sketching flow, then return
+	if !pool.SleepingForSketching {
+		return
+	}
+
+	// since it is in sketching mode, send the hintstring
+	c.send(model.SocketMessage{
+		Type:    89,
+		TypeStr: messageTypeMap[89],
+		Content: pool.HintString,
+	})
+
+	// since it is in sketching mode, timer is required
+	c.send(model.SocketMessage{
+		Type:              86,
+		TypeStr:           messageTypeMap[86],
+		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 	})
 }

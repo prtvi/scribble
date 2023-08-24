@@ -1,7 +1,6 @@
 package socket
 
 import (
-	model "scribble/model"
 	utils "scribble/utils"
 	"time"
 )
@@ -17,40 +16,8 @@ func (pool *Pool) start() {
 			pool.broadcastClientRegister(client.ID, client.Name)
 			pool.broadcastClientInfoList()
 
-			if pool.HasGameStarted {
-				// to trigger event 70 for mid game joinee,
-				client.send(model.SocketMessage{
-					Type:          70,
-					TypeStr:       messageTypeMap[70],
-					Success:       true,
-					Content:       "Game has started!",
-					MidGameJoinee: true,
-				})
-
-				// trigger round info,
-				client.send(model.SocketMessage{
-					Type:          71,
-					TypeStr:       messageTypeMap[71],
-					CurrRound:     pool.CurrRound,
-					MidGameJoinee: true,
-				})
-
-				if pool.SleepingForSketching {
-					// trigger word stat
-					client.send(model.SocketMessage{
-						Type:    89,
-						TypeStr: messageTypeMap[89],
-						Content: pool.HintString,
-					})
-
-					// trigger timer info
-					client.send(model.SocketMessage{
-						Type:              86,
-						TypeStr:           messageTypeMap[86],
-						CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
-					})
-				}
-			}
+			// to any player that joins mid-game
+			pool.triggerCurrentGameStatsToMidGameJoinee(client)
 
 			// start broadcasting client info list on first client join
 			if len(pool.Clients) == 1 &&
@@ -60,18 +27,14 @@ func (pool *Pool) start() {
 				// run sep goroutine to begin broadcasting client info at regular intervals
 				go pool.beginBroadcastClientInfo()
 			}
-
 			// pool.printStats("client connected, clientId:", client.ID)
-			break
 
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client slice and broadcast the unregister
 			pool.removeClientFromList(client)
 			pool.broadcastClientUnregister(client.ID, client.Name)
 			pool.broadcastClientInfoList()
-
 			// pool.printStats("client disconnected, clientId:", client.ID)
-			break
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message
@@ -100,8 +63,6 @@ func (pool *Pool) start() {
 			default:
 				break
 			}
-
-			break
 		}
 	}
 }
@@ -131,7 +92,9 @@ func (pool *Pool) beginGameFlow() {
 			pool.broadcastClientInfoList()
 
 			stopRevealingHints := make(chan bool)
-			pool.broadcastHintsForWord(stopRevealingHints)
+			if pool.WordMode == "normal" {
+				pool.broadcastHintsForWord(stopRevealingHints)
+			}
 
 			// start a timer with interrupt, create a channel to use it to interrupt the timer if required
 			// and run a go routine and pass this channel to pass data on this chan on all clients guess

@@ -19,7 +19,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 		dt := utils.FormatTimeLong(time.Now())
 		reqMethod := c.Request().Method
 
-		utils.Cp("green", fmt.Sprintf("%s: %s  %s", reqMethod, fmt.Sprintf("%s", c.Request().URL), dt))
+		utils.Cp("green", fmt.Sprintf("%s: %s  %s", reqMethod, c.Request().URL.String(), dt))
 
 		return next(c)
 	}
@@ -186,17 +186,7 @@ func WsConnect(c echo.Context) error {
 	pool := hub[poolId]
 
 	// create a new client to append to Pool.Clients map
-	client := &Client{
-		ID:            clientId,
-		Name:          clientName,
-		AvatarConfig:  avatarConfigObj,
-		IsSketching:   false,
-		DoneSketching: false,
-		HasGuessed:    false,
-		Score:         0,
-		Conn:          conn,
-		Pool:          pool,
-	}
+	client := newClient(clientId, clientName, conn, pool, avatarConfigObj)
 
 	// register and notify other clients
 	pool.Register <- client

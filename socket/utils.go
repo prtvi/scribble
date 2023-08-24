@@ -7,6 +7,8 @@ import (
 	utils "scribble/utils"
 	"text/tabwriter"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 func (pool *Pool) printSocketMsg(m model.SocketMessage) {
@@ -62,6 +64,20 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		Broadcast:      make(chan model.SocketMessage),
 		CreatedTime:    time.Now(),
 		HasGameStarted: false,
+	}
+}
+
+func newClient(id, name string, conn *websocket.Conn, pool *Pool, ac model.AvatarConfig) *Client {
+	return &Client{
+		ID:            id,
+		Name:          name,
+		AvatarConfig:  ac,
+		IsSketching:   false,
+		DoneSketching: false,
+		HasGuessed:    false,
+		Score:         0,
+		Conn:          conn,
+		Pool:          pool,
 	}
 }
 

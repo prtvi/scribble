@@ -91,7 +91,7 @@ var FormParams = []model.CreateFormParam{
 			{Value: "9", Label: "9"},
 			{Value: "10", Label: "10"}}},
 
-	{ID: "wordMode", Label: "Word mode", ImgIdx: 4, Desc: "Word mode, Normal: display number of characters in word, also display hints. Hidden: do not reveal the number of characters, no hints. Combination: combination of two words separated by '+'",
+	{ID: "wordMode", Label: "Word mode", ImgIdx: 4, Desc: "Word mode, Normal: display number of characters in word and reveal hints. Hidden: do not reveal the number of characters, no hints. Combination: combination of two words separated by a '+'",
 		Options: []model.FormOption{
 			{Value: "normal", Label: "Normal", Selected: true},
 			{Value: "hidden", Label: "Hidden"},
