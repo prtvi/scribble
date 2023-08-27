@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
@@ -11,11 +12,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func LoadEnv() {
+func LoadAndGetEnv() bool {
 	err := godotenv.Load(".env")
 	if err != nil {
 		Cp("redBg", "Error loading .env file")
 	}
+
+	env := os.Getenv("ENV")
+	if env == "" || env == "PROD" {
+		return false
+	}
+
+	return true
 }
 
 func GenerateUUID() string {
@@ -65,7 +73,7 @@ func GetTimeString(t time.Time) string {
 }
 
 func GetSecondsLeftFrom(t time.Time) int {
-	return int(t.Sub(time.Now()).Seconds())
+	return int(time.Until(t).Seconds())
 }
 
 func DurationToSeconds(t time.Duration) int {
@@ -106,13 +114,13 @@ func GetHintString(word, char, hintString string) string {
 // randomise
 
 func GetRandomItem(arr []string) string {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 	n := rand.Int() % len(arr)
 	return arr[n]
 }
 
 func GetRandomItemWithIdx(arr []string) (string, int) {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 	n := rand.Int() % len(arr)
 	return arr[n], n
 }
@@ -132,9 +140,8 @@ func PickRandomCharacter(chars [](string)) ([]string, string) {
 }
 
 func ShuffleList(list []string) []string {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 	rand.Shuffle(len(list), func(i, j int) { list[i], list[j] = list[j], list[i] })
-
 	return list
 }
 

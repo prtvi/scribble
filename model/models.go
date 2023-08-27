@@ -1,7 +1,6 @@
 package model
 
 // Type:              int identifier
-// TypeStr:           string identifier
 // Content:           can contain any kind of data, type of data identified using Type field
 // Success:           to acknowledge success for any event
 // ClientId:          incoming clientId from clients
@@ -16,10 +15,10 @@ package model
 
 type SocketMessage struct {
 	Type              int    `json:"type"`
-	TypeStr           string `json:"typeStr"`
 	Content           string `json:"content,omitempty"`
 	Success           bool   `json:"success,omitempty"`
 	MidGameJoinee     bool   `json:"midGameJoinee,omitempty"`
+	WordMode          string `json:"wordMode,omitempty"`
 	ClientId          string `json:"clientId,omitempty"`
 	ClientName        string `json:"clientName,omitempty"`
 	PoolId            string `json:"poolId,omitempty"`

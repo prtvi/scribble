@@ -27,6 +27,9 @@ func (c *Client) read() {
 		// parse message received from client
 		var clientMsg model.SocketMessage
 		err = json.Unmarshal(msgByte, &clientMsg)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		// broadcast the message to all clients in the pool
 		c.Pool.Broadcast <- clientMsg
@@ -59,15 +62,15 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 		})
 	}
 
+	// sort descending wrt score
 	sort.Slice(clientInfoList, func(i, j int) bool {
-		return clientInfoList[i].Score < clientInfoList[j].Score
+		return clientInfoList[i].Score > clientInfoList[j].Score
 	})
 
 	// marshall array in byte and init as string
 	byteInfo, _ := json.Marshal(clientInfoList)
 	return model.SocketMessage{
 		Type:    6,
-		TypeStr: messageTypeMap[6],
 		Content: string(byteInfo),
 	}
 }
@@ -92,14 +95,14 @@ func (pool *Pool) removeClientFromList(client *Client) {
 }
 
 func (pool *Pool) flagAllClientsAsNotGuessed() {
-	for _, cl := range pool.Clients {
-		cl.HasGuessed = false
+	for _, c := range pool.Clients {
+		c.HasGuessed = false
 	}
 }
 
 func (pool *Pool) flagAllClientsAsNotSketched() {
-	for _, cl := range pool.Clients {
-		cl.DoneSketching = false
+	for _, c := range pool.Clients {
+		c.DoneSketching = false
 	}
 }
 
@@ -122,7 +125,6 @@ func (pool *Pool) startGameAndBroadcast() {
 
 	pool.broadcast(model.SocketMessage{
 		Type:    70,
-		TypeStr: messageTypeMap[70],
 		Success: true,
 		Content: "Game started!",
 	})
@@ -144,18 +146,19 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 		utils.Sleep(TimeoutForChoosingWord)
 
 		if pool.CurrWord == "" {
-			pool.CurrWord = utils.GetRandomItem(words)
+			pool.InitCurrWord <- utils.GetRandomItem(words)
 		}
 	}()
 
-	// run an infinite loop until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func), or initialised in word choose countdown goroutine
-	for pool.CurrWord == "" {
-	}
+	// wait until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func, case: 34), or initialised in word choose countdown goroutine above
+	pool.CurrWord = <-pool.InitCurrWord
 
 	// add the word expiry
 	pool.CurrWordExpiresAt = time.Now().Add(pool.DrawTime)
 	// reinit hints revealed
 	pool.NumHintsRevealed = 0
+	// clear hint string
+	pool.HintString = ""
 }
 
 // begin clientInfo broadcast
@@ -184,10 +187,7 @@ func (pool *Pool) startGameRequestFromClient(clientId string) {
 	// start the game and broadcast the same
 
 	if len(pool.Clients) < 2 {
-		pool.sendToClientId(clientId, model.SocketMessage{
-			Type:    69,
-			TypeStr: messageTypeMap[69],
-		})
+		pool.sendToClientId(clientId, model.SocketMessage{Type: 69})
 
 		return
 	}
@@ -225,7 +225,6 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 		(guessedLower == currWordLower || strings.Contains(guessedLower, currWordLower)) {
 
 		message.Type = 313
-		message.TypeStr = messageTypeMap[313]
 		return message
 	}
 
@@ -244,7 +243,6 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 
 		// if correct guess then modify the message
 		message.Type = 31
-		message.TypeStr = messageTypeMap[31]
 		return message
 	}
 
@@ -256,7 +254,6 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 		strings.Contains(guessedLower, currWordLower) {
 
 		message.Type = 312
-		message.TypeStr = messageTypeMap[312]
 	}
 
 	return message
@@ -279,8 +276,12 @@ func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
 
 		// if gussed clients is everyone except the sketcher
 		if count != 0 && count == len(pool.Clients)-1 {
-			stopSketching <- true // write to channel and break
-			stopHints <- true
+			// write to channel and break
+			stopSketching <- true
+			if pool.WordMode == "normal" {
+				stopHints <- true
+			}
+
 			break
 		}
 
@@ -319,15 +320,11 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 
 			pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 				Type:    89,
-				TypeStr: messageTypeMap[89],
 				Content: pool.HintString,
 			})
 
 			pool.NumHintsRevealed += 1
 		}
-
-		pool.HintString = ""
-		pool.NumHintsRevealed = 0
 	}()
 }
 
@@ -338,7 +335,29 @@ func (pool *Pool) endGame() {
 	pool.HasGameEnded = true
 	pool.broadcast(model.SocketMessage{
 		Type:    9,
-		TypeStr: messageTypeMap[9],
 		Content: pool.getClientInfoList().Content,
 	})
+}
+
+func (pool *Pool) getClientForSketching() *Client {
+	for _, c := range pool.Clients {
+		if !c.DoneSketching {
+			return c
+		}
+	}
+
+	return nil
+}
+
+func (pool *Pool) allSketched() bool {
+	flag := false
+	for _, c := range pool.Clients {
+		if c.DoneSketching {
+			flag = true
+		} else {
+			flag = false
+		}
+	}
+
+	return flag
 }

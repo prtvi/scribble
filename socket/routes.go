@@ -57,10 +57,6 @@ func CreateRoom(c echo.Context) error {
 
 	pool := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
 
-	if debug {
-		pool.ID = "debug"
-	}
-
 	// append to global Hub map, and start listening to pool connections
 	hub[pool.ID] = pool
 	go pool.start()
@@ -115,10 +111,7 @@ func JoinPool(c echo.Context) error {
 	}
 
 	// if pool exists, get its capacity and curr size
-	poolCap := pool.Capacity
-	poolCurrSizePlus1 := len(pool.Clients) + 1
-
-	if poolCurrSizePlus1 > poolCap {
+	if len(pool.Clients)+1 > pool.Capacity {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
 		return c.Render(http.StatusOK, "index", map[string]any{
 			"RenderTemplateName": "error",

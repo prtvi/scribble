@@ -153,7 +153,6 @@ function sendChatMsgBtnEL(e) {
 
 	const socketMsg = {
 		type: 3,
-		typeStr: messageTypeMap.get(3),
 		content: msg,
 		clientName,
 		clientId,
@@ -402,7 +401,6 @@ function copyJoiningLinkEL() {
 function startGameEl() {
 	const socketMsg = {
 		type: 7,
-		typeStr: messageTypeMap.get(7),
 		clientId,
 		clientName,
 		poolId,
@@ -424,7 +422,6 @@ function wordChooseEL(e) {
 
 	const socketMsg = {
 		type: 34,
-		typeStr: messageTypeMap.get(34),
 		content: chosenWord,
 		clientName,
 		clientId,
@@ -724,7 +721,6 @@ function requestCanvasClear() {
 
 	const socketMsg = {
 		type: 5,
-		typeStr: messageTypeMap.get(5),
 		clientId,
 		clientName,
 		poolId,
@@ -740,7 +736,6 @@ function sendImgData() {
 	// called by paint function
 	const socketMsg = {
 		type: 4,
-		typeStr: messageTypeMap.get(4),
 		content: String(canvas.toDataURL('img/png')),
 		clientName,
 		clientId,
@@ -757,7 +752,6 @@ function sendImgDataForUndoAction() {
 	// called by undo function
 	const socketMsg = {
 		type: 41,
-		typeStr: messageTypeMap.get(41),
 		content: String(canvas.toDataURL('img/png')),
 		clientName,
 		clientId,
@@ -1020,9 +1014,12 @@ function showSketcherIsDrawing(socketMessage) {
 	// begin the timer
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
-	let text = '';
-	for (let i = 0; i < socketMessage.currWordLen; i++) text += '_ ';
-	text = text + text.length / 2;
+	let text = 'The word is hidden';
+	if (socketMessage.wordMode === 'normal') {
+		text = '';
+		for (let i = 0; i < socketMessage.currWordLen; i++) text += '_ ';
+		text = text + text.length / 2;
+	}
 
 	// show the word to be guessed - stats on the game bar
 	setGbWordStatus('Guess this!', text);
@@ -1164,7 +1161,10 @@ function socketOnMessage(message) {
 	const socketMessage = JSON.parse(message.data);
 
 	if (socketMessage.type !== 4)
-		log(socketMessage.type, socketMessage.typeStr);
+		log(
+			socketMessage.type,
+			messageTypeMap && messageTypeMap.get(socketMessage.type)
+		);
 
 	switch (socketMessage.type) {
 		case 1:

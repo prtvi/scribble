@@ -68,7 +68,6 @@ func (pool *Pool) broadcastConfigs() {
 	byteInfo, _ := json.Marshal(cfg)
 	pool.broadcast(model.SocketMessage{
 		Type:    10,
-		TypeStr: messageTypeMap[10],
 		Content: string(byteInfo),
 	})
 }
@@ -77,7 +76,6 @@ func (pool *Pool) broadcastConfigs() {
 func (pool *Pool) broadcastClientRegister(id, name string) {
 	pool.broadcast(model.SocketMessage{
 		Type:       1,
-		TypeStr:    messageTypeMap[1],
 		ClientId:   id,
 		ClientName: name,
 	})
@@ -87,7 +85,6 @@ func (pool *Pool) broadcastClientRegister(id, name string) {
 func (pool *Pool) broadcastClientUnregister(id, name string) {
 	pool.broadcast(model.SocketMessage{
 		Type:       2,
-		TypeStr:    messageTypeMap[2],
 		ClientId:   id,
 		ClientName: name,
 	})
@@ -102,17 +99,13 @@ func (pool *Pool) broadcastClientInfoList() {
 func (pool *Pool) broadcastRoundNumber() {
 	pool.broadcast(model.SocketMessage{
 		Type:      71,
-		TypeStr:   messageTypeMap[71],
 		CurrRound: pool.CurrRound,
 	})
 }
 
 // 51
 func (pool *Pool) broadcastClearCanvasEvent() {
-	pool.broadcast(model.SocketMessage{
-		Type:    51,
-		TypeStr: messageTypeMap[51],
-	})
+	pool.broadcast(model.SocketMessage{Type: 51})
 }
 
 // 33, 35
@@ -120,7 +113,6 @@ func (pool *Pool) broadcastWordList(words []string) {
 	byteInfo, _ := json.Marshal(words)
 	m1 := model.SocketMessage{
 		Type:             33,
-		TypeStr:          messageTypeMap[33],
 		Content:          string(byteInfo),
 		CurrSketcherId:   pool.CurrSketcher.ID,
 		CurrSketcherName: pool.CurrSketcher.Name,
@@ -129,7 +121,6 @@ func (pool *Pool) broadcastWordList(words []string) {
 
 	m := model.SocketMessage{
 		Type:             35,
-		TypeStr:          messageTypeMap[35],
 		CurrSketcherName: pool.CurrSketcher.Name,
 	}
 
@@ -140,7 +131,6 @@ func (pool *Pool) broadcastWordList(words []string) {
 func (pool *Pool) broadcastCurrentWordDetails() {
 	m1 := model.SocketMessage{
 		Type:              8,
-		TypeStr:           messageTypeMap[8],
 		CurrSketcherId:    pool.CurrSketcher.ID,
 		CurrWord:          pool.CurrWord,
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
@@ -148,15 +138,14 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 
 	m := model.SocketMessage{
 		Type:              88,
-		TypeStr:           messageTypeMap[88],
 		CurrWordLen:       len(pool.CurrWord),
+		WordMode:          pool.WordMode,
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 	}
 
 	// send sketcher is now drawing event to everyone except the sketcher
 	pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 		Type:             87,
-		TypeStr:          messageTypeMap[87],
 		CurrSketcherName: pool.CurrSketcher.Name,
 	})
 
@@ -165,30 +154,16 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 
 // 81, 82
 func (pool *Pool) broadcastTurnOver() {
-	m1 := model.SocketMessage{
-		Type:    81,
-		TypeStr: messageTypeMap[81],
-	}
-
-	m := model.SocketMessage{
-		Type:    82,
-		TypeStr: messageTypeMap[82],
-	}
+	m1 := model.SocketMessage{Type: 81}
+	m := model.SocketMessage{Type: 82}
 
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
 
 // 83, 84
 func (pool *Pool) broadcastTurnOverBeforeTimeout() {
-	m1 := model.SocketMessage{
-		Type:    83,
-		TypeStr: messageTypeMap[83],
-	}
-
-	m := model.SocketMessage{
-		Type:    84,
-		TypeStr: messageTypeMap[84],
-	}
+	m1 := model.SocketMessage{Type: 83}
+	m := model.SocketMessage{Type: 84}
 
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
 }
@@ -197,7 +172,6 @@ func (pool *Pool) broadcastTurnOverBeforeTimeout() {
 func (pool *Pool) broadcastWordReveal(word string) {
 	pool.broadcast(model.SocketMessage{
 		Type:    32,
-		TypeStr: messageTypeMap[32],
 		Content: word,
 	})
 }
@@ -210,7 +184,6 @@ func (pool *Pool) triggerCurrentGameStatsToMidGameJoinee(c *Client) {
 	// send game started event
 	c.send(model.SocketMessage{
 		Type:          70,
-		TypeStr:       messageTypeMap[70],
 		Success:       true,
 		Content:       "Game has started!",
 		MidGameJoinee: true,
@@ -219,7 +192,6 @@ func (pool *Pool) triggerCurrentGameStatsToMidGameJoinee(c *Client) {
 	// send current round info
 	c.send(model.SocketMessage{
 		Type:          71,
-		TypeStr:       messageTypeMap[71],
 		CurrRound:     pool.CurrRound,
 		MidGameJoinee: true,
 	})
@@ -229,17 +201,17 @@ func (pool *Pool) triggerCurrentGameStatsToMidGameJoinee(c *Client) {
 		return
 	}
 
-	// since it is in sketching mode, send the hintstring
-	c.send(model.SocketMessage{
-		Type:    89,
-		TypeStr: messageTypeMap[89],
-		Content: pool.HintString,
-	})
+	if pool.WordMode == "normal" {
+		// since it is in sketching mode, send the hintstring
+		c.send(model.SocketMessage{
+			Type:    89,
+			Content: pool.HintString,
+		})
+	}
 
 	// since it is in sketching mode, timer is required
 	c.send(model.SocketMessage{
 		Type:              86,
-		TypeStr:           messageTypeMap[86],
 		CurrWordExpiresAt: utils.FormatTimeLong(pool.CurrWordExpiresAt),
 	})
 }

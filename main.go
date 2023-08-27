@@ -8,15 +8,12 @@ import (
 )
 
 func main() {
-	utils.LoadEnv()
-	socket.DebugMode()
-
-	go socket.Maintainer()
+	isDebugEnv := utils.LoadAndGetEnv()
+	socket.InitDebugEnv(isDebugEnv)
 
 	e := echo.New()
 	e.Static("/public", "public")
 	e.Renderer = utils.InitTemplates()
-
 	ee := e.Group("", socket.Logger)
 
 	ee.GET("/", socket.Index)

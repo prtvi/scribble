@@ -27,14 +27,12 @@ func (pool *Pool) start() {
 				// run sep goroutine to begin broadcasting client info at regular intervals
 				go pool.beginBroadcastClientInfo()
 			}
-			// pool.printStats("client connected, clientId:", client.ID)
 
 		case client := <-pool.Unregister:
 			// on client disconnect, delete the client from Pool.Client slice and broadcast the unregister
 			pool.removeClientFromList(client)
 			pool.broadcastClientUnregister(client.ID, client.Name)
 			pool.broadcastClientInfoList()
-			// pool.printStats("client disconnected, clientId:", client.ID)
 
 		case message := <-pool.Broadcast:
 			// on message received from any of the clients in the pool, broadcast the message
@@ -49,7 +47,6 @@ func (pool *Pool) start() {
 				if pool.CurrSketcher == nil {
 					break
 				}
-
 				pool.sendExcludingClientId(pool.CurrSketcher.ID, message) // avoid sending canvas data and clear canvas event to the curr sketcher
 
 			case 7:
@@ -58,7 +55,7 @@ func (pool *Pool) start() {
 
 			case 34:
 				pool.printSocketMsg(message)
-				pool.CurrWord = message.Content // client choosing word
+				pool.InitCurrWord <- message.Content // client choosing word
 
 			default:
 				break
@@ -79,9 +76,15 @@ func (pool *Pool) beginGameFlow() {
 		// broadcast round number and wait
 		pool.broadcastRoundNumber()
 		utils.Sleep(InterGameWaitDuration)
+		pool.flagAllClientsAsNotSketched()
 
-		// loop over all clients and assign words to each client and sleep until next client's turn
-		for _, c := range pool.Clients {
+		for !pool.allSketched() {
+			// get the client who has not yet sketched for the current round
+			c := pool.getClientForSketching()
+			if c == nil {
+				break
+			}
+
 			// flag all clients as not guessed
 			pool.flagAllClientsAsNotGuessed()
 
@@ -91,18 +94,19 @@ func (pool *Pool) beginGameFlow() {
 			pool.broadcastCurrentWordDetails()
 			pool.broadcastClientInfoList()
 
-			stopRevealingHints := make(chan bool)
+			// if word mode is normal then start broadcasting hints
+			stopHints := make(chan bool)
 			if pool.WordMode == "normal" {
-				pool.broadcastHintsForWord(stopRevealingHints)
+				pool.broadcastHintsForWord(stopHints)
 			}
 
 			// start a timer with interrupt, create a channel to use it to interrupt the timer if required
 			// and run a go routine and pass this channel to pass data on this chan on all clients guess
-			stopSketchingTime := make(chan bool)
-			go pool.checkIfAllGuessed(stopSketchingTime, stopRevealingHints)
+			stopSketching := make(chan bool)
+			go pool.checkIfAllGuessed(stopSketching, stopHints)
 
 			pool.SleepingForSketching = true
-			interrupted := utils.SleepWithInterrupt(pool.CurrWordExpiresAt.Sub(time.Now()), stopSketchingTime)
+			interrupted := utils.SleepWithInterrupt(time.Until(pool.CurrWordExpiresAt), stopSketching)
 			pool.SleepingForSketching = false
 
 			// broadcast turn_over, reveal the word and clear canvas
@@ -118,11 +122,9 @@ func (pool *Pool) beginGameFlow() {
 			utils.Sleep(InterGameWaitDuration)
 			pool.broadcastWordReveal(currWord)
 
-			utils.Sleep(InterGameWaitDuration)
+			utils.Sleep(InterGameWaitDuration * 2)
 			pool.broadcastClearCanvasEvent()
 		}
-
-		pool.flagAllClientsAsNotSketched()
 	}
 
 	// once all clients are done playing, end the game and broadcast the same
