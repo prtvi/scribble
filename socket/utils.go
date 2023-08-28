@@ -1,7 +1,6 @@
 package socket
 
 import (
-	"fmt"
 	model "scribble/model"
 	utils "scribble/utils"
 	"time"
@@ -20,7 +19,6 @@ func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 	}
 
 	var color string
-
 	switch m.Type {
 	case 35, 82, 84, 87, 88, 89:
 		color = "cyan"
@@ -36,13 +34,14 @@ func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 		color = "green"
 	}
 
-	utils.Cp("reset", "pool id:", utils.Cs("green", pool.ID),
-		"from:", utils.Cs(color, fmt.Sprintf("%-15s ", from)),
-		"msg type:", utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
-		utils.Cs(color, messageTypeMap[m.Type]))
+	// utils.Cp("reset", "SOCKET_MSG> pool id:", utils.Cs("green", pool.ID),
+	// 	"from:", utils.Cs(color, fmt.Sprintf("%-15s ", from)),
+	// 	"msg type:", utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
+	// 	utils.Cs(color, messageTypeMap[m.Type]))
+	utils.Cp(color, "SOCKET_MSG> pool id:", pool.ID, "from:", from, "msg type:", m.Type, messageTypeMap[m.Type])
 }
 
-func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) *Pool {
+func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) *Pool {
 	return &Pool{
 		ID:        utils.GenerateUUID(),
 		Capacity:  players,
@@ -50,11 +49,7 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		Rounds:    rounds,
 		WordCount: wordCount,
 		Hints:     hints,
-		WordMode:  wordMode, // combination pending
-
-		// not implemented yet
-		CustomWords:        customWords,
-		UseCustomWordsOnly: useCustomWordsOnly,
+		WordMode:  wordMode,
 
 		InitCurrWord:   make(chan string),
 		Register:       make(chan *Client),
@@ -90,13 +85,13 @@ func Maintainer() {
 		for poolId, pool := range hub {
 			// if pool exists and game has ended
 			if pool != nil && pool.HasGameEnded {
-				fmt.Println("Removing pool from hub, poolId:", poolId)
+				utils.Cp("red", "removing pool from hub, poolId:", poolId)
 				delete(hub, poolId)
 			}
 
 			// if pool exists and game hasn't started for RemovePoolAfterGameNotStarted duration
 			if now := time.Now(); now.Sub(pool.CreatedTime) > RemovePoolAfterGameNotStarted {
-				fmt.Println("Removing junky pool, poolId:", poolId)
+				utils.Cp("red", "removing junky pool, poolId:", poolId)
 				delete(hub, poolId)
 			}
 		}
@@ -107,5 +102,7 @@ func InitDebugEnv(isDebugEnv bool) {
 	debug = isDebugEnv
 	if isDebugEnv {
 		utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
+	} else {
+		utils.Cp("redBg", "----------- PROD ENV -----------")
 	}
 }

@@ -6,7 +6,14 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
 	{{ if .debug }}
-	<link rel="stylesheet" href="public/css/fonts.css" />
+	<style>
+		{{ range .FF }}
+		@font-face {
+			font-family: {{.}};
+			src: url('public/assets/poppins/{{.}}.ttf');
+		}
+		{{ end }}
+	</style>
 	<script>
 		console.log('loading offline fonts');
 	</script>

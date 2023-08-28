@@ -7,8 +7,6 @@ import (
 	"scribble/model"
 	utils "scribble/utils"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,11 +14,7 @@ import (
 // / middleware
 func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		dt := utils.FormatTimeLong(time.Now())
-		reqMethod := c.Request().Method
-
-		utils.Cp("green", fmt.Sprintf("%s: %s  %s", reqMethod, c.Request().URL.String(), dt))
-
+		utils.Cp("green", fmt.Sprintf("%s: %s", c.Request().Method, c.Request().URL.String()))
 		return next(c)
 	}
 }
@@ -52,13 +46,15 @@ func CreateRoom(c echo.Context) error {
 	wordCount, _ := strconv.Atoi(c.FormValue("wordCount"))
 	hints, _ := strconv.Atoi(c.FormValue("hints"))
 	wordMode := c.FormValue("wordMode")
-	customWords := utils.SplitIntoWords(c.FormValue("customWords"))
-	useCustomWordsOnly := c.FormValue("useCustomWordsOnly") == "on"
+	// customWords := utils.SplitIntoWords(c.FormValue("customWords"))
+	// useCustomWordsOnly := c.FormValue("useCustomWordsOnly") == "on"
 
-	pool := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
+	pool := newPool(players, drawTime, rounds, wordCount, hints, wordMode) //, customWords, useCustomWordsOnly)
+	utils.Cp("blue", "pool created:", pool.ID)
 
-	// append to global Hub map, and start listening to pool connections
+	// append to global hub map, and start listening to pool connections
 	hub[pool.ID] = pool
+	utils.Cp("red", "len hub:", len(hub))
 	go pool.start()
 
 	// generate link to join the pool
@@ -74,14 +70,15 @@ func CreateRoom(c echo.Context) error {
 		"Link":               link,
 
 		// show on submit value submitted on form
-		"Players":            pool.Capacity,
-		"DrawTime":           utils.DurationToSeconds(pool.DrawTime),
-		"Rounds":             pool.Rounds,
-		"WordCount":          pool.WordCount,
-		"Hints":              pool.Hints,
-		"WordMode":           pool.WordMode,
-		"CustomWords":        strings.Join(pool.CustomWords, ","),
-		"UseCustomWordsOnly": pool.UseCustomWordsOnly,
+		"Players":   pool.Capacity,
+		"DrawTime":  utils.DurationToSeconds(pool.DrawTime),
+		"Rounds":    pool.Rounds,
+		"WordCount": pool.WordCount,
+		"Hints":     pool.Hints,
+		"WordMode":  pool.WordMode,
+
+		// "CustomWords":        strings.Join(pool.CustomWords, ","),
+		// "UseCustomWordsOnly": pool.UseCustomWordsOnly,
 	})
 }
 

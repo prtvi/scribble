@@ -26,6 +26,18 @@ func LoadAndGetEnv() bool {
 	return true
 }
 
+func logToFile(content string) {
+	f, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(content); err != nil {
+		fmt.Println(err)
+	}
+}
+
 func GenerateUUID() string {
 	return uuid.New().String()[0:8]
 }
@@ -154,8 +166,17 @@ func getColor(color string) string {
 	return reset
 }
 
-func Cp(color string, message ...string) {
-	fmt.Printf("%s%s%s\n", getColor(color), strings.Join(message, " "), reset)
+// solids: "black", "red", "green", "yellow", "blue", "purple", "cyan", "white"
+// underline: "blackU", "redU", "greenU", "yellowU", "blueU", "purpleU", "cyanU", "whiteU"
+// backgrounds: "blackBg", "redBg", "greenBg", "yellowBg", "blueBg", "purpleBg", "cyanBg", "whiteBg"
+func Cp(color string, message ...any) {
+	msg := ""
+	for _, m := range message {
+		msg += fmt.Sprintf("%+v ", m)
+	}
+
+	fmt.Printf("%s%s%s\n", getColor(color), msg, reset)
+	logToFile(fmt.Sprintf("%s: %s\n", FormatTimeLong(time.Now())[11:19], msg))
 }
 
 func Cs(color string, message ...string) string {

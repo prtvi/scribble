@@ -405,7 +405,7 @@ img {
 	display: grid;
 	grid-template-columns: repeat(3, var(--col-width));
 	grid-template-rows: auto;
-	margin: 0 auto;
+	margin: 0 auto 10px auto;
 }
 .form-content-grid > div {
 	width: var(--col-width);
@@ -896,6 +896,9 @@ canvas {
 	font-size: var(--fs-9);
 	display: block;
 	clear: both;
+}
+.player .name.self {
+	color: #026585;
 }
 .player .score {
 	font-family: l300, var(--ff);

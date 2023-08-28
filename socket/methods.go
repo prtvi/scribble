@@ -48,7 +48,7 @@ func (c *Client) send(m model.SocketMessage) {
 }
 
 // returns client info list embedded in model.SocketMessage
-func (pool *Pool) getClientInfoList() model.SocketMessage {
+func (pool *Pool) getClientInfoList(finalCall bool) model.SocketMessage {
 	clientInfoList := make([]model.ClientInfo, 0)
 
 	// append client info into an array
@@ -66,6 +66,13 @@ func (pool *Pool) getClientInfoList() model.SocketMessage {
 	sort.Slice(clientInfoList, func(i, j int) bool {
 		return clientInfoList[i].Score > clientInfoList[j].Score
 	})
+
+	if finalCall {
+		// crown the player with highest score
+		if len(clientInfoList) > 0 && clientInfoList[0].Score > 0 {
+			clientInfoList[0].AvatarConfig.IsCrowned = true
+		}
+	}
 
 	// marshall array in byte and init as string
 	byteInfo, _ := json.Marshal(clientInfoList)
@@ -95,12 +102,14 @@ func (pool *Pool) removeClientFromList(client *Client) {
 }
 
 func (pool *Pool) flagAllClientsAsNotGuessed() {
+	utils.Cp("yellow", "flagging all clients as not guessed")
 	for _, c := range pool.Clients {
 		c.HasGuessed = false
 	}
 }
 
 func (pool *Pool) flagAllClientsAsNotSketched() {
+	utils.Cp("yellow", "flagging all clients as not sketched")
 	for _, c := range pool.Clients {
 		c.DoneSketching = false
 	}
@@ -108,6 +117,7 @@ func (pool *Pool) flagAllClientsAsNotSketched() {
 
 // flag the client's turn as over and return the current word
 func (pool *Pool) turnOver(c *Client) string {
+	utils.Cp("blue", "turn over")
 	currWord := pool.CurrWord
 
 	c.IsSketching = false
@@ -120,6 +130,7 @@ func (pool *Pool) turnOver(c *Client) string {
 
 // 70, flag and broadcast the starting of the game
 func (pool *Pool) startGameAndBroadcast() {
+	utils.Cp("green", "start game broadcasting")
 	pool.HasGameStarted = true
 	pool.GameStartedAt = time.Now()
 
@@ -132,6 +143,7 @@ func (pool *Pool) startGameAndBroadcast() {
 
 // begin the client's turn to draw, assign them the word automatically based on timeout if not chosen
 func (pool *Pool) clientWordAssignmentFlow(client *Client) {
+	utils.Cp("cyan", "client word assignment flow has begun")
 	// select the client
 	pool.CurrSketcher = client
 	client.IsSketching = true
@@ -146,6 +158,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 		utils.Sleep(TimeoutForChoosingWord)
 
 		if pool.CurrWord == "" {
+			utils.Cp("cyan", "word assigned after timeout")
 			pool.InitCurrWord <- utils.GetRandomItem(words)
 		}
 	}()
@@ -166,7 +179,7 @@ func (pool *Pool) beginBroadcastClientInfo() {
 	// to be run as a go routine
 	// starts an infinite loop to broadcast client info after every regular interval
 	pool.HasClientInfoBroadcastStarted = true
-	utils.Cp("yellow", "Broadcasting client info start!")
+	utils.Cp("yellow", "broadcasting client info start")
 
 	for {
 		utils.Sleep(RenderClientsEvery)
@@ -174,7 +187,7 @@ func (pool *Pool) beginBroadcastClientInfo() {
 
 		// stop broadcasting when game ends
 		if pool.HasGameEnded || len(pool.Clients) == 0 {
-			utils.Cp("yellow", "Stopped broadcasting client info")
+			utils.Cp("yellow", "stopped broadcasting client info")
 			pool.HasClientInfoBroadcastStarted = false
 			break
 		}
@@ -188,12 +201,11 @@ func (pool *Pool) startGameRequestFromClient(clientId string) {
 
 	if len(pool.Clients) < 2 {
 		pool.sendToClientId(clientId, model.SocketMessage{Type: 69})
-
 		return
 	}
 
 	pool.startGameAndBroadcast()
-	utils.Cp("greenBg", "Game started!")
+	utils.Cp("greenBg", "game started by client")
 
 	// start game flow
 	go pool.beginGameFlow()
@@ -261,6 +273,7 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 
 // checks if all the clients have guessed the word and acknowledges it on the stopTimer channel
 func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
+	utils.Cp("yellow", "entered checking if all have guessed flow")
 	// to be run as a separate goroutine
 	// every second, check if all clients have guessed the word
 	// if yes, then acknowledge the same on the channel and break this loop
@@ -276,6 +289,7 @@ func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
 
 		// if gussed clients is everyone except the sketcher
 		if count != 0 && count == len(pool.Clients)-1 {
+			utils.Cp("yellow", "all clients have guessed, breaking from loop")
 			// write to channel and break
 			stopSketching <- true
 			if pool.WordMode == "normal" {
@@ -290,9 +304,12 @@ func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
 			break
 		}
 	}
+	utils.Cp("yellow", "exited check if all guessed loop")
 }
 
 func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
+	utils.Cp("purple", "entered broadcasting hints flow")
+
 	pool.NumHintsForCurrWord = utils.CalculateMaxHintsAllowedForWord(pool.CurrWord, pool.Hints)
 	revealDurationParts := pool.NumHintsForCurrWord + 2
 	revealHintsEvery := time.Duration(utils.DurationToSeconds(pool.DrawTime)/revealDurationParts) * time.Second
@@ -308,44 +325,53 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 		return res
 	}(word)
 
+	utils.Cp("blue", "nHints:", pool.NumHintsForCurrWord)
+
 	go func() {
 		for pool.NumHintsRevealed < pool.NumHintsForCurrWord {
 			interrupted := utils.SleepWithInterrupt(revealHintsEvery, stopHints)
 			if interrupted {
+				utils.Cp("purple", "interrupted hints reveal timer")
 				break
 			}
 
 			charsLeft, charPicked = utils.PickRandomCharacter(charsLeft)
 			pool.HintString = utils.GetHintString(word, charPicked, pool.HintString)
 
+			utils.Cp("purple", "hintstring:", pool.HintString)
 			pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 				Type:    89,
 				Content: pool.HintString,
 			})
 
 			pool.NumHintsRevealed += 1
+			utils.Cp("purple", "numHintsRevealed:", pool.NumHintsRevealed)
 		}
+
+		utils.Cp("purple", "exited hints reveal loop")
 	}()
 }
 
 // 9, flag and broadcast game end
 func (pool *Pool) endGame() {
-	utils.Cp("greenBg", "All players done playing!")
+	utils.Cp("greenBg", "all players done playing")
 
 	pool.HasGameEnded = true
 	pool.broadcast(model.SocketMessage{
 		Type:    9,
-		Content: pool.getClientInfoList().Content,
+		Content: pool.getClientInfoList(true).Content,
 	})
 }
 
 func (pool *Pool) getClientForSketching() *Client {
 	for _, c := range pool.Clients {
 		if !c.DoneSketching {
+			utils.Cp("yellow", "returning client:", c.Name)
 			return c
 		}
 	}
 
+	utils.Cp("red", "returning <nil> client")
 	return nil
 }
 
@@ -359,5 +385,6 @@ func (pool *Pool) allSketched() bool {
 		}
 	}
 
+	utils.Cp("red", "allSketched:", flag)
 	return flag
 }

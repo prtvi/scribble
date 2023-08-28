@@ -16,7 +16,6 @@ func (pool *Pool) sendExcludingClientId(excludeId string, message model.SocketMe
 		if c.ID == excludeId {
 			continue
 		}
-
 		c.send(message)
 	}
 }
@@ -50,7 +49,6 @@ func (pool *Pool) sendToClientId(clientId string, m model.SocketMessage) {
 // broadcast the given message to all clients in pool
 func (pool *Pool) broadcast(message model.SocketMessage) {
 	pool.printSocketMsg(message)
-
 	for _, c := range pool.Clients {
 		c.send(message)
 	}
@@ -58,6 +56,8 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 
 // 10
 func (pool *Pool) broadcastConfigs() {
+	utils.Cp("blue", "broadcasting configs")
+
 	cfg := model.SharedConfig{
 		MessageTypeMap:               messageTypeMap,
 		TimeForEachWordInSeconds:     utils.DurationToSeconds(pool.DrawTime),
@@ -92,7 +92,7 @@ func (pool *Pool) broadcastClientUnregister(id, name string) {
 
 // 6
 func (pool *Pool) broadcastClientInfoList() {
-	pool.broadcast(pool.getClientInfoList())
+	pool.broadcast(pool.getClientInfoList(false))
 }
 
 // 71
@@ -110,6 +110,8 @@ func (pool *Pool) broadcastClearCanvasEvent() {
 
 // 33, 35
 func (pool *Pool) broadcastWordList(words []string) {
+	utils.Cp("cyan", "broadcasting word list:", words)
+
 	byteInfo, _ := json.Marshal(words)
 	m1 := model.SocketMessage{
 		Type:             33,
@@ -129,6 +131,8 @@ func (pool *Pool) broadcastWordList(words []string) {
 
 // 8, 87, 88
 func (pool *Pool) broadcastCurrentWordDetails() {
+	utils.Cp("cyan", "broadcasting current word details, currWord:", pool.CurrWord)
+
 	m1 := model.SocketMessage{
 		Type:              8,
 		CurrSketcherId:    pool.CurrSketcher.ID,
@@ -170,6 +174,7 @@ func (pool *Pool) broadcastTurnOverBeforeTimeout() {
 
 // 32
 func (pool *Pool) broadcastWordReveal(word string) {
+	utils.Cp("blue", "word reveal:", word)
 	pool.broadcast(model.SocketMessage{
 		Type:    32,
 		Content: word,
@@ -180,6 +185,8 @@ func (pool *Pool) triggerCurrentGameStatsToMidGameJoinee(c *Client) {
 	if !pool.HasGameStarted {
 		return
 	}
+
+	utils.Cp("red", "triggering events for mid game joinee")
 
 	// send game started event
 	c.send(model.SocketMessage{

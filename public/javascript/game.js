@@ -107,7 +107,10 @@ function getPlayerDom(playerInfo, iteration) {
 	playerName.classList.add('name');
 
 	playerName.textContent = playerInfo.name;
-	if (clientId === playerInfo.id) playerName.textContent += ' (you)';
+	if (clientId === playerInfo.id) {
+		playerName.classList.add('self');
+		playerName.textContent += ' (you)';
+	}
 
 	// score span
 	const playerScore = document.createElement('span');
