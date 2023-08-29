@@ -3,6 +3,7 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
 	model "scribble/model"
 	utils "scribble/utils"
 	"sort"
@@ -190,6 +191,10 @@ func (pool *Pool) beginBroadcastClientInfo() {
 			utils.Cp("yellow", "stopped broadcasting client info")
 			pool.HasClientInfoBroadcastStarted = false
 			break
+		}
+
+		if debug {
+			utils.Cp("greenBg", "Number of goroutines running:", runtime.NumGoroutine())
 		}
 	}
 }

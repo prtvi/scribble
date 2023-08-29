@@ -61,7 +61,7 @@
 }
 
 body {
-	background-image: url('../assets/images/background.png');
+	background-image: url('assets/images/background.png');
 	background-repeat: repeat;
 	background-color: var(--bg);
 }
@@ -189,20 +189,20 @@ img {
 }
 
 .avatar .color {
-	background-image: url('../assets/images/avatar/color_atlas.gif');
+	background-image: url('assets/images/avatar/color_atlas.gif');
 }
 .avatar .eyes {
-	background-image: url('../assets/images/avatar/eyes_atlas.gif');
+	background-image: url('assets/images/avatar/eyes_atlas.gif');
 }
 .avatar .mouth {
-	background-image: url('../assets/images/avatar/mouth_atlas.gif');
+	background-image: url('assets/images/avatar/mouth_atlas.gif');
 }
 .avatar .owner.active {
-	background-image: url('../assets/images/owner.gif');
+	background-image: url('assets/images/owner.gif');
 	rotate: -30deg;
 }
 .avatar .crowned.active {
-	background-image: url('../assets/images/crown.gif');
+	background-image: url('assets/images/crown.gif');
 }
 
 /* .avatar-customisable-btns */
@@ -221,7 +221,7 @@ img {
 	height: var(--avc-btn-size);
 	border: none;
 	cursor: pointer;
-	background-image: url('../assets/images/arrow.gif');
+	background-image: url('assets/images/arrow.gif');
 	background-size: calc(
 		var(--avc-btn-size) * 2
 	); /* x2 because the atlas contains 2*2 images */
@@ -255,7 +255,7 @@ img {
 /* TODO */
 .randomize {
 	position: absolute;
-	background-image: url('../assets/images/randomize.gif');
+	background-image: url('assets/images/randomize.gif');
 	width: 36px;
 	height: 36px;
 	background-size: 36px;
@@ -815,7 +815,7 @@ canvas {
 	width: var(--pu-size);
 	height: var(--pu-size);
 	background-size: var(--pu-size);
-	background-image: url('../assets/images/size.gif');
+	background-image: url('assets/images/size.gif');
 	background-repeat: no-repeat;
 	background-position: center;
 	filter: invert(100%);

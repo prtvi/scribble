@@ -55,8 +55,8 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 }
 
 // 10
-func (pool *Pool) broadcastConfigs() {
-	utils.Cp("blue", "broadcasting configs")
+func (pool *Pool) shareConfigWithClient(c *Client) {
+	utils.Cp("blue", "sending configs to:", c.Name)
 
 	cfg := model.SharedConfig{
 		MessageTypeMap:               messageTypeMap,
@@ -66,7 +66,7 @@ func (pool *Pool) broadcastConfigs() {
 	}
 
 	byteInfo, _ := json.Marshal(cfg)
-	pool.broadcast(model.SocketMessage{
+	c.send(model.SocketMessage{
 		Type:    10,
 		Content: string(byteInfo),
 	})

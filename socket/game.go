@@ -16,7 +16,7 @@ func (pool *Pool) start() {
 
 			// on client register, append the client to Pool.Clients slice, broadcast messageTypeMap, joining of the client and client info list
 			pool.appendClientToList(client)
-			pool.broadcastConfigs()
+			pool.shareConfigWithClient(client)
 			pool.broadcastClientRegister(client.ID, client.Name)
 			pool.broadcastClientInfoList()
 

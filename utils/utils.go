@@ -176,7 +176,7 @@ func Cp(color string, message ...any) {
 	}
 
 	fmt.Printf("%s%s%s\n", getColor(color), msg, reset)
-	logToFile(fmt.Sprintf("%s: %s\n", FormatTimeLong(time.Now())[11:19], msg))
+	logToFile(fmt.Sprintf("%s: %s\n", FormatTimeLong(time.Now())[:19], msg))
 }
 
 func Cs(color string, message ...string) string {
