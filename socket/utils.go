@@ -43,14 +43,13 @@ func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) *Pool {
 	return &Pool{
-		ID:        utils.GenerateUUID(),
-		Capacity:  players,
-		DrawTime:  time.Duration(time.Second * time.Duration(drawTime)),
-		Rounds:    rounds,
-		WordCount: wordCount,
-		Hints:     hints,
-		WordMode:  wordMode,
-
+		ID:             utils.GenerateUUID(),
+		Capacity:       players,
+		DrawTime:       time.Duration(time.Second * time.Duration(drawTime)),
+		Rounds:         rounds,
+		WordCount:      wordCount,
+		Hints:          hints,
+		WordMode:       wordMode,
 		InitCurrWord:   make(chan string),
 		Register:       make(chan *Client),
 		Unregister:     make(chan *Client),

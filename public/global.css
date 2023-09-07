@@ -41,9 +41,10 @@
 	--scale-avatar-by: 3;
 	--avatar-size: calc(var(--scale-avatar-by) * 48px);
 	--avc-btn-size: calc(var(--scale-avatar-by) * 12px);
+	--row-avatar-size: 48px;
 
-	--form-width: 340px;
-	--col-width: calc(var(--form-width) / 3);
+	--container-width: 320px;
+	--col-width: calc(var(--container-width) / 3);
 
 	/* app.html */
 	--game-bar-h: 36px;
@@ -85,7 +86,7 @@ img {
 	font-family: sb600, var(--ff);
 	font-weight: var(--fw-600);
 	font-size: var(--fs-12);
-	color: var(--white);
+	color: #fff;
 	width: fit-content;
 	height: fit-content;
 	padding: 8px 10px 8px 10px;
@@ -122,27 +123,34 @@ img {
 /* main */
 
 .container {
-	margin: 50px 10px;
+	margin: 50px auto;
 	padding: 30px 20px;
 	border-radius: 8px;
 	background-color: var(--bg);
 	color: var(--white);
+	width: var(--container-width);
+	max-width: calc(var(--container-width) + 40px);
 }
 
 .logo {
 	padding: 0;
-	display: flex;
-	align-items: center;
-	vertical-align: middle;
 	background-color: transparent;
 }
 .logo img {
 	width: 100%;
 	margin: auto;
+	margin-bottom: 30px;
+}
+
+.avatar-row {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
 }
 
 .start {
 	text-align: center;
+	margin-bottom: 200px;
 }
 .start > div:not(:last-child) {
 	margin-bottom: 20px;
@@ -155,8 +163,12 @@ img {
 	justify-content: center;
 	align-items: center;
 	position: relative;
+	background-color: #112f82;
+	border-radius: 3px;
+	margin-bottom: 10px;
 }
-.avatar {
+.avatar,
+.row-avatar {
 	width: var(--avatar-size);
 	height: var(--avatar-size);
 	position: relative;
@@ -165,7 +177,10 @@ img {
 
 .avatar .color,
 .avatar .eyes,
-.avatar .mouth {
+.avatar .mouth,
+.row-avatar .color,
+.row-avatar .eyes,
+.row-avatar .mouth {
 	width: var(--avatar-size);
 	height: var(--avatar-size);
 	position: absolute;
@@ -178,7 +193,9 @@ img {
 }
 
 .avatar .owner,
-.avatar .crowned {
+.avatar .crowned,
+.row-avatar .owner,
+.row-avatar .crowned {
 	position: absolute;
 	top: calc((var(--avatar-size) / 4) * -1);
 	left: 0;
@@ -188,20 +205,44 @@ img {
 	background-size: calc(var(--avatar-size) / 2);
 }
 
-.avatar .color {
+.row-avatar {
+	width: var(--row-avatar-size);
+	height: var(--row-avatar-size);
+}
+.row-avatar .color,
+.row-avatar .eyes,
+.row-avatar .mouth {
+	width: var(--row-avatar-size);
+	height: var(--row-avatar-size);
+	background-size: calc(var(--row-avatar-size) * 10);
+}
+.row-avatar .owner,
+.row-avatar .crowned {
+	top: calc((var(--row-avatar-size) / 4) * -1);
+	width: calc(var(--row-avatar-size) / 2);
+	height: calc(var(--row-avatar-size) / 2);
+	background-size: calc(var(--row-avatar-size) / 2);
+}
+
+.avatar .color,
+.row-avatar .color {
 	background-image: url('assets/images/avatar/color_atlas.gif');
 }
-.avatar .eyes {
+.avatar .eyes,
+.row-avatar .eyes {
 	background-image: url('assets/images/avatar/eyes_atlas.gif');
 }
-.avatar .mouth {
+.avatar .mouth,
+.row-avatar .mouth {
 	background-image: url('assets/images/avatar/mouth_atlas.gif');
 }
-.avatar .owner.active {
+.avatar .owner.active,
+.row-avatar .owner.active {
 	background-image: url('assets/images/owner.gif');
 	rotate: -30deg;
 }
-.avatar .crowned.active {
+.avatar .crowned.active,
+.row-avatar .crowned.active {
 	background-image: url('assets/images/crown.gif');
 }
 
@@ -259,7 +300,7 @@ img {
 	width: 36px;
 	height: 36px;
 	background-size: 36px;
-	top: -10px;
+	top: 0;
 	right: 0;
 	cursor: pointer;
 }
@@ -367,14 +408,14 @@ img {
 	height: 15px;
 	width: 15px;
 	margin: 0 2px;
-	background-color: #bbb;
+	background-color: #7b7b7b;
 	border-radius: 50%;
 	display: inline-block;
 	transition: background-color 0.6s ease;
 	cursor: pointer;
 }
 .dot.active {
-	background-color: #717171;
+	background-color: #ffffff;
 }
 .fade {
 	animation-name: fade;
@@ -389,10 +430,16 @@ img {
 	}
 }
 
+/* home */
+
+.create-new-room-btn {
+	width: calc(var(--container-width) - 20px);
+	font-size: var(--fs-14);
+}
+
 /* create room form */
 
 .form-container {
-	margin: 50px 10px;
 	padding-top: 15px;
 	padding-bottom: 15px;
 	background-color: var(--bg);
@@ -401,7 +448,7 @@ img {
 }
 
 .form-content-grid {
-	width: var(--form-width);
+	width: var(--container-width);
 	display: grid;
 	grid-template-columns: repeat(3, var(--col-width));
 	grid-template-rows: auto;
@@ -445,7 +492,7 @@ img {
 
 .custom-words-container {
 	margin: 0 auto;
-	width: var(--form-width);
+	width: var(--container-width);
 }
 .custom-words-container > div {
 	margin: 5px;
@@ -454,7 +501,7 @@ img {
 	font-family: xl200, var(--ff);
 	font-weight: var(--fw-200);
 	font-size: var(--fs-11);
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 	height: 75px;
 	resize: none;
 }
@@ -472,10 +519,10 @@ img {
 	justify-content: center;
 	align-items: center;
 	margin: 0 auto;
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 }
 .create-room-btn {
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 }
 
 .room-created-container {
@@ -484,16 +531,16 @@ img {
 	vertical-align: middle;
 	margin: 0 auto;
 	margin-top: 5px;
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 }
 .join-room-btn {
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 }
 
 /* join */
 
 .join-room-form form > div:not(:last-child) {
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 	margin: 0 auto 10px auto;
 	text-align: center;
 }
@@ -501,13 +548,13 @@ img {
 	margin-top: 15px;
 }
 .form-btn-container .play-btn {
-	width: calc(var(--form-width) - 10px);
+	width: calc(var(--container-width) - 10px);
 }
 
 /* game.html */
 
 .btn {
-	font-size: var(--fs-10);
+	/* font-size: var(--fs-10); */
 	padding: 6px 8px 6px 8px;
 }
 
@@ -969,19 +1016,6 @@ canvas {
 
 @media screen and (min-width: 580px) {
 	:root {
-		--form-width: 450px;
-	}
-
-	.container {
-		padding: 30px 50px;
-		margin: 50px 30px;
-	}
-
-	.logo img {
-		width: 90%;
-	}
-
-	.start .subtext {
-		font-size: var(--fs-24);
+		--container-width: 400px;
 	}
 }

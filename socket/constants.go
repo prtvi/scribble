@@ -30,54 +30,63 @@ var (
 
 // B=> broadcasting to everyone
 // b=> broadcasting to some
+// Cs - all clients
+// C - single client
 
-// S B=> Cs
-// S b=> Cs
-// S => C
-// C => S B=> Cs
-// C => S b=> Cs
-// C => S
+// S B=> Cs        - server to all clients
+// S b=> Cs        - server to some clients
+// S => C          - server to one client
+// C => S B=> Cs   - one client to server - broadcasting to all clients
+// C => S b=> Cs   - one clients to server - broadcasting to some clients
+// C => S          - one client to server
+
+var class1 = "server_b_clients"
+var class2 = "server_b_some_clients"
+var class3 = "server_client"
+var class4 = "client_server_b_clients"
+var class5 = "client_server_b_some_clients"
+var class6 = "client_server"
 
 var messageTypeMap = map[int]string{
 	// S B=> Cs - green
-	6:   "sc__client_info",
-	9:   "sc__end_game",
-	10:  "sc__get_this_map",
-	31:  "sc__correct_guess",
-	312: "sc__word_in_msg",
-	313: "sc__cant_reveal_word",
-	32:  "sc__reveal_word",
-	51:  "sc__clear_canvas",
-	70:  "sc__game_started",
-	71:  "sc__round_num",
+	6:   class1 + "__client_info",
+	9:   class1 + "__end_game",
+	31:  class1 + "__correct_guess",
+	312: class1 + "__word_in_msg",
+	313: class1 + "__cant_reveal_word",
+	32:  class1 + "__reveal_word",
+	51:  class1 + "__clear_canvas",
+	70:  class1 + "__game_started",
+	71:  class1 + "__round_num",
 
 	// S b=> Cs - cyan
-	35: "sc__choosing_word",
-	82: "sc__turn_over",
-	84: "sc__turn_over_all_guessed",
-	87: "sc__sketcher_begin_drawing",
-	88: "sc__sketcher_drawing",
-	89: "sc__hint",
+	35: class2 + "__choosing_word",
+	82: class2 + "__turn_over",
+	84: class2 + "__turn_over_all_guessed",
+	87: class2 + "__sketcher_begin_drawing",
+	88: class2 + "__sketcher_drawing",
+	89: class2 + "__hint",
 
 	// S => C - yellow
-	69: "sc__game_cant_start",
-	8:  "sc__word_assigned",
-	33: "sc__choose_word",
-	81: "sc__disable_sketching",
-	83: "sc__disable_sketching_all_guessed",
-	86: "sc__midgame_timer",
+	10: class3 + "__shared_config",
+	69: class3 + "__game_cant_start",
+	8:  class3 + "__word_assigned",
+	33: class3 + "__choose_word",
+	81: class3 + "__disable_sketching",
+	83: class3 + "__disable_sketching_all_guessed",
+	86: class3 + "__midgame_timer",
 
 	// C => S B=> Cs - blue
-	1: "csc__client_connect",
-	2: "csc__client_disconnect",
-	3: "csc__text_msg",
+	1: class4 + "__client_connect",
+	2: class4 + "__client_disconnect",
+	3: class4 + "__text_msg",
 
 	// C => S b=> Cs - purple
-	4:  "csc__canvas_data",
-	41: "csc__undo_draw",
-	5:  "csc__clear_canvas",
+	4:  class5 + "__canvas_data",
+	41: class5 + "__undo_draw",
+	5:  class5 + "__clear_canvas",
 
 	// C => S - red
-	7:  "cs__req_start_game",
-	34: "cs__chosen_word",
+	7:  class6 + "__req_start_game",
+	34: class6 + "__chosen_word",
 }

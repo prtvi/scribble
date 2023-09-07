@@ -29,7 +29,6 @@
 		const mouth = document.querySelector('.avatar .mouth');
 
 		const scaleAvatarBy = 3;
-		const offset = 48 * scaleAvatarBy;
 		const rows = 10;
 
 		const avatarConfig = {
@@ -81,12 +80,14 @@
 			ele.addEventListener('click', rightEL)
 		);
 
-		function setBgPosition(element, x, y) {
+		function setBgPosition(element, x, y, scale = scaleAvatarBy) {
+			const offset = scale * 48;
 			element.style.backgroundPositionX = `-${x * offset}px`;
 			element.style.backgroundPositionY = `-${y * offset}px`;
 		}
 
 		function getCurrPosition(pos) {
+			const offset = scaleAvatarBy * 48;
 			const lastIdx = pos.lastIndexOf('px');
 			return Math.abs(+pos.slice(0, lastIdx)) / offset;
 		}
@@ -202,6 +203,69 @@
 
 		function saveToLocalStorage(key, value) {
 			window.localStorage.setItem(key, JSON.stringify(value));
+		}
+
+		// for populating the avatar-row after the logo
+
+		const avatarRow = document.querySelector('.avatar-row');
+		const randomWinner = Math.round(Math.random() * 7);
+
+		for (let i = 0; i < 8; i++) {
+			const coords = getRandomizedAvatarCoords();
+
+			const ac = {
+				color: coords.color,
+				eyes: coords.eyes,
+				mouth: coords.mouth,
+				isOwner: false,
+				isCrowned: false,
+			};
+			if (randomWinner === i) ac.isCrowned = true;
+
+			avatarRow.appendChild(getRowAvatarDom(ac));
+		}
+
+		function getRowAvatarDom(avatarConfig) {
+			const playerAvatar = document.createElement('div');
+			playerAvatar.classList.add('row-avatar');
+
+			const pColor = document.createElement('div');
+			pColor.classList.add('color');
+			setBgPosition(
+				pColor,
+				avatarConfig.color.x,
+				avatarConfig.color.y,
+				1
+			);
+
+			const pEyes = document.createElement('div');
+			pEyes.classList.add('eyes');
+			setBgPosition(pEyes, avatarConfig.eyes.x, avatarConfig.eyes.y, 1);
+
+			const pMouth = document.createElement('div');
+			pMouth.classList.add('mouth');
+			setBgPosition(
+				pMouth,
+				avatarConfig.mouth.x,
+				avatarConfig.mouth.y,
+				1
+			);
+
+			const pOwner = document.createElement('div');
+			pOwner.classList.add('owner');
+			if (avatarConfig.isOwner) pOwner.classList.add('active');
+
+			const pCrowned = document.createElement('div');
+			pCrowned.classList.add('crowned');
+			if (avatarConfig.isCrowned) pCrowned.classList.add('active');
+
+			playerAvatar.appendChild(pColor);
+			playerAvatar.appendChild(pEyes);
+			playerAvatar.appendChild(pMouth);
+			playerAvatar.appendChild(pOwner);
+			playerAvatar.appendChild(pCrowned);
+
+			return playerAvatar;
 		}
 	</script>
 </div>
