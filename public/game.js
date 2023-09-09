@@ -35,39 +35,239 @@ function getSecondsLeftFrom(futureTime) {
 	return Math.round(diff / 1000);
 }
 
+// -------------------------------- AVATAR UTILS --------------------------------
+
 /**
  * Sets the background position of the given element
  * @param {HTMLElement} element element whose backgroud position will be set
  * @param {Number} x x coordinate on the atlas image
  * @param {Number} y y coordinate on the atlas image
+ * @param {Number} scale set the scale
  */
-function setBgPosition(element, x, y) {
-	const offset = 48 * scaleAvatarBy;
-
+function setBgPosition(element, x, y, scale) {
+	const offset = scale * 48;
 	element.style.backgroundPositionX = `-${x * offset}px`;
 	element.style.backgroundPositionY = `-${y * offset}px`;
+}
+
+function getCurrPosition(pos, scale) {
+	const offset = scale * 48;
+	const lastIdx = pos.lastIndexOf('px');
+	return Math.abs(+pos.slice(0, lastIdx)) / offset;
+}
+
+function getRandomValue(arr) {
+	return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getRandomizedAvatarCoords() {
+	return {
+		color: getRandomValue(validCoordsForAvatarAtlas.color),
+		eyes: getRandomValue(validCoordsForAvatarAtlas.eyes),
+		mouth: getRandomValue(validCoordsForAvatarAtlas.mouth),
+	};
+}
+
+function initValidCoordsForAvatarAtlas(prop) {
+	const rows = 10;
+	const columns = 10;
+	let flag = false;
+
+	const coords = [];
+
+	for (let row = 0; row < rows; row++) {
+		for (let col = 0; col < columns; col++) {
+			coords.push({ x: col, y: row });
+
+			if (col === prop.x && row === prop.y) {
+				flag = true;
+				break;
+			}
+		}
+
+		if (flag) break;
+	}
+
+	return coords;
+}
+
+function setIfOwner() {
+	const urlParams = new URLSearchParams(location.search);
+	if (urlParams.get('isOwner') === 'true') avatarConfig.isOwner = true;
+}
+
+function renderRowAvatars() {
+	const avatarRow = document.querySelector('.avatar-row');
+	const randomWinner = Math.round(Math.random() * 7);
+
+	for (let i = 0; i < 8; i++) {
+		const coords = getRandomizedAvatarCoords();
+
+		const ac = {
+			color: coords.color,
+			eyes: coords.eyes,
+			mouth: coords.mouth,
+			isOwner: false,
+			isCrowned: false,
+		};
+		if (randomWinner === i) ac.isCrowned = true;
+
+		avatarRow.appendChild(getAvatarDom(ac, rowAvatarScale, 'row-avatar'));
+	}
+}
+
+function renderCustomisableAvatar() {
+	randomizeAvatar();
+
+	const colorLeft = document.querySelector('.avc-btn.color-left');
+	const colorRight = document.querySelector('.avc-btn.color-right');
+	colorLeft.name = 'color';
+	colorRight.name = 'color';
+
+	const eyesLeft = document.querySelector('.avc-btn.eyes-left');
+	const eyesRight = document.querySelector('.avc-btn.eyes-right');
+	eyesLeft.name = 'eyes';
+	eyesRight.name = 'eyes';
+
+	const mouthLeft = document.querySelector('.avc-btn.mouth-left');
+	const mouthRight = document.querySelector('.avc-btn.mouth-right');
+	mouthLeft.name = 'mouth';
+	mouthRight.name = 'mouth';
+
+	document
+		.querySelector('.randomize')
+		.addEventListener('click', randomizeAvatar);
+
+	[colorLeft, eyesLeft, mouthLeft].forEach(ele =>
+		ele.addEventListener('click', leftElForCustomizableAvatar)
+	);
+
+	[colorRight, eyesRight, mouthRight].forEach(ele =>
+		ele.addEventListener('click', rightElForCustomizableAvatar)
+	);
+}
+
+function leftElForCustomizableAvatar(e) {
+	const rows = 10;
+	const name = e.currentTarget.name;
+	const elem = document.querySelector(`.avatar.custom-avatar .${name}`);
+
+	if (elem.style.backgroundPositionX === '')
+		elem.style.backgroundPositionX = '0px';
+
+	avatarConfig[name].x =
+		getCurrPosition(
+			elem.style.backgroundPositionX,
+			customizableAvatarScale
+		) - 1;
+
+	if (avatarConfig[name].x < 0 && avatarConfig[name].y > 0) {
+		avatarConfig[name].y -= 1;
+		avatarConfig[name].x = rows - 1;
+	}
+
+	if (avatarConfig[name].x < 0 && avatarConfig[name].y === 0) {
+		avatarConfig[name].x = boundariesForAvatarAtlas[name].x;
+		avatarConfig[name].y = boundariesForAvatarAtlas[name].y;
+	}
+
+	setBgPosition(
+		elem,
+		avatarConfig[name].x,
+		avatarConfig[name].y,
+		customizableAvatarScale
+	);
+	setIfOwner();
+	saveToLocalStorage('avatarConfig', avatarConfig);
+}
+
+function rightElForCustomizableAvatar(e) {
+	const rows = 10;
+	const name = e.currentTarget.name;
+	const elem = document.querySelector(`.avatar.custom-avatar .${name}`);
+
+	if (elem.style.backgroundPositionX === '')
+		elem.style.backgroundPositionX = '0px';
+
+	avatarConfig[name].x =
+		getCurrPosition(
+			elem.style.backgroundPositionX,
+			customizableAvatarScale
+		) + 1;
+
+	if (avatarConfig[name].x >= rows) {
+		avatarConfig[name].y += 1;
+		avatarConfig[name].x = 0;
+	}
+
+	if (
+		avatarConfig[name].x > boundariesForAvatarAtlas[name].x &&
+		avatarConfig[name].y === boundariesForAvatarAtlas[name].y
+	) {
+		avatarConfig[name].x = 0;
+		avatarConfig[name].y = 0;
+	}
+
+	setBgPosition(
+		elem,
+		avatarConfig[name].x,
+		avatarConfig[name].y,
+		customizableAvatarScale
+	);
+	setIfOwner();
+	saveToLocalStorage('avatarConfig', avatarConfig);
+}
+
+function randomizeAvatar() {
+	const coords = getRandomizedAvatarCoords();
+
+	avatarConfig.color = coords.color;
+	avatarConfig.eyes = coords.eyes;
+	avatarConfig.mouth = coords.mouth;
+
+	const color = document.querySelector('.avatar.custom-avatar .color');
+	const eyes = document.querySelector('.avatar.custom-avatar .eyes');
+	const mouth = document.querySelector('.avatar.custom-avatar .mouth');
+
+	setBgPosition(
+		color,
+		coords.color.x,
+		coords.color.y,
+		customizableAvatarScale
+	);
+	setBgPosition(eyes, coords.eyes.x, coords.eyes.y, customizableAvatarScale);
+	setBgPosition(
+		mouth,
+		coords.mouth.x,
+		coords.mouth.y,
+		customizableAvatarScale
+	);
+
+	setIfOwner();
+	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
 /**
  * Generates the DOM for an avatar
  * @param {AvatarConfig Object} avatarConfig avatarConfig for rendering an avatar
+ * @param {...String} classNames classnames to be added to avatar
  * @returns the DOM for the avatar
  */
-function getAvatarDom(avatarConfig) {
+function getAvatarDom(avatarConfig, scale, ...classNames) {
 	const playerAvatar = document.createElement('div');
-	playerAvatar.classList.add('avatar', 'player-avatar');
+	playerAvatar.classList.add('avatar', ...classNames);
 
 	const pColor = document.createElement('div');
 	pColor.classList.add('color');
-	setBgPosition(pColor, avatarConfig.color.x, avatarConfig.color.y);
+	setBgPosition(pColor, avatarConfig.color.x, avatarConfig.color.y, scale);
 
 	const pEyes = document.createElement('div');
 	pEyes.classList.add('eyes');
-	setBgPosition(pEyes, avatarConfig.eyes.x, avatarConfig.eyes.y);
+	setBgPosition(pEyes, avatarConfig.eyes.x, avatarConfig.eyes.y, scale);
 
 	const pMouth = document.createElement('div');
 	pMouth.classList.add('mouth');
-	setBgPosition(pMouth, avatarConfig.mouth.x, avatarConfig.mouth.y);
+	setBgPosition(pMouth, avatarConfig.mouth.x, avatarConfig.mouth.y, scale);
 
 	const pOwner = document.createElement('div');
 	pOwner.classList.add('owner');
@@ -92,10 +292,10 @@ function getAvatarDom(avatarConfig) {
  * @param {Number} iteration #number on the UI
  * @returns player DOM with rank, name, score and avatar
  */
-function getPlayerDom(playerInfo, iteration) {
+function getPlayerCardDom(playerInfo, iteration) {
 	// player div
-	const player = document.createElement('div');
-	player.classList.add('player');
+	const playerCard = document.createElement('div');
+	playerCard.classList.add('player');
 
 	// player num span
 	const playerNum = document.createElement('span');
@@ -123,24 +323,28 @@ function getPlayerDom(playerInfo, iteration) {
 	playerNameAndScore.appendChild(playerScore);
 
 	// append everything to player div
-	player.appendChild(playerNum);
-	player.appendChild(playerNameAndScore);
+	playerCard.appendChild(playerNum);
+	playerCard.appendChild(playerNameAndScore);
 
 	if (playerInfo.isSketching) {
 		const playerIsSketching = document.createElement('div');
 		playerIsSketching.classList.add('player-sketching');
 		const isSketchingImg = document.createElement('img');
 		isSketchingImg.src = 'public/assets/images/pen.gif';
-		isSketchingImg.width = 36 * scaleAvatarBy;
+		isSketchingImg.width = 36 * playerCardAvatarScale;
 		playerIsSketching.appendChild(isSketchingImg);
-		player.appendChild(playerIsSketching);
+		playerCard.appendChild(playerIsSketching);
 	}
 
 	// player avatar
-	const playerAvatar = getAvatarDom(playerInfo.avatarConfig);
-	player.appendChild(playerAvatar);
+	const playerAvatar = getAvatarDom(
+		playerInfo.avatarConfig,
+		playerCardAvatarScale,
+		'player-card-avatar'
+	);
+	playerCard.appendChild(playerAvatar);
 
-	return player;
+	return playerCard;
 }
 
 /**
@@ -567,7 +771,7 @@ function initCanvasAndOverlay() {
 	overlay.style.top = `${cc.offsetTop}px`;
 	overlay.style.height = `${cc.offsetHeight}px`;
 
-	return { canvas, ctx, overlay };
+	return [canvas, ctx, overlay];
 }
 
 /**
@@ -911,7 +1115,9 @@ function renderClients(allClients) {
 	allClients = JSON.parse(allClients);
 
 	// append each player into the members div
-	allClients.forEach((n, i) => membersDiv.appendChild(getPlayerDom(n, i)));
+	allClients.forEach((n, i) =>
+		membersDiv.appendChild(getPlayerCardDom(n, i))
+	);
 }
 
 /**
@@ -1349,13 +1555,12 @@ function sendViaSocket(socketMsg) {
 
 // -------------------------------- MAIN --------------------------------
 
-// to be configured in css file too, #overlay{}, render animation/transition for changing innerHTML - https://stackoverflow.com/questions/29640486
 const overlayFadeInAnimationDuration = 300;
-const scaleAvatarBy = 0.5;
 const minBrushStrokeSizeForImg = 6;
 
-// canvas, canvas ctx and overlay init
-const { canvas, ctx, overlay } = initCanvasAndOverlay();
+const customizableAvatarScale = 3;
+const rowAvatarScale = 1;
+const playerCardAvatarScale = 0.5;
 
 // utils for painting on canvas
 const paintUtils = {
@@ -1378,6 +1583,42 @@ let messageTypeMap,
 	wordExpiryTimer,
 	allowLogs;
 
-// init socket connection and check game begin status
-const socket = initSocket();
-initGlobalEventListeners();
+const boundariesForAvatarAtlas = {
+	color: { x: 5, y: 2 },
+	eyes: { x: 6, y: 5 },
+	mouth: { x: 0, y: 5 },
+};
+
+const validCoordsForAvatarAtlas = {
+	color: initValidCoordsForAvatarAtlas(boundariesForAvatarAtlas.color),
+	eyes: initValidCoordsForAvatarAtlas(boundariesForAvatarAtlas.eyes),
+	mouth: initValidCoordsForAvatarAtlas(boundariesForAvatarAtlas.mouth),
+};
+
+const avatarConfig = {
+	color: { x: 0, y: 0 },
+	eyes: { x: 0, y: 0 },
+	mouth: { x: 0, y: 0 },
+	isOwner: false,
+	isCrowned: false,
+};
+
+let canvas, ctx, overlay, socket;
+
+switch (renderTemplateName) {
+	case 'game':
+		[canvas, ctx, overlay] = initCanvasAndOverlay();
+		socket = initSocket();
+		initGlobalEventListeners();
+		break;
+
+	case 'home':
+	case 'join':
+		renderCustomisableAvatar();
+		renderRowAvatars();
+		break;
+
+	default:
+		renderRowAvatars();
+		break;
+}

@@ -3,13 +3,6 @@
 <!DOCTYPE html>
 <html lang="en">
 	{{ template "header" .}}
-
-	<style>
-		:root {
-			--scale-avatar-by: 0.5;
-		}
-	</style>
-
 	<body>
 		<div id="modal" class="modal">
 			<div class="modal-content">
@@ -187,6 +180,7 @@
 		</div>
 
 		<script>
+			const renderTemplateName = 'game';
 			const poolId = '{{ .PoolId }}';
 			const clientId = '{{ .ClientId }}';
 			const clientName = '{{ .ClientName }}';

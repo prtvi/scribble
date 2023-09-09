@@ -88,9 +88,15 @@
 					</div> -->
 
 					<div class="form-btn-container">
+						{{ if .RoomCreated }}
+						<button class="btn create-room-btn" type="submit">
+							Private room created!
+						</button>
+						{{ else }}
 						<button class="btn create-room-btn" type="submit">
 							Create room
 						</button>
+						{{ end }}
 					</div>
 				</form>
 
@@ -190,6 +196,11 @@
 					'doodler_{{ .currentSize }}');
 		</script>
 		{{ end }}
+
+		<script>
+			const renderTemplateName = '{{ .RenderTemplateName }}';
+		</script>
+		<script src="public/game.js"></script>
 	</body>
 </html>
 

@@ -39,9 +39,11 @@
 	--drop-shadow: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
 
 	--scale-avatar-by: 3;
-	--avatar-size: calc(var(--scale-avatar-by) * 48px);
+	--customizable-avatar-size: calc(var(--scale-avatar-by) * 48px);
 	--avc-btn-size: calc(var(--scale-avatar-by) * 12px);
-	--row-avatar-size: 48px;
+
+	--row-avatar-size: 48px; /* scale= 1 * 48px */
+	--player-card-avatar-size: 24px; /* scale= 0.5 * 48px */
 
 	--container-width: 320px;
 	--col-width: calc(var(--container-width) / 3);
@@ -135,6 +137,7 @@ img {
 .logo {
 	padding: 0;
 	background-color: transparent;
+	margin-bottom: 80px;
 }
 .logo img {
 	width: 100%;
@@ -167,44 +170,55 @@ img {
 	border-radius: 3px;
 	margin-bottom: 10px;
 }
-.avatar,
-.row-avatar {
-	width: var(--avatar-size);
-	height: var(--avatar-size);
+
+/* set all default avatar specifications, default is custom-avatar */
+.avatar {
+	width: var(--customizable-avatar-size);
+	height: var(--customizable-avatar-size);
 	position: relative;
 	image-rendering: pixelated; /* does not blur the image on resizing */
 }
-
 .avatar .color,
 .avatar .eyes,
-.avatar .mouth,
-.row-avatar .color,
-.row-avatar .eyes,
-.row-avatar .mouth {
-	width: var(--avatar-size);
-	height: var(--avatar-size);
+.avatar .mouth {
+	width: var(--customizable-avatar-size);
+	height: var(--customizable-avatar-size);
 	position: absolute;
 	top: 0;
 	left: 0;
 	background-position: 0 0;
 	background-size: calc(
-		var(--avatar-size) * 10
+		var(--customizable-avatar-size) * 10
 	); /* x10 because the atlas contains 10*10 images */
 }
-
 .avatar .owner,
-.avatar .crowned,
-.row-avatar .owner,
-.row-avatar .crowned {
+.avatar .crowned {
 	position: absolute;
-	top: calc((var(--avatar-size) / 4) * -1);
+	top: calc((var(--customizable-avatar-size) / 4) * -1);
 	left: 0;
-	width: calc(var(--avatar-size) / 2);
-	height: calc(var(--avatar-size) / 2);
+	width: calc(var(--customizable-avatar-size) / 2);
+	height: calc(var(--customizable-avatar-size) / 2);
 	background-position: 0 0;
-	background-size: calc(var(--avatar-size) / 2);
+	background-size: calc(var(--customizable-avatar-size) / 2);
+}
+.avatar .color {
+	background-image: url('assets/images/avatar/color_atlas.gif');
+}
+.avatar .eyes {
+	background-image: url('assets/images/avatar/eyes_atlas.gif');
+}
+.avatar .mouth {
+	background-image: url('assets/images/avatar/mouth_atlas.gif');
+}
+.avatar .owner.active {
+	background-image: url('assets/images/owner.gif');
+	rotate: -30deg;
+}
+.avatar .crowned.active {
+	background-image: url('assets/images/crown.gif');
 }
 
+/* add specifications for row-avatar */
 .row-avatar {
 	width: var(--row-avatar-size);
 	height: var(--row-avatar-size);
@@ -224,26 +238,24 @@ img {
 	background-size: calc(var(--row-avatar-size) / 2);
 }
 
-.avatar .color,
-.row-avatar .color {
-	background-image: url('assets/images/avatar/color_atlas.gif');
+/* add specifications for player-card-avatar */
+.player-card-avatar {
+	width: var(--player-card-avatar-size);
+	height: var(--player-card-avatar-size);
 }
-.avatar .eyes,
-.row-avatar .eyes {
-	background-image: url('assets/images/avatar/eyes_atlas.gif');
+.player-card-avatar .color,
+.player-card-avatar .eyes,
+.player-card-avatar .mouth {
+	width: var(--player-card-avatar-size);
+	height: var(--player-card-avatar-size);
+	background-size: calc(var(--player-card-avatar-size) * 10);
 }
-.avatar .mouth,
-.row-avatar .mouth {
-	background-image: url('assets/images/avatar/mouth_atlas.gif');
-}
-.avatar .owner.active,
-.row-avatar .owner.active {
-	background-image: url('assets/images/owner.gif');
-	rotate: -30deg;
-}
-.avatar .crowned.active,
-.row-avatar .crowned.active {
-	background-image: url('assets/images/crown.gif');
+.player-card-avatar .owner,
+.player-card-avatar .crowned {
+	top: calc((var(--player-card-avatar-size) / 4) * -1);
+	width: calc(var(--player-card-avatar-size) / 2);
+	height: calc(var(--player-card-avatar-size) / 2);
+	background-size: calc(var(--player-card-avatar-size) / 2);
 }
 
 /* .avatar-customisable-btns */
@@ -346,8 +358,6 @@ img {
 	}
 }
 
-/* avatar customise */
-
 /* footer */
 
 .title {
@@ -445,6 +455,7 @@ img {
 	background-color: var(--bg);
 	border-radius: 8px;
 	color: var(--white);
+	margin-bottom: 200px;
 }
 
 .form-content-grid {
@@ -519,6 +530,7 @@ img {
 	justify-content: center;
 	align-items: center;
 	margin: 0 auto;
+	margin-bottom: 5px;
 	width: calc(var(--container-width) - 10px);
 }
 .create-room-btn {
@@ -529,8 +541,7 @@ img {
 	display: flex;
 	justify-content: space-between;
 	vertical-align: middle;
-	margin: 0 auto;
-	margin-top: 5px;
+	margin: 5px auto;
 	width: calc(var(--container-width) - 10px);
 }
 .join-room-btn {
@@ -541,7 +552,7 @@ img {
 
 .join-room-form form > div:not(:last-child) {
 	width: calc(var(--container-width) - 10px);
-	margin: 0 auto 10px auto;
+	margin: 5px auto 15px auto;
 	text-align: center;
 }
 .play-btn-container {
