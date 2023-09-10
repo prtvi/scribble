@@ -170,6 +170,13 @@
 						</button>
 					</div>
 				</form>
+
+				{{ if .debug }}
+				<script>
+					document.querySelector('#clientName').value =
+						'doodler_{{ .currentSize }}';
+				</script>
+				{{ end }}
 			</div>
 
 			{{ else }}
@@ -188,14 +195,6 @@
 			<!-- render about and how-to-play sections -->
 			{{ template "footer" .}}
 		</main>
-
-		{{ if .debug }}
-		<script>
-			document.querySelector('#clientName') &&
-				(document.querySelector('#clientName').value =
-					'doodler_{{ .currentSize }}');
-		</script>
-		{{ end }}
 
 		<script>
 			const renderTemplateName = '{{ .RenderTemplateName }}';

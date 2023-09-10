@@ -50,9 +50,9 @@
 
 	/* app.html */
 	--game-bar-h: 36px;
-	--overlay-transition: opacity 0.3s ease-in-out;
-
 	--game-bar-item-width: 24px;
+
+	--overlay-transition: opacity 0.3s ease-in-out;
 
 	--min-brush-stroke-size: 6px;
 	--pu-size: 30px;
@@ -562,11 +562,11 @@ img {
 	width: calc(var(--container-width) - 10px);
 }
 
-/* game.html */
+/* app.html */
 
-.btn {
-	/* font-size: var(--fs-10); */
-	padding: 6px 8px 6px 8px;
+.btn.game-btn {
+	font-size: var(--fs-10);
+	padding: 6px 8px;
 }
 
 .main {
@@ -619,6 +619,10 @@ img {
 	cursor: pointer;
 }
 
+.component {
+	margin-bottom: 5px;
+}
+
 .game-bar {
 	height: var(--game-bar-h);
 	display: flex;
@@ -667,10 +671,15 @@ img {
 
 .gb-item.word span.status {
 	display: block;
+	clear: both;
+	margin-top: 3px;
+	margin-bottom: 2px;
 	text-transform: uppercase;
 }
 
 .gb-item.word span.content {
+	display: block;
+	clear: both;
 	font-family: monospace;
 }
 
@@ -684,8 +693,6 @@ img {
 .canvas-container {
 	text-align: center;
 	height: fit-content;
-	margin-top: 4px;
-	margin-bottom: 4px;
 }
 
 canvas {
@@ -696,7 +703,6 @@ canvas {
 
 #overlay {
 	position: absolute;
-	height: 100%;
 	top: 0;
 	left: 0;
 	right: 0;
@@ -768,7 +774,6 @@ canvas {
 
 .paint-utils {
 	height: var(--pu-size);
-	margin-bottom: 4px;
 	display: flex;
 	justify-content: space-between;
 }
@@ -913,13 +918,11 @@ canvas {
 .pc-container {
 	height: 270px;
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
 }
 .side {
-	width: 48%;
+	width: 49.5%;
 	height: inherit;
-	margin-left: 2px;
-	margin-right: 2px;
 	background-color: var(--white);
 	text-align: center;
 	vertical-align: middle;
@@ -988,7 +991,6 @@ canvas {
 /* mc pseudo classes */
 
 .chat-box {
-	margin-top: 6px;
 	display: flex;
 	justify-content: center;
 	height: fit-content;
@@ -1028,5 +1030,57 @@ canvas {
 @media screen and (min-width: 580px) {
 	:root {
 		--container-width: 400px;
+	}
+
+	.main {
+		margin: 30px;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	:root {
+		--container-width: 400px;
+	}
+
+	.main {
+		margin: 20px;
+		margin-top: 100px;
+	}
+
+	.pc-container {
+		height: fit-content;
+		position: relative;
+	}
+	.pc-container div.canvas-container {
+		margin-left: 5px;
+		margin-right: 5px;
+		width: 80%;
+		margin-bottom: 0;
+	}
+	.pc-container .side {
+		width: 19.5%;
+	}
+	.pc-container .side.messages {
+		height: auto;
+		padding-bottom: 30px; /* same value as in -> pcMessages.style.maxHeight = `${h - 30}px` */
+	}
+
+	.chat-box {
+		position: absolute;
+		right: 0;
+		bottom: -5px;
+		margin-bottom: 0;
+		width: 19.5%;
+		height: 30px;
+	}
+	.input-wrapper input {
+		font-size: var(--fs-8);
+		height: 15px;
+		padding: 3px;
+		padding-right: 20px;
+	}
+	.input-wrapper span {
+		right: 6px;
+		top: 2px;
 	}
 }

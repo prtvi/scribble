@@ -7,18 +7,21 @@
 		<div id="modal" class="modal">
 			<div class="modal-content">
 				<span class="close-modal">&times;</span>
-
 				<p class="modal-title">Connection lost!</p>
 
 				<div class="btn-container">
-					<a href="/"><button class="btn">Go to home page</button></a>
+					<a href="/"
+						><button class="btn game-btn">
+							Go to home page
+						</button></a
+					>
 				</div>
 			</div>
 		</div>
 
 		<div class="main">
 			<!-- game bar -->
-			<div class="game-bar">
+			<div class="component game-bar">
 				<div class="gb-item timer">
 					<img
 						src="public/assets/images/setting_2.gif"
@@ -43,14 +46,14 @@
 				</div>
 
 				<div class="gb-item joining-link-div">
-					<button class="btn joining-link-btn">
+					<button class="btn game-btn joining-link-btn">
 						Copy joining link
 					</button>
 				</div>
 			</div>
 
 			<!-- canvas -->
-			<div class="canvas-container">
+			<div class="component canvas-container">
 				<div id="overlay">
 					<div class="overlay-content">
 						{{ if .HasGameStarted }}
@@ -65,7 +68,7 @@
 						</div>
 
 						<div>
-							<button class="btn start-game-btn">
+							<button class="btn game-btn start-game-btn">
 								Start now
 							</button>
 						</div>
@@ -77,7 +80,7 @@
 			</div>
 
 			<!-- paint utils -->
-			<div class="paint-utils hidden">
+			<div class="component paint-utils hidden">
 				<div>
 					<div class="pu brush-color-select">
 						<div class="color-select hidden">
@@ -155,25 +158,25 @@
 			</div>
 
 			<!-- players and chat container -->
-			<div class="pc-container">
+			<div class="component pc-container">
 				<div class="side players"></div>
 				<div class="side messages"></div>
 			</div>
 
 			<!-- chat box -->
-			<div class="chat-box">
+			<div class="component chat-box">
 				<form>
 					<div class="input-wrapper">
 						<input
 							type="text"
 							class="msg"
 							placeholder="Type your guess here"
-							maxlength="50"
+							maxlength="25"
 							required
 						/>
 						<span>0</span>
 
-						<button class="btn send-msg">Send</button>
+						<button class="btn game-btn send-msg">Send</button>
 					</div>
 				</form>
 			</div>

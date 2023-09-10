@@ -50,16 +50,31 @@ function setBgPosition(element, x, y, scale) {
 	element.style.backgroundPositionY = `-${y * offset}px`;
 }
 
+/**
+ * Returns the current position of window over the avatar atlas
+ * @param {String} pos element position as a string: 34px
+ * @param {*} scale scale of avatar
+ * @returns current position of window over the avatar atlas
+ */
 function getCurrPosition(pos, scale) {
 	const offset = scale * 48;
 	const lastIdx = pos.lastIndexOf('px');
 	return Math.abs(+pos.slice(0, lastIdx)) / offset;
 }
 
+/**
+ * Returns a random element from input array
+ * @param {Array} arr input array
+ * @returns a random element from input array
+ */
 function getRandomValue(arr) {
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/**
+ * Returns randomised avatar configuration
+ * @returns randomised avatar configuration
+ */
 function getRandomizedAvatarCoords() {
 	return {
 		color: getRandomValue(validCoordsForAvatarAtlas.color),
@@ -68,6 +83,11 @@ function getRandomizedAvatarCoords() {
 	};
 }
 
+/**
+ * Initialises valid co-ordinates over which the avatar can be rendered
+ * @param {Object} prop one of the three properties of the avatar - mouth, color and eyes
+ * @returns valid co-ordinates over which the avatar can be chosen over
+ */
 function initValidCoordsForAvatarAtlas(prop) {
 	const rows = 10;
 	const columns = 10;
@@ -91,11 +111,17 @@ function initValidCoordsForAvatarAtlas(prop) {
 	return coords;
 }
 
+/**
+ * Sets the avatarConfig.isOwner field as true if the url contains isOwner=true
+ */
 function setIfOwner() {
 	const urlParams = new URLSearchParams(location.search);
 	if (urlParams.get('isOwner') === 'true') avatarConfig.isOwner = true;
 }
 
+/**
+ * Renders row-avatars on home page
+ */
 function renderRowAvatars() {
 	const avatarRow = document.querySelector('.avatar-row');
 	const randomWinner = Math.round(Math.random() * 7);
@@ -116,6 +142,9 @@ function renderRowAvatars() {
 	}
 }
 
+/**
+ * Renders customizable avatar and adds event listeners for the same
+ */
 function renderCustomisableAvatar() {
 	randomizeAvatar();
 
@@ -147,6 +176,10 @@ function renderCustomisableAvatar() {
 	);
 }
 
+/**
+ * Event listener for customising avatar, left direction
+ * @param {Event} e click event for customising avatar
+ */
 function leftElForCustomizableAvatar(e) {
 	const rows = 10;
 	const name = e.currentTarget.name;
@@ -181,6 +214,10 @@ function leftElForCustomizableAvatar(e) {
 	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
+/**
+ * Event listener for customising avatar, right direction
+ * @param {Event} e click event for customising avatar
+ */
 function rightElForCustomizableAvatar(e) {
 	const rows = 10;
 	const name = e.currentTarget.name;
@@ -218,6 +255,9 @@ function rightElForCustomizableAvatar(e) {
 	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
+/**
+ * Randomise the customisable avatar
+ */
 function randomizeAvatar() {
 	const coords = getRandomizedAvatarCoords();
 
@@ -425,6 +465,7 @@ function adjustOverlay() {
 	overlay.style.top = `${cc.offsetTop}px`;
 	overlay.style.height = `${cc.offsetHeight}px`;
 	overlay.style.width = `${cc.offsetWidth}px`;
+	overlay.style.left = `${cc.offsetLeft}px`;
 }
 
 /**
@@ -551,6 +592,9 @@ function initGlobalEventListeners() {
 		canvas.addEventListener('mousedown', startPainting);
 		canvas.addEventListener('mouseup', stopPainting);
 		canvas.addEventListener('mousemove', paint);
+
+		repositionElements();
+		adjustOverlay();
 	});
 
 	// resize canvas on window resize
@@ -564,6 +608,7 @@ function initGlobalEventListeners() {
 		cc.style.height = `${h}px`;
 
 		adjustOverlay();
+		repositionElements();
 	});
 
 	// copy joining link
@@ -592,6 +637,41 @@ function initGlobalEventListeners() {
 		if (e.target === modal && modal.style.display != 'none')
 			modal.style.display = 'none';
 	});
+}
+
+/**
+ * Reposition/hide/unhide/set css properties of elements on window resize
+ */
+function repositionElements() {
+	const cc = document.querySelector('.canvas-container');
+	const main = document.querySelector('div.main');
+	const pcContainer = document.querySelector('.pc-container');
+	const pcMessages = document.querySelector('.pc-container .messages');
+	const pu = document.querySelector('.paint-utils');
+	const cb = document.querySelector('.chat-box');
+	const msgInput = document.querySelector('.msg');
+
+	const { w, h } = getCanvasSize();
+
+	// 1 -> move canvas-container element to-and-fro from main to pc-container depending on window size
+	// 2 -> move chat-box from main to pc-container to-and-fro
+	// 3 -> hide the send msg btn
+	// 4 -> set messages-div max height
+	// 5 -> set msg input width
+
+	if (window.innerWidth > 768) {
+		pcContainer.insertBefore(cc, pcMessages); // 1
+		pcContainer.appendChild(cb); // 2
+		cb.querySelector('button').classList.add('hidden'); // 3
+		pcMessages.style.maxHeight = `${h - 30}px`; // 4
+		msgInput.style.width = `${pcMessages.offsetWidth - 30}px`; // 5
+	} else {
+		main.insertBefore(cc, pu); // 1
+		main.appendChild(cb); // 2
+		cb.querySelector('button').classList.remove('hidden'); // 3
+		pcMessages.style.maxHeight = ``; // 4
+		msgInput.style.width = ``; // 5
+	}
 }
 
 /**
@@ -779,7 +859,13 @@ function initCanvasAndOverlay() {
  * @returns Object, { w: width, h: height }
  */
 function getCanvasSize() {
-	const w = window.innerWidth;
+	const windowWidth = window.innerWidth;
+	const gb = document.querySelector('.component.game-bar').offsetWidth;
+
+	let w = 0;
+	if (windowWidth >= 768) w = gb * 0.6;
+	else w = gb;
+
 	const cw = w;
 	const ch = cw / 1.5;
 
