@@ -495,13 +495,13 @@ function disableSketching() {
 	const clearCanvasBtn = document.querySelector('.pu.clear');
 	const undoBtn = document.querySelector('.pu.undo');
 
-	// get the strokes and brushStrokeSelect divs
+	// get the strokes and brush Stroke Selected divs
 	const strokes = document.querySelector('.strokes');
-	const brushStrokeSelect = document.querySelector('.pu.brush-stroke-select');
+	const strokeSelected = document.querySelector('.pu.stroke-selected');
 
-	// get the colors and colorSelect divs
+	// get the colors and color selected divs
 	const colors = document.querySelector('.colors');
-	const colorSelect = document.querySelector('.pu.brush-color-select');
+	const colorSelected = document.querySelector('.pu.color-selected');
 
 	// hide paint utils div and disable painting access
 	paintUtils.isAllowedToPaint = false;
@@ -513,11 +513,11 @@ function disableSketching() {
 
 	// remove ELs for selecting brush stroke
 	strokes.removeEventListener('click', selectStrokeEL);
-	brushStrokeSelect.removeEventListener('click', openBrushStrokeSelect);
+	strokeSelected.removeEventListener('click', openStrokeSelectOptions);
 
 	// remove ELs for selecting brush color
 	colors.removeEventListener('click', selectColorEL);
-	colorSelect.removeEventListener('click', openColorSelect);
+	colorSelected.removeEventListener('click', openColorSelectOptions);
 }
 
 /**
@@ -658,19 +658,29 @@ function repositionElements() {
 	// 3 -> hide the send msg btn
 	// 4 -> set messages-div max height
 	// 5 -> set msg input width
+	// 6 -> move paint utils to the bottom
+	// 7 -> set width of paint utils
 
 	if (window.innerWidth > 768) {
+		landscapeOrientation = true;
+
 		pcContainer.insertBefore(cc, pcMessages); // 1
 		pcContainer.appendChild(cb); // 2
 		cb.querySelector('button').classList.add('hidden'); // 3
 		pcMessages.style.maxHeight = `${h - 30}px`; // 4
 		msgInput.style.width = `${pcMessages.offsetWidth - 30}px`; // 5
+		main.appendChild(pu); // 6
+		pu.style.width = `${w}px`; // 7
 	} else {
+		landscapeOrientation = false;
+
 		main.insertBefore(cc, pu); // 1
 		main.appendChild(cb); // 2
 		cb.querySelector('button').classList.remove('hidden'); // 3
 		pcMessages.style.maxHeight = ``; // 4
 		msgInput.style.width = ``; // 5
+		main.insertBefore(pu, pcContainer); // 6
+		pu.style.width = ``; // 7
 	}
 }
 
@@ -737,22 +747,26 @@ function selectStrokeEL(e) {
 	paintUtils.lineWidth = size * 2;
 
 	// selected stroke width being shown on this element
-	const viewImg = document.querySelector('.brush-stroke-select img');
+	const viewImg = document.querySelector('.stroke-selected img');
 	viewImg.style.width = `${size * minBrushStrokeSizeForImg}px`;
 	viewImg.style.height = `${size * minBrushStrokeSizeForImg}px`;
 
 	// add a small timeout to add the hidden class
-	const strokeSelectMenu = document.querySelector('.stroke-select');
-	setTimeout(() => strokeSelectMenu.classList.add('hidden'), 100);
+	setTimeout(
+		() =>
+			document
+				.querySelector('.stroke-select-options')
+				.classList.add('hidden'),
+		100
+	);
 }
 
 /**
  * Event listener to open the stroke select menu popup
  */
-function openBrushStrokeSelect() {
+function openStrokeSelectOptions() {
 	// remove the hidden class
-	const strokeSelectMenu = document.querySelector('.stroke-select');
-	strokeSelectMenu.classList.remove('hidden');
+	document.querySelector('.stroke-select-options').classList.remove('hidden');
 
 	// add EL to the strokes elements and check for click events
 	const strokes = document.querySelector('.strokes');
@@ -778,21 +792,28 @@ function selectColorEL(e) {
 	paintUtils.strokeStyle = selectedColor;
 
 	// selected color being shown on this element
-	const viewColor = document.querySelector('.brush-color-select');
+	const viewColor = document.querySelector('.color-selected');
 	viewColor.style.backgroundColor = selectedColor;
 
-	// add a small timeout to add the hidden class
-	const colorSelectMenu = document.querySelector('.color-select');
-	setTimeout(() => colorSelectMenu.classList.add('hidden'), 100);
+	if (!landscapeOrientation) {
+		// add a small timeout to add the hidden class, ! only in portrait mode
+		setTimeout(
+			() =>
+				document
+					.querySelector('.color-select-options')
+					.classList.add('hidden'),
+			100
+		);
+	}
 }
 
 /**
  * Event listener to open the color selection menu
  */
-function openColorSelect() {
+function openColorSelectOptions() {
 	// remove the hidden class
-	const colorSelectMenu = document.querySelector('.color-select');
-	colorSelectMenu.classList.remove('hidden');
+	const colorSelectOptions = document.querySelector('.color-select-options');
+	colorSelectOptions.classList.remove('hidden');
 
 	// add EL to the colors elements and check for click events
 	const colors = document.querySelector('.colors');
@@ -1146,6 +1167,7 @@ function showWordToChoose(socketMessage) {
  * @param {Object} socketMessage
  */
 function showChoosingWordOnOverlay(socketMessage) {
+	// TODO: show avatar
 	displayOverlay(
 		getOverlayHtmlForTextOnly(
 			`${socketMessage.currSketcherName} is choosing a word!`
@@ -1265,15 +1287,21 @@ function beginClientSketchingFlow(socketMessage) {
 	const paintUtilsDiv = document.querySelector('.paint-utils');
 	const clearCanvasBtn = document.querySelector('.pu.clear');
 	const undoBtn = document.querySelector('.pu.undo');
-	const brushStrokeSelect = document.querySelector('.pu.brush-stroke-select');
-	const colorSelect = document.querySelector('.pu.brush-color-select');
+	const colorSelected = document.querySelector('.pu.color-selected');
+	const strokeSelected = document.querySelector('.pu.stroke-selected');
 
 	// display paint utils div and add ELs
 	paintUtilsDiv.classList.remove('hidden');
+
+	// always show all colors in landscape mode
+	const colorSelectOptions = document.querySelector('.color-select-options');
+	if (landscapeOrientation) colorSelectOptions.classList.remove('hidden');
+	else colorSelectOptions.classList.add('hidden');
+
 	clearCanvasBtn.addEventListener('click', requestCanvasClear);
 	undoBtn.addEventListener('click', undo);
-	brushStrokeSelect.addEventListener('click', openBrushStrokeSelect);
-	colorSelect.addEventListener('click', openColorSelect);
+	colorSelected.addEventListener('click', openColorSelectOptions);
+	strokeSelected.addEventListener('click', openStrokeSelectOptions);
 
 	// enable painting
 	paintUtils.isAllowedToPaint = true;
@@ -1667,7 +1695,8 @@ let messageTypeMap,
 	timeForEachWordInSeconds,
 	timeForChoosingWordInSeconds,
 	wordExpiryTimer,
-	allowLogs;
+	allowLogs,
+	landscapeOrientation = false;
 
 const boundariesForAvatarAtlas = {
 	color: { x: 5, y: 2 },

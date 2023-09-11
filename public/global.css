@@ -824,7 +824,7 @@ canvas {
 
 /* brush color select */
 
-.brush-color-select {
+.color-selected {
 	background-color: black;
 	position: relative;
 }
@@ -848,16 +848,27 @@ canvas {
 	border-radius: 2px;
 	transform: scale(1.05);
 }
-
+.color#c0 {
+	border-top-left-radius: 2px;
+}
+.color#c12 {
+	border-top-right-radius: 2px;
+}
+.color#c13 {
+	border-bottom-left-radius: 2px;
+}
+.color#c25 {
+	border-bottom-right-radius: 2px;
+}
 /* brush stroke width select */
 
-.brush-stroke-select {
+.stroke-selected {
 	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
-.brush-stroke-select img {
+.stroke-selected img {
 	filter: invert(100%) var(--drop-shadow);
 	height: 6px;
 	width: 6px;
@@ -865,9 +876,9 @@ canvas {
 .strokes {
 	position: absolute;
 	z-index: 3;
-	top: calc((var(--pu-size) * 5 + 15px) * -1);
+	top: calc((var(--pu-size) * 5 + (var(--pu-size) / 2)) * -1);
 	left: 0;
-	background-color: #aaa;
+	background-color: #aa9;
 	display: flex-end;
 	justify-content: center;
 	border-radius: 2px;
@@ -885,6 +896,8 @@ canvas {
 }
 .stroke#s1 {
 	background-size: var(--min-brush-stroke-size);
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
 }
 .stroke#s2 {
 	background-size: calc(var(--min-brush-stroke-size) * 2);
@@ -897,6 +910,8 @@ canvas {
 }
 .stroke#s5 {
 	background-size: calc(var(--min-brush-stroke-size) * 5);
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
 }
 .stroke.active {
 	background-color: purple;
@@ -904,9 +919,9 @@ canvas {
 .arrow-down {
 	width: 0;
 	height: 0;
-	border-left: 15px solid transparent;
-	border-right: 15px solid transparent;
-	border-top: 15px solid #aaa;
+	border-left: calc(var(--pu-size) / 2) solid transparent;
+	border-right: calc(var(--pu-size) / 2) solid transparent;
+	border-top: calc(var(--pu-size) / 2) solid #aa9;
 	position: absolute;
 	top: -15px;
 	left: 0;
@@ -1040,6 +1055,7 @@ canvas {
 @media screen and (min-width: 768px) {
 	:root {
 		--container-width: 400px;
+		--pu-size: 40px;
 	}
 
 	.main {
@@ -1082,5 +1098,32 @@ canvas {
 	.input-wrapper span {
 		right: 6px;
 		top: 2px;
+	}
+
+	.paint-utils {
+		margin-left: 20%;
+	}
+	.arrow-down {
+		display: none;
+	}
+
+	.colors {
+		top: 0;
+		left: calc(var(--pu-size) + 5px);
+	}
+	.color {
+		width: calc(var(--pu-size) / 2);
+		height: calc(var(--pu-size) / 2);
+	}
+
+	.stroke-selected {
+		left: calc((var(--pu-size) * 6.5) + 5px);
+	}
+	.strokes {
+		top: calc(((var(--pu-size) / 1.5) * 5 + 2px) * -1);
+	}
+	.stroke {
+		width: calc(var(--pu-size) / 1.5);
+		height: calc(var(--pu-size) / 1.5);
 	}
 }

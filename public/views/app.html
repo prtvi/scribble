@@ -82,8 +82,8 @@
 			<!-- paint utils -->
 			<div class="component paint-utils hidden">
 				<div>
-					<div class="pu brush-color-select">
-						<div class="color-select hidden">
+					<div class="pu color-selected">
+						<div class="color-select-options hidden">
 							<div class="colors">
 								{{ range $i, $val := .Colors }}
 								<div
@@ -97,7 +97,7 @@
 						</div>
 					</div>
 
-					<div class="pu brush-stroke-select">
+					<div class="pu stroke-selected">
 						<div>
 							<img
 								src="public/assets/images/size.gif"
@@ -105,7 +105,7 @@
 							/>
 						</div>
 
-						<div class="stroke-select hidden">
+						<div class="stroke-select-options hidden">
 							<div class="strokes">
 								<div class="stroke active" id="s1"></div>
 								<div class="stroke" id="s2"></div>
@@ -118,7 +118,7 @@
 					</div>
 				</div>
 
-				<div>
+				<!-- <div>
 					<div class="pu brush active">
 						<span>B</span>
 						<img
@@ -127,15 +127,15 @@
 							alt="pen icon"
 						/>
 					</div>
-					<!-- <div class="pu fill">
+					<div class="pu fill">
 						<span>F</span>
 						<img
 							class="pu-img"
 							src="public/assets/images/fill.gif"
 							alt="fill bucket icon"
 						/>
-					</div> -->
-				</div>
+					</div>
+				</div> -->
 
 				<div>
 					<div class="pu undo">
