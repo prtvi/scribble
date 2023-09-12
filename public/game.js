@@ -640,6 +640,30 @@ function initGlobalEventListeners() {
 }
 
 /**
+ * Alter the game bar UI, change timer icon, hide round icon and alter round number text
+ * @param {Boolean} landscape true if in landscape mode
+ */
+function alterGameBar(landscape) {
+	const timerIcon = document.querySelector('.gb-item.timer img');
+	const roundIcon = document.querySelector('.gb-item.round img');
+	const roundInfoText = document.querySelector('.round span.img-sub');
+	const pretext = roundInfoText.querySelector('.pretext');
+	const seperator = roundInfoText.querySelector('.separator');
+
+	if (landscape) {
+		roundIcon.classList.add('hidden');
+		timerIcon.setAttribute('src', 'public/assets/images/clock.gif');
+		pretext.textContent = 'Round';
+		seperator.textContent = 'of';
+	} else {
+		roundIcon.classList.remove('hidden');
+		timerIcon.setAttribute('src', 'public/assets/images/setting_2.gif');
+		pretext.textContent = '';
+		seperator.textContent = '/';
+	}
+}
+
+/**
  * Reposition/hide/unhide/set css properties of elements on window resize
  */
 function repositionElements() {
@@ -660,6 +684,7 @@ function repositionElements() {
 	// 5 -> set msg input width
 	// 6 -> move paint utils to the bottom
 	// 7 -> set width of paint utils
+	// 8 -> alter game bar UI
 
 	if (window.innerWidth > 768) {
 		landscapeOrientation = true;
@@ -671,6 +696,7 @@ function repositionElements() {
 		msgInput.style.width = `${pcMessages.offsetWidth - 30}px`; // 5
 		main.appendChild(pu); // 6
 		pu.style.width = `${w}px`; // 7
+		alterGameBar(landscapeOrientation); // 8
 	} else {
 		landscapeOrientation = false;
 
@@ -681,6 +707,7 @@ function repositionElements() {
 		msgInput.style.width = ``; // 5
 		main.insertBefore(pu, pcContainer); // 6
 		pu.style.width = ``; // 7
+		alterGameBar(landscapeOrientation); // 8
 	}
 }
 

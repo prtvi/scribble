@@ -668,18 +668,18 @@ img {
 	display: flex;
 	align-items: center;
 }
-
-.gb-item.word span.status {
+.gb-item.word {
+	margin-top: 4px;
+}
+.gb-item.word > span {
 	display: block;
 	clear: both;
-	margin-top: 3px;
-	margin-bottom: 2px;
+	line-height: calc(var(--game-bar-h) / 2 - 2px);
+}
+.gb-item.word span.status {
 	text-transform: uppercase;
 }
-
 .gb-item.word span.content {
-	display: block;
-	clear: both;
 	font-family: monospace;
 }
 
@@ -1056,11 +1056,33 @@ canvas {
 	:root {
 		--container-width: 400px;
 		--pu-size: 40px;
+		--game-bar-h: 42px;
+		--game-bar-item-width: 28px;
 	}
 
 	.main {
 		margin: 20px;
 		margin-top: 100px;
+	}
+
+	.gb-item.timer img {
+		height: inherit;
+	}
+	.gb-item.timer span,
+	.gb-item.round > span {
+		font-size: var(--fs-11);
+		position: absolute;
+		top: 3px;
+		line-height: var(--game-bar-h);
+	}
+
+	.gb-item.round {
+		width: 100px;
+		left: calc(var(--game-bar-item-width) + 25px);
+	}
+	.gb-item.round span {
+		font-size: var(--fs-13);
+		font-weight: var(--fw-800);
 	}
 
 	.pc-container {
