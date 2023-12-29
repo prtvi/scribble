@@ -99,6 +99,15 @@ func Maintainer() {
 
 func InitDebugEnv(isDebugEnv bool) {
 	debug = isDebugEnv
+
+	pool := newPool(2, 20, 2, 5, 2, "normal")
+	pool.ID = "debug"
+	hub[pool.ID] = pool
+	go pool.start()
+
+	utils.Cp("blue", "pool created:", pool.ID)
+	utils.Cp("red", "len hub:", len(hub))
+
 	if isDebugEnv {
 		utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 	} else {

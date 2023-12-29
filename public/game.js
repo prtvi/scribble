@@ -335,7 +335,7 @@ function getAvatarDom(avatarConfig, scale, ...classNames) {
 function getPlayerCardDom(playerInfo, iteration) {
 	// player div
 	const playerCard = document.createElement('div');
-	playerCard.classList.add('player');
+	playerCard.classList.add('player-card');
 
 	// player num span
 	const playerNum = document.createElement('span');
@@ -1242,7 +1242,7 @@ function clearCanvas() {
 function renderClients(allClients) {
 	if (allClients.length === 0) return;
 
-	const membersDiv = document.querySelector('.players');
+	const membersDiv = document.querySelector('.player-cards');
 	// clear the existing dom
 	membersDiv.innerHTML = '';
 
