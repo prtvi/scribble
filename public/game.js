@@ -716,7 +716,7 @@ function repositionElements() {
  * Event listener for copying joining link
  */
 function copyJoiningLinkEL() {
-	navigator.clipboard.writeText(joiningLink);
+	navigator.clipboard.writeText(`${getDomain()}${joiningLink}`);
 	appendChatMsgToDOM('Copied to clipboard!', '#0043ff');
 }
 
@@ -1486,8 +1486,11 @@ function initSocket() {
 	// get the avatar config from the local storage
 	const avatarConfig = getFromLocalStorage('avatarConfig');
 
+	let wsProtocol = 'ws';
+	if (window.location.protocol === 'https:') wsProtocol = 'wss';
+
 	// construct the web socket url with the required params
-	const wsUrl = `ws://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
+	const wsUrl = `${wsProtocol}://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
 
 	// make the connection
 	const socket = new WebSocket(wsUrl);

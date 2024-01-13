@@ -59,7 +59,7 @@ func CreateRoom(c echo.Context) error {
 
 	// generate link to join the pool
 	link := "/app?join=" + pool.ID
-	pool.JoiningLink = fmt.Sprintf("localhost:1323%s", link) // TODO
+	pool.JoiningLink = link
 	link += "&isOwner=true"
 
 	// send the link for the same

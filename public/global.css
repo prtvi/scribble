@@ -1217,7 +1217,7 @@ td {
 	}
 	.gb-item.round span {
 		font-size: var(--fs-13);
-		font-weight: var(--fw-800);
+		font-weight: var(--fw-400);
 	}
 
 	.pc-container {
