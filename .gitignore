@@ -1,6 +1,6 @@
 .vscode/
 gin-bin
-assets/
+poppins/
 .DS_Store
 .env
 *.txt
