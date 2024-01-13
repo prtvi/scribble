@@ -8,6 +8,15 @@ import (
 )
 
 func main() {
+	defer func() {
+		// TODO - gotta test recover
+		if recover() == nil {
+			return
+		}
+
+		utils.Cp("red", "panic occurred! recovering ...")
+	}()
+
 	isDebugEnv := utils.LoadAndGetEnv()
 	socket.InitDebugEnv(isDebugEnv)
 

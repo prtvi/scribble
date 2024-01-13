@@ -27,6 +27,11 @@ func LoadAndGetEnv() bool {
 }
 
 func logToFile(content string) {
+	env := os.Getenv("ENV")
+	if env == "PROD" || env == "" {
+		return
+	}
+
 	f, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		fmt.Println(err)

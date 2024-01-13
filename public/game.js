@@ -309,9 +309,10 @@ function getAvatarDom(avatarConfig, scale, ...classNames) {
 	pMouth.classList.add('mouth');
 	setBgPosition(pMouth, avatarConfig.mouth.x, avatarConfig.mouth.y, scale);
 
-	const pOwner = document.createElement('div');
-	pOwner.classList.add('owner');
-	if (avatarConfig.isOwner) pOwner.classList.add('active');
+	// TODO: add this to the beginning of player card
+	// const pOwner = document.createElement('div');
+	// pOwner.classList.add('owner');
+	// if (avatarConfig.isOwner) pOwner.classList.add('active');
 
 	const pCrowned = document.createElement('div');
 	pCrowned.classList.add('crowned');
@@ -320,7 +321,7 @@ function getAvatarDom(avatarConfig, scale, ...classNames) {
 	playerAvatar.appendChild(pColor);
 	playerAvatar.appendChild(pEyes);
 	playerAvatar.appendChild(pMouth);
-	playerAvatar.appendChild(pOwner);
+	// playerAvatar.appendChild(pOwner);
 	playerAvatar.appendChild(pCrowned);
 
 	return playerAvatar;
@@ -1434,7 +1435,7 @@ function showAllHaveGuessed() {
 
 /**
  * EVENT: 9
- * Render final score on overlay - TODO
+ * Render final score on overlay - TODO: with avatar
  * @param {Object} socketMessage
  */
 function displayScores(socketMessage) {
@@ -1453,7 +1454,7 @@ function displayScores(socketMessage) {
 	html += `</table> </div> </div>`;
 
 	displayOverlay(html);
-	appendChatMsgToDOM('Game over!', '#ff0000');
+	appendChatMsgToDOM('Game over!', '#fff000');
 }
 
 /**

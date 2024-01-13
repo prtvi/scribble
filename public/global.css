@@ -972,7 +972,7 @@ canvas {
 }
 .player-card .name {
 	font-family: r400, var(--ff);
-	font-weight: var(--fw-900);
+	font-weight: var(--fw-400);
 	font-size: var(--fs-9);
 	display: block;
 	clear: both;
@@ -1038,6 +1038,12 @@ canvas {
 .input-wrapper .btn {
 	padding: 6px;
 	width: 50px;
+}
+
+th,
+td {
+	font-family: r400, var(--ff);
+	font-size: var(--fs-16);
 }
 
 .hidden {
