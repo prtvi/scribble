@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"runtime"
 	model "scribble/model"
 	utils "scribble/utils"
 	"time"
@@ -38,7 +39,7 @@ func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 	// 	"from:", utils.Cs(color, fmt.Sprintf("%-15s ", from)),
 	// 	"msg type:", utils.Cs("red", fmt.Sprintf("%2d ", m.Type)),
 	// 	utils.Cs(color, messageTypeMap[m.Type]))
-	utils.Cp(color, "SOCKET_MSG> pool id:", pool.ID, "from:", from, "msg type:", m.Type, messageTypeMap[m.Type])
+	utils.Cp(color, pool.ID, "SOCKET_MSG>", "from:", from, "msg type:", m.Type, messageTypeMap[m.Type])
 }
 
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) *Pool {
@@ -75,6 +76,8 @@ func newClient(id, name string, conn *websocket.Conn, pool *Pool, ac model.Avata
 }
 
 func Maintainer() {
+	utils.Cp("yellow", "started maintainer")
+
 	// clears the pools in which the game has ended every 10 mins
 	// can be implemented using channel
 	for {
@@ -84,15 +87,21 @@ func Maintainer() {
 		for poolId, pool := range hub {
 			// if pool exists and game has ended
 			if pool != nil && pool.HasGameEnded {
-				utils.Cp("red", "removing pool from hub, poolId:", poolId)
+				utils.Cp("red", "game ended, removing pool from hub, poolId:", poolId)
 				delete(hub, poolId)
 			}
 
 			// if pool exists and game hasn't started for RemovePoolAfterGameNotStarted duration
 			if now := time.Now(); now.Sub(pool.CreatedTime) > RemovePoolAfterGameNotStarted {
+				pool.HasGameEnded = true
 				utils.Cp("red", "removing junky pool, poolId:", poolId)
 				delete(hub, poolId)
 			}
+		}
+
+		if debug {
+			utils.Cp("greenBg", "Number of goroutines running:", runtime.NumGoroutine())
+			utils.Cp("red", "len hub:", len(hub))
 		}
 	}
 }
@@ -102,6 +111,7 @@ func InitDebugEnv(isDebugEnv bool) {
 
 	pool := newPool(2, 20, 2, 5, 2, "normal")
 	pool.ID = "debug"
+	pool.JoiningLink = "/app?join=" + pool.ID
 	hub[pool.ID] = pool
 	go pool.start()
 

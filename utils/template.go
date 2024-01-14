@@ -3,7 +3,6 @@ package utils
 import (
 	"html/template"
 	"io"
-	"os"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,7 +14,7 @@ type Template struct {
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	dataMap := data.(map[string]any)
 
-	if os.Getenv("ENV") == "DEV" {
+	if !IsProdEnv() {
 		dataMap["debug"] = true
 		dataMap["FF"] = FontFaces
 	}

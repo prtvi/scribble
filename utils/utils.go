@@ -12,14 +12,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func LoadAndGetEnv() bool {
+func IsProdEnv() bool {
+	return os.Getenv("ENV") == "PROD" || os.Getenv("ENV") == ""
+}
+
+func LoadAndGetEnv() (isDebugEnv bool) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		Cp("redBg", "Error loading .env file")
 	}
 
-	env := os.Getenv("ENV")
-	if env == "" || env == "PROD" {
+	if IsProdEnv() {
 		return false
 	}
 
@@ -27,11 +30,6 @@ func LoadAndGetEnv() bool {
 }
 
 func logToFile(content string) {
-	env := os.Getenv("ENV")
-	if env == "PROD" || env == "" {
-		return
-	}
-
 	f, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		fmt.Println(err)
@@ -180,8 +178,12 @@ func Cp(color string, message ...any) {
 		msg += fmt.Sprintf("%+v ", m)
 	}
 
-	fmt.Printf("%s%s%s\n", getColor(color), msg, reset)
-	logToFile(fmt.Sprintf("%s: %s\n", FormatTimeLong(time.Now())[:19], msg))
+	if IsProdEnv() {
+		fmt.Println(msg)
+	} else {
+		fmt.Printf("%s%s%s\n", getColor(color), msg, reset)
+		logToFile(fmt.Sprintf("%s: %s\n", FormatTimeLong(time.Now())[:19], msg))
+	}
 }
 
 func Cs(color string, message ...string) string {

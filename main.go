@@ -19,6 +19,7 @@ func main() {
 
 	isDebugEnv := utils.LoadAndGetEnv()
 	socket.InitDebugEnv(isDebugEnv)
+	go socket.Maintainer()
 
 	e := echo.New()
 	e.Static("/public", "public")

@@ -7,12 +7,12 @@ import (
 
 // start listening to pool connections and messages
 func (pool *Pool) start() {
-	utils.Cp("cyan", "pool started!")
+	utils.Cp("cyan", pool.ID, "pool started!")
 
 	for {
 		select {
 		case client := <-pool.Register:
-			utils.Cp("yellow", "client register:", client.Name)
+			utils.Cp("yellow", pool.ID, "client register:", client.Name)
 
 			// on client register, append the client to Pool.Clients slice, broadcast messageTypeMap, joining of the client and client info list
 			pool.appendClientToList(client)
@@ -33,7 +33,7 @@ func (pool *Pool) start() {
 			}
 
 		case client := <-pool.Unregister:
-			utils.Cp("yellow", "client unregister:", client.Name)
+			utils.Cp("yellow", pool.ID, "client unregister:", client.Name)
 
 			// on client disconnect, delete the client from Pool.Client slice and broadcast the unregister
 			pool.removeClientFromList(client)
@@ -61,7 +61,7 @@ func (pool *Pool) start() {
 
 			case 34:
 				pool.printSocketMsg(message)
-				utils.Cp("purple", "client chose word:", message.Content)
+				utils.Cp("purple", pool.ID, "client chose word:", message.Content)
 				pool.InitCurrWord <- message.Content // client choosing word
 
 			default:
@@ -73,14 +73,14 @@ func (pool *Pool) start() {
 
 // begin game flow by scheduling schedule timers
 func (pool *Pool) beginGameFlow() {
-	utils.Cp("greenBg", "game flow has begun!")
+	utils.Cp("greenBg", pool.ID, "game flow has begun!")
 	// wait for the "game started" overlay
 	utils.Sleep(InterGameWaitDuration)
 
 	// loop over the number of rounds
 	for i := 0; i < pool.Rounds; i++ {
 		pool.CurrRound = i + 1
-		utils.Cp("yellow", "round no:", pool.CurrRound)
+		utils.Cp("yellow", pool.ID, "round no:", pool.CurrRound)
 
 		// broadcast round number and wait
 		pool.broadcastRoundNumber()
@@ -118,14 +118,14 @@ func (pool *Pool) beginGameFlow() {
 			interrupted := utils.SleepWithInterrupt(time.Until(pool.CurrWordExpiresAt), stopSketching)
 			pool.SleepingForSketching = false
 
-			utils.Cp("yellow", "sketching time over")
+			utils.Cp("yellow", pool.ID, "sketching time over")
 
 			// broadcast turn_over, reveal the word and clear canvas
 			if interrupted {
-				utils.Cp("yellow", "sketching time interrupted")
+				utils.Cp("yellow", pool.ID, "sketching time interrupted")
 				pool.broadcastTurnOverBeforeTimeout()
 			} else {
-				utils.Cp("yellow", "sketched for entire duration")
+				utils.Cp("yellow", pool.ID, "sketched for entire duration")
 				pool.broadcastTurnOver()
 			}
 

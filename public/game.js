@@ -1454,7 +1454,7 @@ function displayScores(socketMessage) {
 	html += `</table> </div> </div>`;
 
 	displayOverlay(html);
-	appendChatMsgToDOM('Game over!', '#fff000');
+	appendChatMsgToDOM('Game over!', '#ff0000');
 }
 
 /**

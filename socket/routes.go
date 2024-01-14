@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"scribble/model"
+	model "scribble/model"
 	utils "scribble/utils"
 	"strconv"
 
