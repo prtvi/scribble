@@ -736,7 +736,7 @@ canvas {
 .overlay-content > div:not(:last-child) {
 	margin-bottom: 15px;
 }
-.overlay-text {
+.overlay-heading {
 	font-family: r400, var(--ff);
 	font-weight: var(--fw-400);
 	font-size: var(--fs-13);
@@ -1060,7 +1060,7 @@ td {
 	}
 
 	#overlay,
-	.overlay-text {
+	.overlay-heading {
 		font-size: var(--fs-14);
 	}
 

@@ -5,3 +5,5 @@ poppins/
 .env
 *.txt
 *.py
+scribble
+deployment.md

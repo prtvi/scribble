@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	socket "scribble/socket"
 	utils "scribble/utils"
 
@@ -9,15 +10,13 @@ import (
 
 func main() {
 	defer func() {
-		// TODO - gotta test recover
-		if recover() == nil {
-			return
+		r := recover()
+		if r != nil {
+			utils.Cp("red", "panic occurred! recovering from", r)
 		}
-
-		utils.Cp("red", "panic occurred! recovering ...")
 	}()
 
-	isDebugEnv := utils.LoadAndGetEnv()
+	isDebugEnv, port := utils.LoadAndGetEnv()
 	socket.InitDebugEnv(isDebugEnv)
 	go socket.Maintainer()
 
@@ -36,5 +35,5 @@ func main() {
 
 	ee.GET("/ws", socket.WsConnect)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }

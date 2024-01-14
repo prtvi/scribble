@@ -16,17 +16,17 @@ func IsProdEnv() bool {
 	return os.Getenv("ENV") == "PROD" || os.Getenv("ENV") == ""
 }
 
-func LoadAndGetEnv() (isDebugEnv bool) {
+func LoadAndGetEnv() (isDebugEnv bool, port string) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		Cp("redBg", "Error loading .env file")
 	}
 
 	if IsProdEnv() {
-		return false
+		return false, os.Getenv("PORT")
 	}
 
-	return true
+	return true, "1323"
 }
 
 func logToFile(content string) {

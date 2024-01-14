@@ -109,16 +109,16 @@ func Maintainer() {
 func InitDebugEnv(isDebugEnv bool) {
 	debug = isDebugEnv
 
-	pool := newPool(2, 20, 2, 5, 2, "normal")
-	pool.ID = "debug"
-	pool.JoiningLink = "/app?join=" + pool.ID
-	hub[pool.ID] = pool
-	go pool.start()
-
-	utils.Cp("blue", "pool created:", pool.ID)
-	utils.Cp("red", "len hub:", len(hub))
-
 	if isDebugEnv {
+		pool := newPool(2, 20, 2, 5, 2, "normal")
+		pool.ID = "debug"
+		pool.JoiningLink = "/app?join=" + pool.ID
+		hub[pool.ID] = pool
+		go pool.start()
+
+		utils.Cp("blue", "pool created:", pool.ID)
+		utils.Cp("red", "len hub:", len(hub))
+
 		utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
 	} else {
 		utils.Cp("redBg", "----------- PROD ENV -----------")

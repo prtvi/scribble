@@ -411,32 +411,38 @@ function sendChatMsgBtnEL(e) {
 }
 
 /**
- * Returns the HTML DOM string for the overlay, for text only
- * @param {String} overlayText text that will be shown on the overlay
- * @returns String, html dom string
+ * Returns the HTML DOM for the overlay, for text only
+ * @param {String} overlayHeading text that will be shown on the overlay
+ * @returns String, html dom
  */
-function getOverlayHtmlForTextOnly(overlayText) {
-	return `
-	<div class="overlay-content">
-		<div>
-			<p class="overlay-text">
-				${overlayText}
-			</p>
-		</div>
-	</div>`;
+function getOverlayContentDomWithHeading(overlayHeading) {
+	const overlayContent = document.createElement('div');
+	overlayContent.classList.add('overlay-content');
+
+	const heading = document.createElement('p');
+	heading.classList.add('overlay-heading');
+	heading.textContent = overlayHeading;
+
+	const headingContainer = document.createElement('div');
+	headingContainer.appendChild(heading);
+
+	overlayContent.appendChild(headingContainer);
+
+	return overlayContent;
 }
 
 /**
  * Renders the overlay with the given HTML string
- * @param {String} html the HTML that will be shown on the overlay
+ * @param {HTMLElement} dom the HTML that will be shown on the overlay
  */
-function displayOverlay(html) {
+function displayOverlay(dom) {
 	// display overlay after some delay to render fade in animation
 	// if event listeners are to be added to the given html, then use the same timeout to attach the event listeners
 
 	overlay.style.opacity = 0;
 	setTimeout(function () {
-		overlay.innerHTML = html;
+		overlay.innerHTML = '';
+		overlay.appendChild(dom);
 		overlay.style.display = 'flex';
 		overlay.style.opacity = 1;
 		adjustOverlay();
@@ -1149,7 +1155,7 @@ function appendChatMsgToDOM(msg, formatColor) {
  */
 function revealWordOnOverlayAndChat(socketMessage) {
 	const message = `The word was '${socketMessage.content}'`;
-	displayOverlay(getOverlayHtmlForTextOnly(message));
+	displayOverlay(getOverlayContentDomWithHeading(message));
 	appendChatMsgToDOM(message, '#ffa500');
 	setGbWordStatus('The word was', socketMessage.content);
 }
@@ -1163,29 +1169,47 @@ function showWordToChoose(socketMessage) {
 	// parse the words
 	const words = JSON.parse(socketMessage.content);
 
-	// generate html to display on the overlay
-	let html = `<div class="overlay-content">
-	<div><p class="overlay-text">Your turn, choose a word to draw!</p></div>
-	<div class="word-options">`;
-	words.forEach(
-		w => (html += `<div class="word-option"><span>${w}</span></div>`)
+	const overlayContent = getOverlayContentDomWithHeading(
+		'Your turn, choose a word to draw!'
 	);
-	html += `</div> <div><div class="word-choose-timer"><span>${timeForChoosingWordInSeconds}s</span></div> </div>`;
 
-	displayOverlay(html);
+	const wordOptionsContainer = document.createElement('div');
+	wordOptionsContainer.classList.add('word-options');
 
-	// add event listener on the new overlay dom after a timeout - (because it will be animating until fully visible on the UI)
+	words.forEach(w => {
+		const wordOptionContainer = document.createElement('div');
+		wordOptionContainer.classList.add('word-option');
+
+		const wordOption = document.createElement('span');
+		wordOption.textContent = w;
+
+		wordOptionContainer.appendChild(wordOption);
+		wordOptionsContainer.appendChild(wordOptionContainer);
+	});
+
+	const timerContainer = document.createElement('div');
+	const wordChooseTimerDiv = document.createElement('div');
+	wordChooseTimerDiv.classList.add('word-choose-timer');
+
+	const timeLeftSpan = document.createElement('span');
+	timeLeftSpan.textContent = `${timeForChoosingWordInSeconds}s`;
+
+	wordChooseTimerDiv.appendChild(timeLeftSpan);
+	timerContainer.appendChild(wordChooseTimerDiv);
+
+	// append to overlayContent
+	overlayContent.appendChild(wordOptionsContainer);
+	overlayContent.appendChild(timerContainer);
+
+	// to access the words array outside this function scope, attach the words array to the element on which the EL is attached, like in the next line
+	wordOptionsContainer.words = words;
+	wordOptionsContainer.addEventListener('click', wordChooseEL);
+
+	displayOverlay(overlayContent);
+
 	setTimeout(() => {
-		const optionsEle = overlay.querySelector('.word-options');
-		// to access the words array outside this function scope, attach the words array to the element on which the EL is attached, like in the next line
-		optionsEle.words = words;
-		optionsEle.addEventListener('click', wordChooseEL);
-
-		// start the timeout
 		const timeoutAt = new Date(socketMessage.timeoutAfter).getTime();
-		const timerEle = overlay.querySelector('div.word-choose-timer span');
-		timerEle.textContent = `${timeForChoosingWordInSeconds}s`;
-		runTimer(timerEle, timeoutAt);
+		runTimer(timeLeftSpan, timeoutAt);
 	}, overlayFadeInAnimationDuration + 50);
 }
 
@@ -1197,7 +1221,7 @@ function showWordToChoose(socketMessage) {
 function showChoosingWordOnOverlay(socketMessage) {
 	// TODO: show avatar
 	displayOverlay(
-		getOverlayHtmlForTextOnly(
+		getOverlayContentDomWithHeading(
 			`${socketMessage.currSketcherName} is choosing a word!`
 		)
 	);
@@ -1273,7 +1297,7 @@ function startGame(socketMessage) {
 	removeEventListenersOnGameStart();
 
 	// display game started overlay
-	displayOverlay(getOverlayHtmlForTextOnly(socketMessage.content));
+	displayOverlay(getOverlayContentDomWithHeading(socketMessage.content));
 
 	// show game started on game bar
 	setGbWordStatus(socketMessage.content, socketMessage.content);
@@ -1291,7 +1315,7 @@ function renderRoundDetails(socketMessage) {
 
 	if (!socketMessage.midGameJoinee)
 		displayOverlay(
-			getOverlayHtmlForTextOnly(`Round ${socketMessage.currRound}`)
+			getOverlayContentDomWithHeading(`Round ${socketMessage.currRound}`)
 		);
 }
 
@@ -1304,9 +1328,10 @@ function renderRoundDetails(socketMessage) {
 function beginClientSketchingFlow(socketMessage) {
 	// hide the overlay and remove the word choosing ELs
 	hideOverlay();
-	overlay
-		.querySelector('.word-options')
-		.removeEventListener('click', wordChooseEL);
+
+	// overlay
+	// 	.querySelector('.word-options')
+	// 	.removeEventListener('click', wordChooseEL);
 
 	// start the timer
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
@@ -1347,7 +1372,7 @@ function beginClientSketchingFlow(socketMessage) {
  */
 function showSketcherBeginDrawing(socketMessage) {
 	displayOverlay(
-		getOverlayHtmlForTextOnly(
+		getOverlayContentDomWithHeading(
 			`${socketMessage.currSketcherName} is now drawing!`
 		)
 	);
@@ -1410,7 +1435,7 @@ function disableSketchingTurnOver() {
 function showTimeUp() {
 	setGbTimerStat(0);
 	clearAllIntervals(wordExpiryTimer);
-	displayOverlay(getOverlayHtmlForTextOnly('Time up!'));
+	displayOverlay(getOverlayContentDomWithHeading('Time up!'));
 }
 
 /**
@@ -1430,7 +1455,9 @@ function disableSketchingAllGuessed() {
 function showAllHaveGuessed() {
 	setGbTimerStat(0);
 	clearAllIntervals(wordExpiryTimer);
-	displayOverlay(getOverlayHtmlForTextOnly('Everyone guessed the word!'));
+	displayOverlay(
+		getOverlayContentDomWithHeading('Everyone guessed the word!')
+	);
 }
 
 /**
@@ -1441,19 +1468,35 @@ function showAllHaveGuessed() {
 function displayScores(socketMessage) {
 	const dataArr = JSON.parse(socketMessage.content);
 
-	let html = `<div class="overlay-content">
-	<div><p class="overlay-text">Game over!</p></div>`;
-	html += `<div> <table>
-	<tr>
-		<th>Name</th>
-		<th>Score</th>
-	</tr>`;
-	dataArr.forEach(
-		item => (html += `<tr><td>${item.name}</td><td>${item.score}</td></tr>`)
-	);
-	html += `</table> </div> </div>`;
+	const overlayContent = getOverlayContentDomWithHeading('Game over!');
 
-	displayOverlay(html);
+	const table = document.createElement('table');
+	const tr = document.createElement('tr');
+	const name = document.createElement('th');
+	const score = document.createElement('th');
+	name.textContent = 'Name';
+	score.textContent = 'Score';
+
+	tr.appendChild(name);
+	tr.appendChild(score);
+	table.appendChild(tr);
+
+	dataArr.forEach(d => {
+		const tr = document.createElement('tr');
+		const name = document.createElement('th');
+		const score = document.createElement('th');
+		name.textContent = d.name;
+		score.textContent = d.score;
+		tr.appendChild(name);
+		tr.appendChild(score);
+
+		table.appendChild(tr);
+	});
+
+	// append table
+	overlayContent.appendChild(table);
+
+	displayOverlay(overlayContent);
 	appendChatMsgToDOM('Game over!', '#ff0000');
 }
 
