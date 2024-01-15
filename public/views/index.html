@@ -24,7 +24,7 @@
 				{{ template "customiseAvatar" .}}
 
 				<div>
-					<a href="/create-room"
+					<a href="{{ .CreateRoomRoute }}"
 						><button class="btn create-new-room-btn">
 							Create a private room
 						</button></a
@@ -35,7 +35,7 @@
 			{{ else if eq .RenderTemplateName "createRoom" }}
 
 			<div class="container form-container">
-				<form action="/create-room" method="post">
+				<form action="{{ .CreateRoomRoute }}" method="post">
 					<div class="form-content-grid">
 						{{ range .FormParams }}
 						<div>
@@ -104,7 +104,7 @@
 
 				<div class="room-created-container">
 					<div>
-						<a href="{{ .Link }}" class="link"
+						<a href="{{ .RoomJoiningLink }}" class="link"
 							><button class="btn join-room-btn">
 								Click here to join!
 							</button></a
@@ -148,7 +148,7 @@
 			{{ else if eq .RenderTemplateName "join" }}
 
 			<div class="container form-container join-room-form">
-				<form action="/app" method="post">
+				<form action="{{ .AppRoute }}" method="post">
 					<input type="hidden" name="poolId" value="{{ .PoolId }}" />
 
 					<div class="join-room-input">
@@ -186,7 +186,9 @@
 					<p>{{ .Message }}</p>
 				</div>
 				<div>
-					<a href="/"><button class="btn">Go home</button></a>
+					<a href="{{ .HomeRoute }}"
+						><button class="btn">Go home</button></a
+					>
 				</div>
 			</div>
 

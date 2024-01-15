@@ -10,16 +10,6 @@ function wait(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function getDomain() {
-	// extract domain from url
-	const url = window.location.href;
-	const fi = url.indexOf('/');
-	const li = url.lastIndexOf('/');
-	const domain = url.slice(fi + 2, li);
-
-	return domain;
-}
-
 function clearAllIntervals(...ids) {
 	ids.forEach(i => clearInterval(i));
 }
@@ -729,7 +719,7 @@ function repositionElements() {
  * Event listener for copying joining link
  */
 function copyJoiningLinkEL() {
-	navigator.clipboard.writeText(`${getDomain()}${joiningLink}`);
+	navigator.clipboard.writeText(`${window.location.origin}${joiningLink}`);
 	appendChatMsgToDOM('Copied to clipboard!', '#0043ff');
 }
 
@@ -1570,7 +1560,7 @@ function concludeGame() {
 		btn.textContent = 'Play again!';
 		btn.addEventListener('click', () => {
 			closeSocketConn('game over, clicked on play again!');
-			window.location.href = '/';
+			window.location.href = '/scribble';
 		});
 	}, 2000);
 
@@ -1593,7 +1583,7 @@ function initSocket() {
 	if (window.location.protocol === 'https:') wsProtocol = 'wss';
 
 	// construct the web socket url with the required params
-	const wsUrl = `${wsProtocol}://${getDomain()}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
+	const wsUrl = `${wsProtocol}://${window.location.host}/scribble/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
 
 	// make the connection
 	const socket = new WebSocket(wsUrl);

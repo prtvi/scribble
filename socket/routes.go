@@ -11,7 +11,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// / middleware
+var (
+	slashRoute      = "/scribble"
+	createRoomRoute = "/scribble/create-room"
+	appRoute        = "/scribble/app"
+)
+
 func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		utils.Cp("green", fmt.Sprintf("%s: %s", c.Request().Method, c.Request().URL.String()))
@@ -23,6 +28,7 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 func Index(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", map[string]any{
 		"RenderTemplateName": "home",
+		"CreateRoomRoute":    createRoomRoute,
 	})
 }
 
@@ -33,6 +39,7 @@ func CreateRoomForm(c echo.Context) error {
 		"RenderTemplateName": "createRoom",
 		"FormParams":         utils.FormParams,
 		"RoomCreated":        false,
+		"CreateRoomRoute":    createRoomRoute,
 	})
 }
 
@@ -58,16 +65,15 @@ func CreateRoom(c echo.Context) error {
 	go pool.start()
 
 	// generate link to join the pool
-	link := "/app?join=" + pool.ID
-	pool.JoiningLink = link
-	link += "&isOwner=true"
+	pool.JoiningLink = "/scribble/app?join=" + pool.ID
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "index", map[string]any{
 		"RenderTemplateName": "createRoom",
 		"FormParams":         utils.FormParams,
 		"RoomCreated":        true,
-		"Link":               link,
+		"RoomJoiningLink":    pool.JoiningLink + "&isOwner=true",
+		"CreateRoomRoute":    createRoomRoute,
 
 		// show on submit value submitted on form
 		"Players":   pool.Capacity,
@@ -94,6 +100,7 @@ func JoinPool(c echo.Context) error {
 		return c.Render(http.StatusOK, "index", map[string]any{
 			"RenderTemplateName": "error",
 			"Message":            "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
+			"HomeRoute":          slashRoute,
 		})
 	}
 
@@ -104,6 +111,7 @@ func JoinPool(c echo.Context) error {
 		return c.Render(http.StatusOK, "index", map[string]any{
 			"RenderTemplateName": "error",
 			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
+			"HomeRoute":          slashRoute,
 		})
 	}
 
@@ -113,12 +121,14 @@ func JoinPool(c echo.Context) error {
 		return c.Render(http.StatusOK, "index", map[string]any{
 			"RenderTemplateName": "error",
 			"Message":            "Your party is full! Maximum room capacity reached! 😃",
+			"HomeRoute":          slashRoute,
 		})
 	}
 
 	// else if every check, checks out then render "RegisterToPool" form
 	return c.Render(http.StatusOK, "index", map[string]any{
 		"RenderTemplateName": "join",
+		"AppRoute":           appRoute,
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
 		"PoolId": poolId,
@@ -140,6 +150,7 @@ func EnterPool(c echo.Context) error {
 		return c.Render(http.StatusOK, "index", map[string]any{
 			"RenderTemplateName": "error",
 			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
+			"HomeRoute":          slashRoute,
 		})
 	}
 
@@ -147,6 +158,7 @@ func EnterPool(c echo.Context) error {
 		"Rounds":         pool.Rounds,
 		"Colors":         utils.COLORS_FOR_DRAWING,
 		"HasGameStarted": pool.HasGameStarted,
+		"HomeRoute":      slashRoute,
 
 		// init as js vars
 		"PoolId":      poolId,
