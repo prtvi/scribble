@@ -78,23 +78,28 @@ func newClient(id, name string, conn *websocket.Conn, pool *Pool, ac model.Avata
 func Maintainer() {
 	utils.Cp("yellow", "started maintainer")
 
-	// clears the pools in which the game has ended every 10 mins
+	// clears the pools in which the game has ended
 	// can be implemented using channel
 	for {
-		// TODO - to be tested
-		utils.Sleep(DeletePoolAfterGameEndsDuration)
+		utils.Sleep(DurationToCheckForRemovingJunkyPools)
 
 		for poolId, pool := range hub {
 			// if pool exists and game has ended
 			if pool != nil && pool.HasGameEnded {
 				utils.Cp("red", "game ended, removing pool from hub, poolId:", poolId)
+				pool = nil
+
 				delete(hub, poolId)
 			}
+		}
 
+		for poolId, pool := range hub {
 			// if pool exists and game hasn't started for RemovePoolAfterGameNotStarted duration
-			if now := time.Now(); now.Sub(pool.CreatedTime) > RemovePoolAfterGameNotStarted {
-				pool.HasGameEnded = true
+			if now := time.Now(); pool != nil && now.Sub(pool.CreatedTime) > RemovePoolAfterGameNotStarted {
 				utils.Cp("red", "removing junky pool, poolId:", poolId)
+				pool.HasGameEnded = true
+				pool = nil
+
 				delete(hub, poolId)
 			}
 		}

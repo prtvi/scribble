@@ -525,6 +525,13 @@ function disableSketching() {
 	// remove ELs for selecting brush color
 	colors.removeEventListener('click', selectColorEL);
 	colorSelected.removeEventListener('click', openColorSelectOptions);
+
+	// clear the paths
+	paintUtils.points = [];
+	paintUtils.paths = [];
+
+	// undo overflow:hidden
+	document.querySelector('*').style.overflow = '';
 }
 
 /**
@@ -1337,10 +1344,6 @@ function beginClientSketchingFlow(socketMessage) {
 	// hide the overlay and remove the word choosing ELs
 	hideOverlay();
 
-	// overlay
-	// 	.querySelector('.word-options')
-	// 	.removeEventListener('click', wordChooseEL);
-
 	// start the timer
 	const wordExpiryCountdown = beginClientSketchingFlowInit(socketMessage);
 
@@ -1366,6 +1369,10 @@ function beginClientSketchingFlow(socketMessage) {
 
 	// enable painting
 	paintUtils.isAllowedToPaint = true;
+
+	// to avoid scrolling on canvas on mobile devices
+	if (!landscapeOrientation)
+		document.querySelector('*').style.overflow = 'hidden';
 
 	// display the word to be sketched
 	setGbWordStatus('Draw this!', socketMessage.currWord);

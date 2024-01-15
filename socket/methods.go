@@ -165,6 +165,8 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 			pool.InitCurrWord <- utils.GetRandomItem(words)
 			initialisedWordAfterTimer = true
 		}
+
+		utils.Cp("yellow", pool.ID, "exited word assigment timer func")
 	}()
 
 	// wait until pool.InitCurrWord is initialised by sketcher client (initialised in pool.Start func, case: 34), or initialised in word choose countdown goroutine above

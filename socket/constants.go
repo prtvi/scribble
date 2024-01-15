@@ -18,13 +18,15 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	RenderClientsEvery              = time.Second * 5
-	InterGameWaitDuration           = time.Second * 2
-	TimeoutForChoosingWord          = time.Second * 15
-	DeletePoolAfterGameEndsDuration = time.Minute * 10
-	RemovePoolAfterGameNotStarted   = time.Minute * 20
-	CloseSocketConnectionIn         = time.Second * 30
-	ScoreForCorrectGuess            = 50
+	RenderClientsEvery      = time.Second * 5
+	InterGameWaitDuration   = time.Second * 2
+	TimeoutForChoosingWord  = time.Second * 15
+	CloseSocketConnectionIn = time.Second * 30
+
+	DurationToCheckForRemovingJunkyPools = time.Minute * 10
+	RemovePoolAfterGameNotStarted        = time.Minute * 10
+
+	ScoreForCorrectGuess = 50
 
 	debug = false
 )
