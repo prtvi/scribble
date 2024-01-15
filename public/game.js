@@ -1132,7 +1132,7 @@ function appendChatMsgToDOM(msg, formatColor) {
 	text.style.color = formatColor || '#1d1d1f'; // f5f5f7
 
 	newMsgDiv.style.backgroundColor = `${formatColor}20`;
-	text.innerHTML = msg; // TODO: handle better
+	text.innerHTML = msg;
 
 	// append the text into message container
 	newMsgDiv.appendChild(text);
@@ -1141,7 +1141,7 @@ function appendChatMsgToDOM(msg, formatColor) {
 	messagesDiv.appendChild(newMsgDiv);
 
 	// bring this new message into view
-	newMsgDiv.scrollIntoView();
+	newMsgDiv.scrollIntoView(false);
 
 	// clear the message box
 	document.querySelector('.msg').value = '';
@@ -1219,12 +1219,20 @@ function showWordToChoose(socketMessage) {
  * @param {Object} socketMessage
  */
 function showChoosingWordOnOverlay(socketMessage) {
-	// TODO: show avatar
-	displayOverlay(
-		getOverlayContentDomWithHeading(
-			`${socketMessage.currSketcherName} is choosing a word!`
-		)
+	const overlayContent = getOverlayContentDomWithHeading(
+		`${socketMessage.currSketcherName} is choosing a word!`
 	);
+
+	const ac = JSON.parse(socketMessage.content);
+	const avatar = getAvatarDom(
+		ac,
+		scoreCardAvatarScale,
+		'score-card-avatar',
+		'single-avatar-on-overlay'
+	);
+	overlayContent.insertBefore(avatar, overlayContent.firstChild);
+
+	displayOverlay(overlayContent);
 }
 
 /**
@@ -1371,11 +1379,20 @@ function beginClientSketchingFlow(socketMessage) {
  * @param {Object} socketMessage
  */
 function showSketcherBeginDrawing(socketMessage) {
-	displayOverlay(
-		getOverlayContentDomWithHeading(
-			`${socketMessage.currSketcherName} is now drawing!`
-		)
+	const overlayContent = getOverlayContentDomWithHeading(
+		`${socketMessage.currSketcherName} is now drawing!`
 	);
+
+	const ac = JSON.parse(socketMessage.content);
+	const avatar = getAvatarDom(
+		ac,
+		scoreCardAvatarScale,
+		'score-card-avatar',
+		'single-avatar-on-overlay'
+	);
+	overlayContent.insertBefore(avatar, overlayContent.firstChild);
+
+	displayOverlay(overlayContent);
 
 	setTimeout(hideOverlay, 2000);
 }
@@ -1462,7 +1479,7 @@ function showAllHaveGuessed() {
 
 /**
  * EVENT: 9
- * Render final score on overlay - TODO: with avatar
+ * Render final score on overlay using table and show go home button
  * @param {Object} socketMessage
  */
 function displayScores(socketMessage) {
@@ -1512,6 +1529,8 @@ function displayScores(socketMessage) {
 
 	displayOverlay(overlayContent);
 	appendChatMsgToDOM('Game over!', '#ff0000');
+
+	concludeGame();
 }
 
 /**
@@ -1525,12 +1544,32 @@ function makeMessageTypeMapGlobal(socketMessage) {
 	timeForEachWordInSeconds = content.timeForEachWordInSeconds;
 	timeForChoosingWordInSeconds = content.timeForChoosingWordInSeconds;
 	allowLogs = content.printLogs;
+	closeSocketConnInSeconds = content.closeSocketConnInSeconds * 1000;
 
 	const m = content.messageTypeMap;
 	const keys = Object.keys(m);
 	messageTypeMap = new Map();
 
 	keys.forEach(k => messageTypeMap.set(Number(k), m[k]));
+}
+
+function concludeGame() {
+	// render go home button
+	setTimeout(() => {
+		const btnDiv = document.querySelector('.joining-link-div');
+		btnDiv.classList.remove('hidden');
+
+		const btn = document.querySelector('.joining-link-btn');
+		btn.textContent = 'Play again!';
+		btn.addEventListener('click', () => {
+			closeSocketConn('game over, clicked on play again!');
+			window.location.href = '/';
+		});
+	}, 2000);
+
+	setTimeout(() => {
+		closeSocketConn('game over, closing connection after timeout');
+	}, closeSocketConnInSeconds);
 }
 
 // -------------------------------- SOCKET --------------------------------
@@ -1732,6 +1771,10 @@ function socketOnClose() {
 	document.getElementById('modal').style.display = 'flex';
 }
 
+function closeSocketConn(reason) {
+	socket.close(1000, reason);
+}
+
 /**
  * Send the socketMsg to the server if connected, else show disconnected prompt
  * @param {Object} socketMsg message to be sent to the server
@@ -1751,6 +1794,8 @@ function sendViaSocket(socketMsg) {
 		// clear any intervals and show connection lost
 		log('socket current state:', socket.readyState);
 		clearAllIntervals(wordExpiryTimer);
+
+		// display connection lost on the modal
 		document.getElementById('modal').style.display = 'flex';
 	}
 }
@@ -1785,6 +1830,7 @@ let messageTypeMap,
 	timeForChoosingWordInSeconds,
 	wordExpiryTimer,
 	allowLogs,
+	closeSocketConnInSeconds,
 	landscapeOrientation = false;
 
 const boundariesForAvatarAtlas = {

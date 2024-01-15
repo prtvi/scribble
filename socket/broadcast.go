@@ -59,10 +59,11 @@ func (pool *Pool) shareConfigWithClient(c *Client) {
 	utils.Cp("blue", pool.ID, "sending configs to:", c.Name)
 
 	cfg := model.SharedConfig{
-		MessageTypeMap:               messageTypeMap,
-		TimeForEachWordInSeconds:     utils.DurationToSeconds(pool.DrawTime),
-		TimeForChoosingWordInSeconds: utils.DurationToSeconds(TimeoutForChoosingWord),
-		PrintLogs:                    debug,
+		MessageTypeMap:                 messageTypeMap,
+		TimeForEachWordInSeconds:       utils.DurationToSeconds(pool.DrawTime),
+		TimeForChoosingWordInSeconds:   utils.DurationToSeconds(TimeoutForChoosingWord),
+		PrintLogs:                      debug,
+		CloseSocketConnectionInSeconds: utils.DurationToSeconds(CloseSocketConnectionIn),
 	}
 
 	byteInfo, _ := json.Marshal(cfg)
@@ -121,9 +122,11 @@ func (pool *Pool) broadcastWordList(words []string) {
 		TimeoutAfter:     utils.FormatTimeLong(time.Now().Add(TimeoutForChoosingWord)),
 	}
 
+	by, _ := json.Marshal(pool.CurrSketcher.AvatarConfig)
 	m := model.SocketMessage{
 		Type:             35,
 		CurrSketcherName: pool.CurrSketcher.Name,
+		Content:          string(by),
 	}
 
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)
@@ -148,9 +151,11 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 	}
 
 	// send sketcher is now drawing event to everyone except the sketcher
+	by, _ := json.Marshal(pool.CurrSketcher.AvatarConfig)
 	pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 		Type:             87,
 		CurrSketcherName: pool.CurrSketcher.Name,
+		Content:          string(by),
 	})
 
 	pool.sendCorrespondingMessages(pool.CurrSketcher.ID, m1, m)

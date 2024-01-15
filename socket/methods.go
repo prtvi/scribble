@@ -153,24 +153,27 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	pool.broadcastWordList(words)
 
 	stopWordChoosingTimeout := make(chan bool)
-	var interrupted bool
+	var initialisedWordAfterTimer bool
 
 	// start a timeout for assigning word if not chosen by client
 	go func() {
 		// sleep until the duration, assign any random word to the client if timer runs out (interrupt will be false)
-		interrupted = utils.SleepWithInterrupt(TimeoutForChoosingWord, stopWordChoosingTimeout)
+		interrupted := utils.SleepWithInterrupt(TimeoutForChoosingWord, stopWordChoosingTimeout)
 
 		if !interrupted && pool.CurrWord == "" {
 			utils.Cp("cyan", pool.ID, "word assigned after timeout")
 			pool.InitCurrWord <- utils.GetRandomItem(words)
+			initialisedWordAfterTimer = true
 		}
 	}()
 
 	// wait until pool.InitCurrWord is initialised by sketcher client (initialised in pool.Start func, case: 34), or initialised in word choose countdown goroutine above
 	pool.CurrWord = <-pool.InitCurrWord
 
-	// write on this channel to interrupt the timer in the goroutine above to avoid writing over pool.InitCurrWord again
-	stopWordChoosingTimeout <- true
+	// write on this channel only if the word is initiliased by the event 34, to interrupt the timer
+	if !initialisedWordAfterTimer {
+		stopWordChoosingTimeout <- true
+	}
 
 	// add the word expiry
 	pool.CurrWordExpiresAt = time.Now().Add(pool.DrawTime)

@@ -138,7 +138,7 @@ img {
 .logo {
 	padding: 0;
 	background-color: transparent;
-	margin-bottom: 80px;
+	margin-bottom: 50px;
 }
 .logo img {
 	width: 100%;
@@ -284,6 +284,12 @@ img {
 	background-size: calc(var(--score-card-avatar-size) / 2);
 }
 
+/* same as the score-card-avatar, only centered */
+.single-avatar-on-overlay {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 /* .avatar-customisable-btns */
 
 .avc-lb-container,
@@ -331,7 +337,6 @@ img {
 	transform: translateX(-3px);
 }
 
-/* TODO */
 .randomize {
 	position: absolute;
 	background-image: url('assets/images/randomize.gif');

@@ -23,6 +23,7 @@ var (
 	TimeoutForChoosingWord          = time.Second * 15
 	DeletePoolAfterGameEndsDuration = time.Minute * 10
 	RemovePoolAfterGameNotStarted   = time.Minute * 20
+	CloseSocketConnectionIn         = time.Second * 30
 	ScoreForCorrectGuess            = 50
 
 	debug = false
