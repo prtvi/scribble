@@ -1472,21 +1472,35 @@ function displayScores(socketMessage) {
 
 	const table = document.createElement('table');
 	const tr = document.createElement('tr');
+	const avatar = document.createElement('th');
 	const name = document.createElement('th');
 	const score = document.createElement('th');
 	name.textContent = 'Name';
 	score.textContent = 'Score';
 
+	tr.appendChild(avatar);
 	tr.appendChild(name);
 	tr.appendChild(score);
 	table.appendChild(tr);
 
 	dataArr.forEach(d => {
 		const tr = document.createElement('tr');
+
+		const avatar = document.createElement('th');
 		const name = document.createElement('th');
 		const score = document.createElement('th');
+
+		avatar.appendChild(
+			getAvatarDom(
+				d.avatarConfig,
+				scoreCardAvatarScale,
+				'score-card-avatar'
+			)
+		);
 		name.textContent = d.name;
 		score.textContent = d.score;
+
+		tr.appendChild(avatar);
 		tr.appendChild(name);
 		tr.appendChild(score);
 
@@ -1749,6 +1763,7 @@ const minBrushStrokeSizeForImg = 6;
 const customizableAvatarScale = 3;
 const rowAvatarScale = 1;
 const playerCardAvatarScale = 0.5;
+const scoreCardAvatarScale = 0.75;
 
 // utils for painting on canvas
 const paintUtils = {

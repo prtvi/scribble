@@ -56,12 +56,12 @@ func (pool *Pool) start() {
 				pool.sendExcludingClientId(pool.CurrSketcher.ID, message) // avoid sending canvas data and clear canvas event to the curr sketcher
 
 			case 7:
-				pool.printSocketMsg(message)
+				// pool.printSocketMsg(message)
 				pool.startGameRequestFromClient(message.ClientId)
 
 			case 34:
-				pool.printSocketMsg(message)
-				utils.Cp("purple", pool.ID, "client chose word:", message.Content)
+				// pool.printSocketMsg(message)
+				utils.Cp("cyan", pool.ID, "client chose word before timeout:", message.Content)
 				pool.InitCurrWord <- message.Content // client choosing word
 
 			default:
@@ -118,14 +118,12 @@ func (pool *Pool) beginGameFlow() {
 			interrupted := utils.SleepWithInterrupt(time.Until(pool.CurrWordExpiresAt), stopSketching)
 			pool.SleepingForSketching = false
 
-			utils.Cp("yellow", pool.ID, "sketching time over")
-
 			// broadcast turn_over, reveal the word and clear canvas
 			if interrupted {
-				utils.Cp("yellow", pool.ID, "sketching time interrupted")
+				utils.Cp("yellow", pool.ID, "sketching time over, sketching time interrupted")
 				pool.broadcastTurnOverBeforeTimeout()
 			} else {
-				utils.Cp("yellow", pool.ID, "sketched for entire duration")
+				utils.Cp("yellow", pool.ID, "sketching time over, sketched for entire duration")
 				pool.broadcastTurnOver()
 			}
 
@@ -137,6 +135,9 @@ func (pool *Pool) beginGameFlow() {
 
 			utils.Sleep(InterGameWaitDuration)
 			pool.broadcastClearCanvasEvent()
+
+			utils.Cp("yellow", pool.ID, c.Name, "'s sketching flow complete, moving to next iteration")
+			utils.Cp("reset", "\n")
 		}
 	}
 

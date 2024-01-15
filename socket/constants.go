@@ -20,7 +20,7 @@ var upgrader = websocket.Upgrader{
 var (
 	RenderClientsEvery              = time.Second * 5
 	InterGameWaitDuration           = time.Second * 2
-	TimeoutForChoosingWord          = time.Second * 20
+	TimeoutForChoosingWord          = time.Second * 15
 	DeletePoolAfterGameEndsDuration = time.Minute * 10
 	RemovePoolAfterGameNotStarted   = time.Minute * 20
 	ScoreForCorrectGuess            = 50

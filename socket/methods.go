@@ -117,7 +117,7 @@ func (pool *Pool) flagAllClientsAsNotSketched() {
 
 // flag the client's turn as over and return the current word
 func (pool *Pool) turnOver(c *Client) string {
-	utils.Cp("blue", pool.ID, "turn over")
+	utils.Cp("blue", pool.ID, "turn over for", pool.CurrSketcher.Name)
 	currWord := pool.CurrWord
 
 	c.IsSketching = false
@@ -130,7 +130,7 @@ func (pool *Pool) turnOver(c *Client) string {
 
 // 70, flag and broadcast the starting of the game
 func (pool *Pool) startGameAndBroadcast() {
-	utils.Cp("green", pool.ID, "start game broadcasting")
+	utils.Cp("green", pool.ID, "start game - broadcasting")
 	pool.HasGameStarted = true
 	pool.GameStartedAt = time.Now()
 
@@ -152,19 +152,25 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	words := utils.GetNrandomWords(utils.WORDS, pool.WordCount)
 	pool.broadcastWordList(words)
 
+	stopWordChoosingTimeout := make(chan bool)
+	var interrupted bool
+
 	// start a timeout for assigning word if not chosen by client
 	go func() {
-		// sleep until the duration, assign any random word to the client if timer runs out
-		utils.Sleep(TimeoutForChoosingWord)
+		// sleep until the duration, assign any random word to the client if timer runs out (interrupt will be false)
+		interrupted = utils.SleepWithInterrupt(TimeoutForChoosingWord, stopWordChoosingTimeout)
 
-		if pool.CurrWord == "" {
+		if !interrupted && pool.CurrWord == "" {
 			utils.Cp("cyan", pool.ID, "word assigned after timeout")
 			pool.InitCurrWord <- utils.GetRandomItem(words)
 		}
 	}()
 
-	// wait until pool.CurrWord is initialised by sketcher client (initialised in pool.Start func, case: 34), or initialised in word choose countdown goroutine above
+	// wait until pool.InitCurrWord is initialised by sketcher client (initialised in pool.Start func, case: 34), or initialised in word choose countdown goroutine above
 	pool.CurrWord = <-pool.InitCurrWord
+
+	// write on this channel to interrupt the timer in the goroutine above to avoid writing over pool.InitCurrWord again
+	stopWordChoosingTimeout <- true
 
 	// add the word expiry
 	pool.CurrWordExpiresAt = time.Now().Add(pool.DrawTime)
@@ -273,9 +279,9 @@ func (pool *Pool) updateScore(message model.SocketMessage) model.SocketMessage {
 
 // checks if all the clients have guessed the word and acknowledges it on the stopTimer channel
 func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
-	utils.Cp("yellow", pool.ID, "entered checking if all have guessed flow")
+	utils.Cp("yellow", pool.ID, "entered checkIfAllGuessed have guessed flow")
 	// to be run as a separate goroutine
-	// every second, check if all clients have guessed the word
+	// every second, checkIfAllGuessed clients have guessed the word
 	// if yes, then acknowledge the same on the channel and break this loop
 	for {
 		utils.Sleep(time.Second * 1)
@@ -304,7 +310,8 @@ func (pool *Pool) checkIfAllGuessed(stopSketching, stopHints chan bool) {
 			break
 		}
 	}
-	utils.Cp("yellow", pool.ID, "exited check if all guessed loop")
+
+	utils.Cp("yellow", pool.ID, "exited checkIfAllGuessed guessed loop")
 }
 
 func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
@@ -325,7 +332,7 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 		return res
 	}(word)
 
-	utils.Cp("blue", pool.ID, "nHints:", pool.NumHintsForCurrWord)
+	// utils.Cp("blue", pool.ID, "nHints:", pool.NumHintsForCurrWord)
 
 	go func() {
 		for pool.NumHintsRevealed < pool.NumHintsForCurrWord {
@@ -338,14 +345,14 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 			charsLeft, charPicked = utils.PickRandomCharacter(charsLeft)
 			pool.HintString = utils.GetHintString(word, charPicked, pool.HintString)
 
-			utils.Cp("purple", pool.ID, "hintstring:", pool.HintString)
+			// utils.Cp("purple", pool.ID, "hintstring:", pool.HintString)
 			pool.sendExcludingClientId(pool.CurrSketcher.ID, model.SocketMessage{
 				Type:    89,
 				Content: pool.HintString,
 			})
 
 			pool.NumHintsRevealed += 1
-			utils.Cp("purple", pool.ID, "numHintsRevealed:", pool.NumHintsRevealed)
+			// utils.Cp("purple", pool.ID, "numHintsRevealed:", pool.NumHintsRevealed)
 		}
 
 		utils.Cp("purple", pool.ID, "exited hints reveal loop")
@@ -354,7 +361,7 @@ func (pool *Pool) broadcastHintsForWord(stopHints chan bool) {
 
 // 9, flag and broadcast game end
 func (pool *Pool) endGame() {
-	utils.Cp("greenBg", pool.ID, "all players done playing")
+	utils.Cp("greenBg", pool.ID, "all players done playing all rounds")
 
 	pool.HasGameEnded = true
 	pool.broadcast(model.SocketMessage{
@@ -366,7 +373,7 @@ func (pool *Pool) endGame() {
 func (pool *Pool) getClientForSketching() *Client {
 	for _, c := range pool.Clients {
 		if !c.DoneSketching {
-			utils.Cp("yellow", pool.ID, "returning client:", c.Name)
+			utils.Cp("yellow", pool.ID, "next sketching client:", c.Name)
 			return c
 		}
 	}
@@ -385,6 +392,6 @@ func (pool *Pool) allSketched() bool {
 		}
 	}
 
-	utils.Cp("red", pool.ID, "allSketched:", flag)
+	utils.Cp("yellow", pool.ID, "allSketched:", flag)
 	return flag
 }

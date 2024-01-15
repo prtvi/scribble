@@ -44,6 +44,7 @@
 
 	--row-avatar-size: 48px; /* scale= 1 * 48px */
 	--player-card-avatar-size: 24px; /* scale= 0.5 * 48px */
+	--score-card-avatar-size: 36px; /* scale= 0.75 * 48px */
 
 	--container-width: 320px;
 	--col-width: calc(var(--container-width) / 3);
@@ -261,6 +262,26 @@ img {
 	width: calc(var(--player-card-avatar-size) / 2);
 	height: calc(var(--player-card-avatar-size) / 2);
 	background-size: calc(var(--player-card-avatar-size) / 2);
+}
+
+/* add specifications for score-card-avatar */
+.score-card-avatar {
+	width: var(--score-card-avatar-size);
+	height: var(--score-card-avatar-size);
+}
+.score-card-avatar .color,
+.score-card-avatar .eyes,
+.score-card-avatar .mouth {
+	width: var(--score-card-avatar-size);
+	height: var(--score-card-avatar-size);
+	background-size: calc(var(--score-card-avatar-size) * 10);
+}
+.score-card-avatar .owner,
+.score-card-avatar .crowned {
+	top: calc((var(--score-card-avatar-size) / 4) * -1);
+	width: calc(var(--score-card-avatar-size) / 2);
+	height: calc(var(--score-card-avatar-size) / 2);
+	background-size: calc(var(--score-card-avatar-size) / 2);
 }
 
 /* .avatar-customisable-btns */
@@ -1042,8 +1063,9 @@ canvas {
 
 th,
 td {
+	padding: 5px;
 	font-family: r400, var(--ff);
-	font-size: var(--fs-16);
+	font-size: var(--fs-14);
 }
 
 .hidden {
