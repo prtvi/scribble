@@ -1560,7 +1560,7 @@ function concludeGame() {
 		btn.textContent = 'Play again!';
 		btn.addEventListener('click', () => {
 			closeSocketConn('game over, clicked on play again!');
-			window.location.href = '/scribble';
+			window.location.href = homeRoute;
 		});
 	}, 2000);
 

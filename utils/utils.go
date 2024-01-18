@@ -177,6 +177,9 @@ func Cp(color string, message ...any) {
 	for _, m := range message {
 		msg += fmt.Sprintf("%+v ", m)
 	}
+	if len(msg) > 1 {
+		msg = msg[:len(msg)-1]
+	}
 
 	if IsProdEnv() {
 		fmt.Println(msg)

@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	slashRoute      = "/scribble"
+	slashRoute      = "/scribble/"
 	createRoomRoute = "/scribble/create-room"
 	appRoute        = "/scribble/app"
 )

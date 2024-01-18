@@ -14,13 +14,15 @@ import (
 func (c *Client) read() {
 	defer func() {
 		c.Pool.Unregister <- c
-		c.Conn.Close()
+		err := c.Conn.Close()
+
+		utils.Cp("redBg", "client unregister", c.Name, err)
 	}()
 
 	for {
 		_, msgByte, err := c.Conn.ReadMessage()
 		if err != nil {
-			fmt.Println(err)
+			utils.Cp("redBg", "error reading socket message", err)
 			return
 		}
 

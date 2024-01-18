@@ -6,7 +6,6 @@ import (
 	utils "scribble/utils"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -22,7 +21,6 @@ func main() {
 	go socket.Maintainer()
 
 	e := echo.New()
-	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Static("/public", "public")
 	e.Static("/scribble/public", "public")
@@ -32,6 +30,7 @@ func main() {
 	ee := e.Group("/scribble", socket.Logger)
 
 	ee.GET("", socket.Index)
+	ee.GET("/", socket.Index)
 
 	ee.GET("/create-room", socket.CreateRoomForm)
 	ee.POST("/create-room", socket.CreateRoom)
