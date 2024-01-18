@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime"
 	model "scribble/model"
 	utils "scribble/utils"
 	"strconv"
@@ -195,4 +196,31 @@ func WsConnect(c echo.Context) error {
 	client.read()
 
 	return nil
+}
+
+func GetAppStats(c echo.Context) error {
+	appId := c.QueryParam("id")
+	if appId != utils.GetEnvVar("APP_ID") {
+		return c.JSON(http.StatusUnauthorized, `{"message": "stay away hehe"}`)
+	}
+
+	var poolStats = make([]model.PoolStat, 0)
+	for poolId, pool := range hub {
+		poolStats = append(poolStats, model.PoolStat{
+			ID:               poolId,
+			NumActiveClients: len(pool.Clients),
+			HasGameStarted:   pool.HasGameStarted,
+			HasGameEnded:     pool.HasGameEnded,
+			CurrSketcher:     pool.CurrSketcher.Name,
+			CreatedTime:      utils.FormatTimeLong(pool.CreatedTime),
+			GameStartedAt:    utils.FormatTimeLong(pool.GameStartedAt),
+		})
+	}
+	stats := model.Stats{
+		LenHub:        len(hub),
+		NumGoroutines: runtime.NumGoroutine(),
+		Pools:         poolStats,
+	}
+
+	return c.JSON(http.StatusOK, stats)
 }

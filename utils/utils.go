@@ -13,7 +13,11 @@ import (
 )
 
 func IsProdEnv() bool {
-	return os.Getenv("ENV") == "PROD" || os.Getenv("ENV") == ""
+	return GetEnvVar("ENV") == "PROD" || GetEnvVar("ENV") == ""
+}
+
+func GetEnvVar(key string) string {
+	return os.Getenv(key)
 }
 
 func LoadAndGetEnv() (isDebugEnv bool, port string) {
@@ -23,7 +27,7 @@ func LoadAndGetEnv() (isDebugEnv bool, port string) {
 	}
 
 	if IsProdEnv() {
-		return false, os.Getenv("PORT")
+		return false, GetEnvVar("PORT")
 	}
 
 	return true, "1323"

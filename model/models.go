@@ -70,3 +70,18 @@ type CreateFormParam struct {
 	ImgIdx          int
 	Options         []FormOption
 }
+
+type PoolStat struct {
+	ID               string `json:"id"`
+	NumActiveClients int    `json:"numActiveClients"`
+	HasGameStarted   bool   `json:"hasGameStarted"`
+	HasGameEnded     bool   `json:"hasGameEnded"`
+	CurrSketcher     string `json:"currSketcher"`
+	CreatedTime      string `json:"createdTime"`
+	GameStartedAt    string `json:"gameStartedAt"`
+}
+type Stats struct {
+	LenHub        int        `json:"lenHub"`
+	NumGoroutines int        `json:"numGoroutines"`
+	Pools         []PoolStat `json:"pools"`
+}

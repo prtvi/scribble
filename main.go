@@ -40,5 +40,7 @@ func main() {
 
 	ee.GET("/ws", socket.WsConnect)
 
+	ee.GET("/api/stats", socket.GetAppStats)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }
