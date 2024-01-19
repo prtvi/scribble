@@ -594,8 +594,13 @@ function initGlobalEventListeners() {
 	// event listeners for drawing
 	window.addEventListener('load', () => {
 		canvas.addEventListener('mousedown', startPainting);
+		canvas.addEventListener('touchstart', startPainting);
+
 		canvas.addEventListener('mouseup', stopPainting);
+		canvas.addEventListener('touchend', stopPainting);
+
 		canvas.addEventListener('mousemove', paint);
+		canvas.addEventListener('touchmove', paint);
 
 		repositionElements();
 		adjustOverlay();
@@ -930,11 +935,21 @@ function getCanvasSize() {
  * @returns Object containing the coordinates of the mouse
  */
 function getMousePos(event) {
+	// https://stackoverflow.com/questions/60688935/my-canvas-drawing-app-wont-work-on-mobile
+
 	const clientRect = canvas.getBoundingClientRect();
-	return {
-		x: Math.round(event.clientX - clientRect.left),
-		y: Math.round(event.clientY - clientRect.top),
-	};
+
+	if (event.type === 'touchmove' || event.type === 'touchstart') {
+		return {
+			x: Math.round(event.touches[0].clientX - clientRect.left),
+			y: Math.round(event.touches[0].clientY - clientRect.top),
+		};
+	} else if (event.type === 'mousemove' || event.type === 'mousedown') {
+		return {
+			x: Math.round(event.clientX - clientRect.left),
+			y: Math.round(event.clientY - clientRect.top),
+		};
+	}
 }
 
 /**
