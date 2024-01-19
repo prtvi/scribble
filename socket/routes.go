@@ -206,16 +206,24 @@ func GetAppStats(c echo.Context) error {
 
 	var poolStats = make([]model.PoolStat, 0)
 	for poolId, pool := range hub {
-		poolStats = append(poolStats, model.PoolStat{
+		stat := model.PoolStat{
 			ID:               poolId,
 			NumActiveClients: len(pool.Clients),
 			HasGameStarted:   pool.HasGameStarted,
 			HasGameEnded:     pool.HasGameEnded,
-			CurrSketcher:     pool.CurrSketcher.Name,
 			CreatedTime:      utils.FormatTimeLong(pool.CreatedTime),
 			GameStartedAt:    utils.FormatTimeLong(pool.GameStartedAt),
-		})
+		}
+
+		if pool.CurrSketcher == nil {
+			stat.CurrSketcher = "<nil>"
+		} else {
+			stat.CurrSketcher = pool.CurrSketcher.Name
+		}
+
+		poolStats = append(poolStats, stat)
 	}
+
 	stats := model.Stats{
 		LenHub:        len(hub),
 		NumGoroutines: runtime.NumGoroutine(),
