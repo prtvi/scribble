@@ -130,6 +130,33 @@ func GetHintString(word, char, hintString string) string {
 	return hintString
 }
 
+func SelectWordsForPool(globalWords, inputWords []string, useCustomWordsOnly bool) []string {
+	if len(inputWords) == 0 {
+		return globalWords
+	}
+
+	if len(inputWords) >= 10 && useCustomWordsOnly {
+		return inputWords
+	}
+
+	// inputWords share, 2/3
+	// totalWords,  t
+	// inputWords,  i = (2/3) * t
+	//              t = (3/2) * i
+	// globalWords, g = (1/3) * t
+	// solve for g wrt to i, that's the number of words that will be fetched from the global array
+	// here, g = i/2
+
+	inputShare := 0.66
+	globalWordsShare := int(math.Round((1 - inputShare) * (float64(len(inputWords)) / float64(inputShare))))
+
+	result := make([]string, 0)
+	result = append(result, inputWords...)
+	result = append(result, GetNrandomWords(globalWords, globalWordsShare)...)
+
+	return ShuffleList(result)
+}
+
 // randomise
 
 func GetRandomItem(arr []string) string {

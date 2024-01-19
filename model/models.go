@@ -31,11 +31,13 @@ type SocketMessage struct {
 	TimeoutAfter      string `json:"timeoutAfter,omitempty"`
 }
 
-type Coords struct {
-	X int `json:"x"`
-	Y int `json:"y"`
+type ClientInfo struct {
+	ID           string       `json:"id"`
+	Name         string       `json:"name"`
+	Score        int          `json:"score"`
+	IsSketching  bool         `json:"isSketching"`
+	AvatarConfig AvatarConfig `json:"avatarConfig"`
 }
-
 type AvatarConfig struct {
 	Color     Coords `json:"color"`
 	Eyes      Coords `json:"eyes"`
@@ -43,13 +45,9 @@ type AvatarConfig struct {
 	IsOwner   bool   `json:"isOwner"`
 	IsCrowned bool   `json:"isCrowned"`
 }
-
-type ClientInfo struct {
-	ID           string       `json:"id"`
-	Name         string       `json:"name"`
-	Score        int          `json:"score"`
-	IsSketching  bool         `json:"isSketching"`
-	AvatarConfig AvatarConfig `json:"avatarConfig"`
+type Coords struct {
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 type SharedConfig struct {
@@ -64,7 +62,6 @@ type FormOption struct {
 	Value, Label string
 	Selected     bool
 }
-
 type CreateFormParam struct {
 	ID, Label, Desc string
 	ImgIdx          int
@@ -84,4 +81,8 @@ type Stats struct {
 	LenHub        int        `json:"lenHub"`
 	NumGoroutines int        `json:"numGoroutines"`
 	Pools         []PoolStat `json:"pools"`
+}
+
+type ApiResp struct {
+	Message string `json:"message"`
 }

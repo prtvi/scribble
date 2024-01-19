@@ -63,12 +63,14 @@
 						{{ end }}
 					</div>
 
-					<!-- <div class="custom-words-container">
+					<div class="custom-words-container">
 						<div>
 							<label for="customWords">Custom words</label>
 
 							<div class="input-checkbox-container">
-								<label for="useCustomWordsOnly">Use custom words only</label>
+								<label for="useCustomWordsOnly">
+									Use custom words only
+								</label>
 								<input
 									type="checkbox"
 									name="useCustomWordsOnly"
@@ -85,7 +87,7 @@
 								placeholder="Minimum of 10 words. 1-32 characters per word! 20000 characters maximum. Separated by a , (comma)"
 							></textarea>
 						</div>
-					</div> -->
+					</div>
 
 					<div class="form-btn-container">
 						{{ if .RoomCreated }}
@@ -98,6 +100,25 @@
 						</button>
 						{{ end }}
 					</div>
+
+					<script>
+						const regex = /(?:\w+\s*,\s*){9,}\w+/;
+						const customWords =
+							document.getElementById('customWords');
+						const createRoomBtn =
+							document.querySelector('.create-room-btn');
+
+						customWords.addEventListener('input', function (e) {
+							const input = this.value.trim();
+							const res = input.match(regex);
+
+							if (res != null && res.length > 0)
+								createRoomBtn.disabled = false;
+							else if (input.length === 0)
+								createRoomBtn.disabled = false;
+							else createRoomBtn.disabled = true;
+						});
+					</script>
 				</form>
 
 				{{ if .RoomCreated }}
@@ -114,32 +135,37 @@
 
 				<script>
 					// disable create btn
-					document.querySelector('.create-room-btn').disabled = true;
+					createRoomBtn.disabled = true;
 
-					// populate input fields
 					const players = document.getElementById('players');
 					const drawTime = document.getElementById('drawTime');
 					const rounds = document.getElementById('rounds');
 					const wordCount = document.getElementById('wordCount');
 					const hints = document.getElementById('hints');
 					const wordMode = document.getElementById('wordMode');
+					const useCustomWordsOnly =
+						document.getElementById('useCustomWordsOnly');
 
+					// populate input fields
 					players.value = '{{ .Players }}';
 					drawTime.value = '{{ .DrawTime }}';
 					rounds.value = '{{ .Rounds }}';
 					wordCount.value = '{{ .WordCount }}';
 					hints.value = '{{ .Hints }}';
 					wordMode.value = '{{ .WordMode }}';
+					customWords.value = '{{ .CustomWords }}';
+					useCustomWordsOnly.checked =
+						'{{ .UseCustomWordsOnly }}' === 'true';
 
+					// disable the fields
 					players.disabled = true;
 					drawTime.disabled = true;
 					rounds.disabled = true;
 					wordCount.disabled = true;
 					hints.disabled = true;
 					wordMode.disabled = true;
-
-					// document.getElementById('customWords').value = '{{ .CustomWords }}';
-					// document.getElementById('useCustomWordsOnly').checked = '{{ .UseCustomWordsOnly }}' === 'true';
+					customWords.disabled = true;
+					useCustomWordsOnly.disabled = true;
 				</script>
 
 				{{ end }}

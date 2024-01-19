@@ -151,7 +151,7 @@ func (pool *Pool) clientWordAssignmentFlow(client *Client) {
 	client.IsSketching = true
 
 	// create a list of words for client to choose
-	words := utils.GetNrandomWords(utils.WORDS, pool.WordCount)
+	words := utils.GetNrandomWords(pool.WordsForGame, pool.WordCount)
 	pool.broadcastWordList(words)
 
 	stopWordChoosingTimeout := make(chan bool)

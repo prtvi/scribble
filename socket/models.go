@@ -22,22 +22,22 @@ type Client struct {
 }
 
 type Pool struct {
-	ID        string
-	Capacity  int
-	Rounds    int
-	WordCount int
-	DrawTime  time.Duration
-	Hints     int
-	WordMode  string
-
-	// CustomWords        []string
-	// UseCustomWordsOnly bool
+	ID                 string
+	Capacity           int
+	Rounds             int
+	WordCount          int
+	DrawTime           time.Duration
+	Hints              int
+	WordMode           string
+	CustomWords        []string
+	UseCustomWordsOnly bool
 
 	Register   chan *Client
 	Unregister chan *Client
 	Clients    []*Client
 	Broadcast  chan model.SocketMessage
 
+	WordsForGame         []string
 	InitCurrWord         chan string
 	CurrWord             string
 	HintString           string

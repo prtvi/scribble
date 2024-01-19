@@ -8,6 +8,7 @@ import (
 	model "scribble/model"
 	utils "scribble/utils"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -54,10 +55,10 @@ func CreateRoom(c echo.Context) error {
 	wordCount, _ := strconv.Atoi(c.FormValue("wordCount"))
 	hints, _ := strconv.Atoi(c.FormValue("hints"))
 	wordMode := c.FormValue("wordMode")
-	// customWords := utils.SplitIntoWords(c.FormValue("customWords"))
-	// useCustomWordsOnly := c.FormValue("useCustomWordsOnly") == "on"
+	customWords := utils.SplitIntoWords(c.FormValue("customWords"))
+	useCustomWordsOnly := c.FormValue("useCustomWordsOnly") == "on"
 
-	pool := newPool(players, drawTime, rounds, wordCount, hints, wordMode) //, customWords, useCustomWordsOnly)
+	pool := newPool(players, drawTime, rounds, wordCount, hints, wordMode, customWords, useCustomWordsOnly)
 	utils.Cp("blue", "pool created:", pool.ID)
 
 	// append to global hub map, and start listening to pool connections
@@ -77,15 +78,14 @@ func CreateRoom(c echo.Context) error {
 		"CreateRoomRoute":    createRoomRoute,
 
 		// show on submit value submitted on form
-		"Players":   pool.Capacity,
-		"DrawTime":  utils.DurationToSeconds(pool.DrawTime),
-		"Rounds":    pool.Rounds,
-		"WordCount": pool.WordCount,
-		"Hints":     pool.Hints,
-		"WordMode":  pool.WordMode,
-
-		// "CustomWords":        strings.Join(pool.CustomWords, ","),
-		// "UseCustomWordsOnly": pool.UseCustomWordsOnly,
+		"Players":            pool.Capacity,
+		"DrawTime":           utils.DurationToSeconds(pool.DrawTime),
+		"Rounds":             pool.Rounds,
+		"WordCount":          pool.WordCount,
+		"Hints":              pool.Hints,
+		"WordMode":           pool.WordMode,
+		"CustomWords":        strings.Join(pool.CustomWords, ","),
+		"UseCustomWordsOnly": pool.UseCustomWordsOnly,
 	})
 }
 
@@ -201,7 +201,7 @@ func WsConnect(c echo.Context) error {
 func GetAppStats(c echo.Context) error {
 	appId := c.QueryParam("id")
 	if appId != utils.GetEnvVar("APP_ID") {
-		return c.JSON(http.StatusUnauthorized, `{"message": "stay away hehe"}`)
+		return c.JSON(http.StatusUnauthorized, model.ApiResp{Message: "stay away, hehe 👻"})
 	}
 
 	var poolStats = make([]model.PoolStat, 0)
@@ -216,7 +216,7 @@ func GetAppStats(c echo.Context) error {
 		}
 
 		if pool.CurrSketcher == nil {
-			stat.CurrSketcher = "<nil>"
+			stat.CurrSketcher = "nil"
 		} else {
 			stat.CurrSketcher = pool.CurrSketcher.Name
 		}

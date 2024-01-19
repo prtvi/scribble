@@ -42,22 +42,25 @@ func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 	utils.Cp(color, pool.ID, "SOCKET_MSG>", "from:", from, "msg type:", m.Type, messageTypeMap[m.Type])
 }
 
-func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string) *Pool {
+func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) *Pool {
 	return &Pool{
-		ID:             utils.GenerateUUID(),
-		Capacity:       players,
-		DrawTime:       time.Duration(time.Second * time.Duration(drawTime)),
-		Rounds:         rounds,
-		WordCount:      wordCount,
-		Hints:          hints,
-		WordMode:       wordMode,
-		InitCurrWord:   make(chan string),
-		Register:       make(chan *Client),
-		Unregister:     make(chan *Client),
-		Clients:        make([]*Client, 0),
-		Broadcast:      make(chan model.SocketMessage),
-		CreatedTime:    time.Now(),
-		HasGameStarted: false,
+		ID:                 utils.GenerateUUID(),
+		Capacity:           players,
+		DrawTime:           time.Duration(time.Second * time.Duration(drawTime)),
+		Rounds:             rounds,
+		WordCount:          wordCount,
+		Hints:              hints,
+		WordMode:           wordMode,
+		CustomWords:        customWords,
+		UseCustomWordsOnly: useCustomWordsOnly,
+		WordsForGame:       utils.SelectWordsForPool(utils.WORDS, customWords, useCustomWordsOnly),
+		InitCurrWord:       make(chan string),
+		Register:           make(chan *Client),
+		Unregister:         make(chan *Client),
+		Clients:            make([]*Client, 0),
+		Broadcast:          make(chan model.SocketMessage),
+		CreatedTime:        time.Now(),
+		HasGameStarted:     false,
 	}
 }
 
