@@ -56,7 +56,7 @@ func (pool *Pool) broadcast(message model.SocketMessage) {
 
 // 10
 func (pool *Pool) shareConfigWithClient(c *Client) {
-	utils.Cp("blue", pool.ID, "sending configs to:", c.Name)
+	utils.Cp("blue", pool.ID, "-> sending configs to:", c.Name)
 
 	cfg := model.SharedConfig{
 		MessageTypeMap:                 messageTypeMap,
@@ -111,7 +111,7 @@ func (pool *Pool) broadcastClearCanvasEvent() {
 
 // 33, 35
 func (pool *Pool) broadcastWordList(words []string) {
-	utils.Cp("cyan", pool.ID, "broadcasting word list:", words)
+	utils.Cp("cyan", pool.ID, "-> broadcasting word list:", words)
 
 	byteInfo, _ := json.Marshal(words)
 	m1 := model.SocketMessage{
@@ -134,7 +134,7 @@ func (pool *Pool) broadcastWordList(words []string) {
 
 // 8, 87, 88
 func (pool *Pool) broadcastCurrentWordDetails() {
-	utils.Cp("cyan", pool.ID, "broadcasting current word details, currWord:", pool.CurrWord)
+	utils.Cp("yellow", pool.ID, "-> broadcasting current word details, currWord:", pool.CurrWord)
 
 	m1 := model.SocketMessage{
 		Type:              8,
@@ -163,6 +163,8 @@ func (pool *Pool) broadcastCurrentWordDetails() {
 
 // 81, 82
 func (pool *Pool) broadcastTurnOver() {
+	utils.Cp("yellow", pool.ID, "-> sketching time over, sketched for entire duration")
+
 	m1 := model.SocketMessage{Type: 81}
 	m := model.SocketMessage{Type: 82}
 
@@ -171,6 +173,8 @@ func (pool *Pool) broadcastTurnOver() {
 
 // 83, 84
 func (pool *Pool) broadcastTurnOverBeforeTimeout() {
+	utils.Cp("yellow", pool.ID, "-> sketching time over, sketching time interrupted")
+
 	m1 := model.SocketMessage{Type: 83}
 	m := model.SocketMessage{Type: 84}
 
@@ -179,7 +183,7 @@ func (pool *Pool) broadcastTurnOverBeforeTimeout() {
 
 // 32
 func (pool *Pool) broadcastWordReveal(word string) {
-	utils.Cp("blue", pool.ID, "word reveal:", word)
+	utils.Cp("yellow", pool.ID, "-> word reveal:", word)
 	pool.broadcast(model.SocketMessage{
 		Type:    32,
 		Content: word,
@@ -191,7 +195,7 @@ func (pool *Pool) triggerCurrentGameStatsToMidGameJoinee(c *Client) {
 		return
 	}
 
-	utils.Cp("red", pool.ID, "triggering events for mid game joinee")
+	utils.Cp("red", pool.ID, "-> triggering events for mid game joinee")
 
 	// send game started event
 	c.send(model.SocketMessage{

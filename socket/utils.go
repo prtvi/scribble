@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+/*
 func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 	if !debug || m.Type == 4 {
 		return
@@ -41,6 +42,7 @@ func (pool *Pool) printSocketMsg(m model.SocketMessage) {
 	// 	utils.Cs(color, messageTypeMap[m.Type]))
 	utils.Cp(color, pool.ID, "SOCKET_MSG>", "from:", from, "msg type:", m.Type, messageTypeMap[m.Type])
 }
+*/
 
 func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, customWords []string, useCustomWordsOnly bool) *Pool {
 	return &Pool{
@@ -54,6 +56,8 @@ func newPool(players, drawTime, rounds, wordCount, hints int, wordMode string, c
 		CustomWords:        customWords,
 		UseCustomWordsOnly: useCustomWordsOnly,
 		WordsForGame:       utils.SelectWordsForPool(utils.WORDS, customWords, useCustomWordsOnly),
+		StopHints:          make(chan bool),
+		StopSketching:      make(chan bool),
 		InitCurrWord:       make(chan string),
 		Register:           make(chan *Client),
 		Unregister:         make(chan *Client),

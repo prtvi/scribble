@@ -7,12 +7,12 @@ import (
 
 // start listening to pool connections and messages
 func (pool *Pool) start() {
-	utils.Cp("cyan", pool.ID, "pool started!")
+	utils.Cp("cyan", pool.ID, "-> pool started!")
 
 	for {
 		select {
 		case client := <-pool.Register:
-			utils.Cp("yellow", pool.ID, "client register:", client.Name)
+			utils.Cp("cyan", pool.ID, "-> client register:", client.Name)
 
 			// on client register, append the client to Pool.Clients slice, broadcast messageTypeMap, joining of the client and client info list
 			pool.appendClientToList(client)
@@ -33,7 +33,7 @@ func (pool *Pool) start() {
 			}
 
 		case client := <-pool.Unregister:
-			utils.Cp("yellow", pool.ID, "client unregister:", client.Name)
+			utils.Cp("cyan", pool.ID, "-> client unregister:", client.Name)
 
 			// on client disconnect, delete the client from Pool.Client slice and broadcast the unregister
 			pool.removeClientFromList(client)
@@ -56,12 +56,10 @@ func (pool *Pool) start() {
 				pool.sendExcludingClientId(pool.CurrSketcher.ID, message) // avoid sending canvas data and clear canvas event to the curr sketcher
 
 			case 7:
-				// pool.printSocketMsg(message)
 				pool.startGameRequestFromClient(message.ClientId)
 
 			case 34:
-				// pool.printSocketMsg(message)
-				utils.Cp("cyan", pool.ID, "client chose word before timeout:", message.Content)
+				utils.Cp("cyan", pool.ID, "-> client chose word before timeout:", message.Content)
 				pool.InitCurrWord <- message.Content // client choosing word
 
 			default:
@@ -73,14 +71,14 @@ func (pool *Pool) start() {
 
 // begin game flow by scheduling schedule timers
 func (pool *Pool) beginGameFlow() {
-	utils.Cp("greenBg", pool.ID, "game flow has begun!")
+	utils.Cp("greenBg", pool.ID, "-> game flow has begun!")
 	// wait for the "game started" overlay
 	utils.Sleep(InterGameWaitDuration)
 
 	// loop over the number of rounds
 	for i := 0; i < pool.Rounds; i++ {
 		pool.CurrRound = i + 1
-		utils.Cp("yellow", pool.ID, "round no:", pool.CurrRound)
+		utils.Cp("yellow", pool.ID, "-> round no:", pool.CurrRound)
 
 		// broadcast round number and wait
 		pool.broadcastRoundNumber()
@@ -104,26 +102,22 @@ func (pool *Pool) beginGameFlow() {
 			pool.broadcastClientInfoList()
 
 			// if word mode is normal then start broadcasting hints
-			stopHints := make(chan bool)
 			if pool.WordMode == "normal" {
-				pool.broadcastHintsForWord(stopHints)
+				pool.broadcastHintsForWord()
 			}
 
 			// start a timer with interrupt, create a channel to use it to interrupt the timer if required
 			// and run a go routine and pass this channel to pass data on this chan on all clients guess
-			stopSketching := make(chan bool)
-			go pool.checkIfAllGuessed(stopSketching, stopHints)
+			go pool.checkIfAllGuessed()
 
 			pool.SleepingForSketching = true
-			interrupted := utils.SleepWithInterrupt(time.Until(pool.CurrWordExpiresAt), stopSketching)
+			interrupted := utils.SleepWithInterrupt(time.Until(pool.CurrWordExpiresAt), pool.StopSketching)
 			pool.SleepingForSketching = false
 
 			// broadcast turn_over, reveal the word and clear canvas
 			if interrupted {
-				utils.Cp("yellow", pool.ID, "sketching time over, sketching time interrupted")
 				pool.broadcastTurnOverBeforeTimeout()
 			} else {
-				utils.Cp("yellow", pool.ID, "sketching time over, sketched for entire duration")
 				pool.broadcastTurnOver()
 			}
 
@@ -136,8 +130,7 @@ func (pool *Pool) beginGameFlow() {
 			utils.Sleep(InterGameWaitDuration)
 			pool.broadcastClearCanvasEvent()
 
-			utils.Cp("yellow", pool.ID, c.Name, "'s sketching flow complete, moving to next iteration")
-			utils.Cp("reset", "\n")
+			utils.Cp("yellow", pool.ID, "->", c.Name, "sketching flow complete, moving to next sketcher\n")
 		}
 	}
 

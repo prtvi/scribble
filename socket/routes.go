@@ -63,7 +63,7 @@ func CreateRoom(c echo.Context) error {
 
 	// append to global hub map, and start listening to pool connections
 	hub[pool.ID] = pool
-	utils.Cp("red", "len hub:", len(hub))
+	utils.Cp("blue", "len hub:", len(hub))
 	go pool.start()
 
 	// generate link to join the pool

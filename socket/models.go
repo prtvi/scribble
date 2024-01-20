@@ -37,6 +37,8 @@ type Pool struct {
 	Clients    []*Client
 	Broadcast  chan model.SocketMessage
 
+	StopHints            chan bool
+	StopSketching        chan bool
 	WordsForGame         []string
 	InitCurrWord         chan string
 	CurrWord             string
