@@ -132,6 +132,11 @@ func (pool *Pool) beginGameFlow() {
 
 			utils.Cp("yellow", pool.ID, "->", c.Name, "sketching flow complete, moving to next sketcher\n")
 		}
+
+		if pool.CurrRound != pool.Rounds {
+			pool.showScoreBoard()
+			utils.Sleep(ShowScoreBoardFor)
+		}
 	}
 
 	// once all clients are done playing, end the game and broadcast the same

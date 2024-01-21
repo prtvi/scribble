@@ -440,6 +440,54 @@ function displayOverlay(dom) {
 }
 
 /**
+ * returns the dom content with score table
+ * @param {Object} socketMessage
+ * @returns table dom
+ */
+function getScoreTable(socketMessage) {
+	const dataArr = JSON.parse(socketMessage.content);
+
+	const table = document.createElement('table');
+	const tr = document.createElement('tr');
+	const avatar = document.createElement('th');
+	const name = document.createElement('th');
+	const score = document.createElement('th');
+	name.textContent = 'Name';
+	score.textContent = 'Score';
+
+	tr.appendChild(avatar);
+	tr.appendChild(name);
+	tr.appendChild(score);
+	table.appendChild(tr);
+
+	dataArr.forEach(d => {
+		const tr = document.createElement('tr');
+
+		const avatar = document.createElement('th');
+		const name = document.createElement('th');
+		const score = document.createElement('th');
+
+		avatar.appendChild(
+			getAvatarDom(
+				d.avatarConfig,
+				scoreCardAvatarScale,
+				'score-card-avatar'
+			)
+		);
+		name.textContent = d.name;
+		score.textContent = d.score;
+
+		tr.appendChild(avatar);
+		tr.appendChild(name);
+		tr.appendChild(score);
+
+		table.appendChild(tr);
+	});
+
+	return table;
+}
+
+/**
  * Hides the overlay
  */
 function hideOverlay() {
@@ -1494,55 +1542,32 @@ function showAllHaveGuessed() {
  * Render final score on overlay using table and show go home button
  * @param {Object} socketMessage
  */
-function displayScores(socketMessage) {
-	const dataArr = JSON.parse(socketMessage.content);
+function displayFinalScores(socketMessage) {
+	const table = getScoreTable(socketMessage);
 
 	const overlayContent = getOverlayContentDomWithHeading('Game over!');
-
-	const table = document.createElement('table');
-	const tr = document.createElement('tr');
-	const avatar = document.createElement('th');
-	const name = document.createElement('th');
-	const score = document.createElement('th');
-	name.textContent = 'Name';
-	score.textContent = 'Score';
-
-	tr.appendChild(avatar);
-	tr.appendChild(name);
-	tr.appendChild(score);
-	table.appendChild(tr);
-
-	dataArr.forEach(d => {
-		const tr = document.createElement('tr');
-
-		const avatar = document.createElement('th');
-		const name = document.createElement('th');
-		const score = document.createElement('th');
-
-		avatar.appendChild(
-			getAvatarDom(
-				d.avatarConfig,
-				scoreCardAvatarScale,
-				'score-card-avatar'
-			)
-		);
-		name.textContent = d.name;
-		score.textContent = d.score;
-
-		tr.appendChild(avatar);
-		tr.appendChild(name);
-		tr.appendChild(score);
-
-		table.appendChild(tr);
-	});
-
-	// append table
 	overlayContent.appendChild(table);
 
 	displayOverlay(overlayContent);
 	appendChatMsgToDOM('Game over!', '#ff0000');
 
 	concludeGame();
+}
+
+/**
+ * EVENT: 91
+ * Render round score on overlay using table
+ * @param {Object} socketMessage
+ */
+function displayRoundScore(socketMessage) {
+	const table = getScoreTable(socketMessage);
+
+	const overlayContent = getOverlayContentDomWithHeading(
+		'Score after Round ' + socketMessage.currRound
+	);
+	overlayContent.appendChild(table);
+
+	displayOverlay(overlayContent);
 }
 
 /**
@@ -1759,7 +1784,11 @@ function socketOnMessage(message) {
 			break;
 
 		case 9:
-			displayScores(socketMessage);
+			displayFinalScores(socketMessage);
+			break;
+
+		case 91:
+			displayRoundScore(socketMessage);
 			break;
 
 		case 10:

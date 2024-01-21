@@ -20,6 +20,7 @@ var upgrader = websocket.Upgrader{
 var (
 	RenderClientsEvery      = time.Second * 5
 	InterGameWaitDuration   = time.Second * 2
+	ShowScoreBoardFor       = time.Second * 7
 	TimeoutForChoosingWord  = time.Second * 15
 	CloseSocketConnectionIn = time.Second * 30
 
@@ -54,6 +55,7 @@ var messageTypeMap = map[int]string{
 	// S B=> Cs - green
 	6:   class1 + "__client_info",
 	9:   class1 + "__end_game",
+	91:  class1 + "__score_board_after_round",
 	31:  class1 + "__correct_guess",
 	312: class1 + "__word_in_msg",
 	313: class1 + "__cant_reveal_word",

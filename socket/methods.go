@@ -362,6 +362,17 @@ func (pool *Pool) broadcastHintsForWord() {
 	}()
 }
 
+// 91, render score board after every round
+func (pool *Pool) showScoreBoard() {
+	utils.Cp("yellow", pool.ID, "-> showing score board after round:", pool.CurrRound)
+
+	pool.broadcast(model.SocketMessage{
+		Type:      91,
+		CurrRound: pool.CurrRound,
+		Content:   pool.getClientInfoList(false).Content,
+	})
+}
+
 // 9, flag and broadcast game end
 func (pool *Pool) endGame() {
 	utils.Cp("greenBg", pool.ID, "-> all players done playing all rounds")
