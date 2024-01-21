@@ -343,6 +343,8 @@ function getPlayerCardDom(playerInfo, iteration) {
 		playerName.textContent += ' (you)';
 	}
 
+	if (playerInfo.hasGuessed) playerName.classList.add('guessed');
+
 	// score span
 	const playerScore = document.createElement('span');
 	playerScore.classList.add('score');
@@ -1189,7 +1191,7 @@ function appendChatMsgToDOM(msg, formatColor) {
 
 	// message text
 	const text = document.createElement('span');
-	text.style.color = formatColor || '#1d1d1f'; // f5f5f7
+	text.style.color = '#1d1d1f'; // f5f5f7
 
 	newMsgDiv.style.backgroundColor = `${formatColor}20`;
 	text.innerHTML = msg;
@@ -1622,8 +1624,12 @@ function initSocket() {
 	let wsProtocol = 'ws';
 	if (window.location.protocol === 'https:') wsProtocol = 'wss';
 
+	let baseRoute = homeRoute;
+	if (homeRoute.endsWith('/'))
+		baseRoute = homeRoute.slice(0, homeRoute.length - 1);
+
 	// construct the web socket url with the required params
-	const wsUrl = `${wsProtocol}://${window.location.host}/scribble/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
+	const wsUrl = `${wsProtocol}://${window.location.host}${baseRoute}/ws?poolId=${poolId}&clientId=${clientId}&clientName=${clientName}&avatarConfig=${avatarConfig}`;
 
 	// make the connection
 	const socket = new WebSocket(wsUrl);

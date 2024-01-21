@@ -1005,6 +1005,9 @@ canvas {
 .player-card .name.self {
 	color: #026585;
 }
+.player-card .name.guessed {
+	color: #02bb1e;
+}
 .player-card .score {
 	font-family: l300, var(--ff);
 	font-weight: var(--fw-300);
@@ -1069,6 +1072,7 @@ th,
 td {
 	padding: 5px;
 	font-family: r400, var(--ff);
+	font-weight: var(--fw-400);
 	font-size: var(--fs-14);
 }
 

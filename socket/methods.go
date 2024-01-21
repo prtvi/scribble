@@ -60,6 +60,7 @@ func (pool *Pool) getClientInfoList(finalCall bool) model.SocketMessage {
 			Name:         client.Name,
 			Score:        client.Score,
 			IsSketching:  client.IsSketching,
+			HasGuessed:   client.HasGuessed,
 			AvatarConfig: client.AvatarConfig,
 		})
 	}

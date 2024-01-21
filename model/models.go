@@ -36,6 +36,7 @@ type ClientInfo struct {
 	Name         string       `json:"name"`
 	Score        int          `json:"score"`
 	IsSketching  bool         `json:"isSketching"`
+	HasGuessed   bool         `json:"hasGuessed"`
 	AvatarConfig AvatarConfig `json:"avatarConfig"`
 }
 type AvatarConfig struct {

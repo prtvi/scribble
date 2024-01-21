@@ -67,7 +67,7 @@ func CreateRoom(c echo.Context) error {
 	go pool.start()
 
 	// generate link to join the pool
-	pool.JoiningLink = "/scribble/app?join=" + pool.ID
+	pool.JoiningLink = appRoute + "?join=" + pool.ID
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "index", map[string]any{
@@ -201,7 +201,7 @@ func WsConnect(c echo.Context) error {
 func GetAppStats(c echo.Context) error {
 	appId := c.QueryParam("id")
 	if appId != utils.GetEnvVar("APP_ID") {
-		return c.JSON(http.StatusUnauthorized, model.ApiResp{Message: "stay away, hehe 👻"})
+		return c.JSON(http.StatusUnauthorized, model.ApiResp{Message: "boo! 👻"})
 	}
 
 	var poolStats = make([]model.PoolStat, 0)
