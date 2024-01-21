@@ -25,6 +25,48 @@ function getSecondsLeftFrom(futureTime) {
 	return Math.round(diff / 1000);
 }
 
+/**
+ * Returns a random element from input array
+ * @param {Array} arr input array
+ * @returns a random element from input array
+ */
+function getRandomFromArray(arr) {
+	return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/**
+ * Sets the local storage with the given values
+ * @param {String} key unique key to set the local storage
+ * @param {any} value any value to be stored
+ */
+function saveToLocalStorage(key, value) {
+	window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+/**
+ * Returns the locally stored content based on the key provided
+ * @param {String} key unique key to get the locally saved content
+ * @returns string value of stored content
+ */
+function getFromLocalStorage(key) {
+	return window.localStorage.getItem(key);
+}
+
+/**
+ * Runs a timer
+ * @param {HTMLElement} timerElement element on which the timer will display the time left
+ * @param {Date.getTime} timeoutAt timeStamp at which the timer runs out
+ * @returns Timer ID
+ */
+function runTimer(timerElement, timeoutAt) {
+	const countdownTimer = setInterval(function () {
+		const secondsLeft = getSecondsLeftFrom(timeoutAt);
+		if (secondsLeft > -1) timerElement.textContent = `${secondsLeft}s`;
+		else clearInterval(countdownTimer);
+	}, 1000);
+	return countdownTimer;
+}
+
 // -------------------------------- AVATAR UTILS --------------------------------
 
 /**
@@ -34,7 +76,7 @@ function getSecondsLeftFrom(futureTime) {
  * @param {Number} y y coordinate on the atlas image
  * @param {Number} scale set the scale
  */
-function setBgPosition(element, x, y, scale) {
+function setBgPosOfAvatarElement(element, x, y, scale) {
 	const offset = scale * 48;
 	element.style.backgroundPositionX = `-${x * offset}px`;
 	element.style.backgroundPositionY = `-${y * offset}px`;
@@ -46,19 +88,10 @@ function setBgPosition(element, x, y, scale) {
  * @param {*} scale scale of avatar
  * @returns current position of window over the avatar atlas
  */
-function getCurrPosition(pos, scale) {
+function getCurrPosOfAvatarOnAtlas(pos, scale) {
 	const offset = scale * 48;
 	const lastIdx = pos.lastIndexOf('px');
 	return Math.abs(+pos.slice(0, lastIdx)) / offset;
-}
-
-/**
- * Returns a random element from input array
- * @param {Array} arr input array
- * @returns a random element from input array
- */
-function getRandomValue(arr) {
-	return arr[Math.floor(Math.random() * arr.length)];
 }
 
 /**
@@ -67,9 +100,9 @@ function getRandomValue(arr) {
  */
 function getRandomizedAvatarCoords() {
 	return {
-		color: getRandomValue(validCoordsForAvatarAtlas.color),
-		eyes: getRandomValue(validCoordsForAvatarAtlas.eyes),
-		mouth: getRandomValue(validCoordsForAvatarAtlas.mouth),
+		color: getRandomFromArray(validCoordsForAvatarAtlas.color),
+		eyes: getRandomFromArray(validCoordsForAvatarAtlas.eyes),
+		mouth: getRandomFromArray(validCoordsForAvatarAtlas.mouth),
 	};
 }
 
@@ -104,7 +137,7 @@ function initValidCoordsForAvatarAtlas(prop) {
 /**
  * Sets the avatarConfig.isOwner field as true if the url contains isOwner=true
  */
-function setIfOwner() {
+function setIfAvatarIsOwner() {
 	const urlParams = new URLSearchParams(location.search);
 	if (urlParams.get('isOwner') === 'true') avatarConfig.isOwner = true;
 }
@@ -136,7 +169,7 @@ function renderRowAvatars() {
  * Renders customizable avatar and adds event listeners for the same
  */
 function renderCustomisableAvatar() {
-	randomizeAvatar();
+	randomizeCustomisableAvatar();
 
 	const colorLeft = document.querySelector('.avc-btn.color-left');
 	const colorRight = document.querySelector('.avc-btn.color-right');
@@ -155,7 +188,7 @@ function renderCustomisableAvatar() {
 
 	document
 		.querySelector('.randomize')
-		.addEventListener('click', randomizeAvatar);
+		.addEventListener('click', randomizeCustomisableAvatar);
 
 	[colorLeft, eyesLeft, mouthLeft].forEach(ele =>
 		ele.addEventListener('click', leftElForCustomizableAvatar)
@@ -179,7 +212,7 @@ function leftElForCustomizableAvatar(e) {
 		elem.style.backgroundPositionX = '0px';
 
 	avatarConfig[name].x =
-		getCurrPosition(
+		getCurrPosOfAvatarOnAtlas(
 			elem.style.backgroundPositionX,
 			customizableAvatarScale
 		) - 1;
@@ -194,13 +227,13 @@ function leftElForCustomizableAvatar(e) {
 		avatarConfig[name].y = boundariesForAvatarAtlas[name].y;
 	}
 
-	setBgPosition(
+	setBgPosOfAvatarElement(
 		elem,
 		avatarConfig[name].x,
 		avatarConfig[name].y,
 		customizableAvatarScale
 	);
-	setIfOwner();
+	setIfAvatarIsOwner();
 	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
@@ -217,7 +250,7 @@ function rightElForCustomizableAvatar(e) {
 		elem.style.backgroundPositionX = '0px';
 
 	avatarConfig[name].x =
-		getCurrPosition(
+		getCurrPosOfAvatarOnAtlas(
 			elem.style.backgroundPositionX,
 			customizableAvatarScale
 		) + 1;
@@ -235,20 +268,20 @@ function rightElForCustomizableAvatar(e) {
 		avatarConfig[name].y = 0;
 	}
 
-	setBgPosition(
+	setBgPosOfAvatarElement(
 		elem,
 		avatarConfig[name].x,
 		avatarConfig[name].y,
 		customizableAvatarScale
 	);
-	setIfOwner();
+	setIfAvatarIsOwner();
 	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
 /**
  * Randomise the customisable avatar
  */
-function randomizeAvatar() {
+function randomizeCustomisableAvatar() {
 	const coords = getRandomizedAvatarCoords();
 
 	avatarConfig.color = coords.color;
@@ -259,21 +292,26 @@ function randomizeAvatar() {
 	const eyes = document.querySelector('.avatar.custom-avatar .eyes');
 	const mouth = document.querySelector('.avatar.custom-avatar .mouth');
 
-	setBgPosition(
+	setBgPosOfAvatarElement(
 		color,
 		coords.color.x,
 		coords.color.y,
 		customizableAvatarScale
 	);
-	setBgPosition(eyes, coords.eyes.x, coords.eyes.y, customizableAvatarScale);
-	setBgPosition(
+	setBgPosOfAvatarElement(
+		eyes,
+		coords.eyes.x,
+		coords.eyes.y,
+		customizableAvatarScale
+	);
+	setBgPosOfAvatarElement(
 		mouth,
 		coords.mouth.x,
 		coords.mouth.y,
 		customizableAvatarScale
 	);
 
-	setIfOwner();
+	setIfAvatarIsOwner();
 	saveToLocalStorage('avatarConfig', avatarConfig);
 }
 
@@ -289,15 +327,30 @@ function getAvatarDom(avatarConfig, scale, ...classNames) {
 
 	const pColor = document.createElement('div');
 	pColor.classList.add('color');
-	setBgPosition(pColor, avatarConfig.color.x, avatarConfig.color.y, scale);
+	setBgPosOfAvatarElement(
+		pColor,
+		avatarConfig.color.x,
+		avatarConfig.color.y,
+		scale
+	);
 
 	const pEyes = document.createElement('div');
 	pEyes.classList.add('eyes');
-	setBgPosition(pEyes, avatarConfig.eyes.x, avatarConfig.eyes.y, scale);
+	setBgPosOfAvatarElement(
+		pEyes,
+		avatarConfig.eyes.x,
+		avatarConfig.eyes.y,
+		scale
+	);
 
 	const pMouth = document.createElement('div');
 	pMouth.classList.add('mouth');
-	setBgPosition(pMouth, avatarConfig.mouth.x, avatarConfig.mouth.y, scale);
+	setBgPosOfAvatarElement(
+		pMouth,
+		avatarConfig.mouth.x,
+		avatarConfig.mouth.y,
+		scale
+	);
 
 	// TODO: add this to the beginning of player card
 	// const pOwner = document.createElement('div');
@@ -380,27 +433,7 @@ function getPlayerCardDom(playerInfo, iteration) {
 	return playerCard;
 }
 
-/**
- * Sends the chat message to the server
- * @param {Event} e event that triggers sending text message
- * @returns void
- */
-function sendChatMsgBtnEL(e) {
-	e.preventDefault();
-
-	const msg = document.querySelector('.msg').value.trim();
-	if (msg.length === 0 || msg === '') return;
-
-	const socketMsg = {
-		type: 3,
-		content: msg,
-		clientName,
-		clientId,
-		poolId,
-	};
-
-	sendViaSocket(socketMsg);
-}
+// -------------------------------- OVERLAY --------------------------------
 
 /**
  * Returns the HTML DOM for the overlay, for text only
@@ -439,6 +472,32 @@ function displayOverlay(dom) {
 		overlay.style.opacity = 1;
 		adjustOverlay();
 	}, overlayFadeInAnimationDuration);
+}
+
+/**
+ * Hides the overlay
+ */
+function hideOverlay() {
+	// render hiding animation using timeout
+	overlay.style.opacity = 1;
+	setTimeout(() => {
+		overlay.style.opacity = 0;
+		overlay.innerHTML = '';
+	}, overlayFadeInAnimationDuration);
+
+	// change overlay display property to none after the animation
+	setTimeout(() => (overlay.style.display = 'none'), 1000);
+}
+
+/**
+ * Adjusts the overlay position, currently used at scroll event
+ */
+function adjustOverlay() {
+	const cc = document.querySelector('.canvas-container');
+	overlay.style.top = `${cc.offsetTop}px`;
+	overlay.style.height = `${cc.offsetHeight}px`;
+	overlay.style.width = `${cc.offsetWidth}px`;
+	overlay.style.left = `${cc.offsetLeft}px`;
 }
 
 /**
@@ -489,139 +548,7 @@ function getScoreTable(socketMessage) {
 	return table;
 }
 
-/**
- * Hides the overlay
- */
-function hideOverlay() {
-	// render hiding animation using timeout
-	overlay.style.opacity = 1;
-	setTimeout(() => {
-		overlay.style.opacity = 0;
-		overlay.innerHTML = '';
-	}, overlayFadeInAnimationDuration);
-
-	// change overlay display property to none after the animation
-	setTimeout(() => (overlay.style.display = 'none'), 1000);
-}
-
-/**
- * Adjusts the overlay position, currently used at scroll event
- */
-function adjustOverlay() {
-	const cc = document.querySelector('.canvas-container');
-	overlay.style.top = `${cc.offsetTop}px`;
-	overlay.style.height = `${cc.offsetHeight}px`;
-	overlay.style.width = `${cc.offsetWidth}px`;
-	overlay.style.left = `${cc.offsetLeft}px`;
-}
-
-/**
- * Sets the local storage with the given values
- * @param {String} key unique key to set the local storage
- * @param {any} value any value to be stored
- */
-function saveToLocalStorage(key, value) {
-	window.localStorage.setItem(key, JSON.stringify(value));
-}
-
-/**
- * Returns the locally stored content based on the key provided
- * @param {String} key unique key to get the locally saved content
- * @returns string value of stored content
- */
-function getFromLocalStorage(key) {
-	return window.localStorage.getItem(key);
-}
-
-/**
- * Disable player sketching by hiding the paint utils and removing the event listeners
- */
-function disableSketching() {
-	// get the paint utils, clear canvav btn & undo btn
-	const paintUtilsDiv = document.querySelector('.paint-utils');
-	const clearCanvasBtn = document.querySelector('.pu.clear');
-	const undoBtn = document.querySelector('.pu.undo');
-
-	// get the strokes and brush Stroke Selected divs
-	const strokes = document.querySelector('.strokes');
-	const strokeSelected = document.querySelector('.pu.stroke-selected');
-
-	// get the colors and color selected divs
-	const colors = document.querySelector('.colors');
-	const colorSelected = document.querySelector('.pu.color-selected');
-
-	// hide paint utils div and disable painting access
-	paintUtils.isAllowedToPaint = false;
-	paintUtilsDiv.classList.add('hidden');
-
-	// remove ELs for clear canvas & undo btn
-	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
-	undoBtn.removeEventListener('click', undo);
-
-	// remove ELs for selecting brush stroke
-	strokes.removeEventListener('click', selectStrokeEL);
-	strokeSelected.removeEventListener('click', openStrokeSelectOptions);
-
-	// remove ELs for selecting brush color
-	colors.removeEventListener('click', selectColorEL);
-	colorSelected.removeEventListener('click', openColorSelectOptions);
-
-	// clear the paths
-	paintUtils.points = [];
-	paintUtils.paths = [];
-
-	// undo overflow:hidden
-	document.querySelector('*').style.overflow = '';
-}
-
-/**
- * EVENT: 86
- * Begins the player sketching process by starting the timer
- * @param {Object} socketMessage
- * @returns Number, the timer id from the setInterval function
- */
-function beginClientSketchingFlowInit(socketMessage) {
-	// initialise the time at which this word expires
-	const currentWordExpiresAt = new Date(
-		socketMessage.currWordExpiresAt
-	).getTime();
-
-	const timeLeftSpan = document.querySelector('.timer span');
-	setGbTimerStat(timeForEachWordInSeconds);
-	return runTimer(timeLeftSpan, currentWordExpiresAt);
-}
-
-/**
- * Runs a timer
- * @param {HTMLElement} timerElement element on which the timer will display the time left
- * @param {Date.getTime} timeoutAt timeStamp at which the timer runs out
- * @returns Timer ID
- */
-function runTimer(timerElement, timeoutAt) {
-	const countdownTimer = setInterval(function () {
-		const secondsLeft = getSecondsLeftFrom(timeoutAt);
-		if (secondsLeft > -1) timerElement.textContent = `${secondsLeft}s`;
-		else clearInterval(countdownTimer);
-	}, 1000);
-	return countdownTimer;
-}
-
-/**
- * Remove event listeners on game start and hide joining link btn
- */
-function removeEventListenersOnGameStart() {
-	const isOwner = JSON.parse(getFromLocalStorage('avatarConfig')).isOwner;
-	if (isOwner) {
-		const startGameBtn = document.querySelector('.start-game-btn');
-		startGameBtn && startGameBtn.removeEventListener('click', startGameEl);
-	}
-
-	document
-		.querySelector('.joining-link-btn')
-		.removeEventListener('click', copyJoiningLinkEL);
-
-	document.querySelector('.joining-link-div').classList.add('hidden');
-}
+// -------------------------------- EVENT HANDLERS --------------------------------
 
 /**
  * Initialise all necessary event listeners - chat, drawing, resize canvas, joining link, start game btn, adjust overlay on scroll and modal
@@ -696,6 +623,103 @@ function initGlobalEventListeners() {
 		if (e.target === modal && modal.style.display != 'none')
 			modal.style.display = 'none';
 	});
+}
+
+/**
+ * Remove event listeners on game start and hide joining link btn
+ */
+function removeEventListenersOnGameStart() {
+	const isOwner = JSON.parse(getFromLocalStorage('avatarConfig')).isOwner;
+	if (isOwner) {
+		const startGameBtn = document.querySelector('.start-game-btn');
+		startGameBtn && startGameBtn.removeEventListener('click', startGameEl);
+	}
+
+	document
+		.querySelector('.joining-link-btn')
+		.removeEventListener('click', copyJoiningLinkEL);
+
+	document.querySelector('.joining-link-div').classList.add('hidden');
+}
+
+/**
+ * Sends the chat message to the server
+ * @param {Event} e event that triggers sending text message
+ * @returns void
+ */
+function sendChatMsgBtnEL(e) {
+	e.preventDefault();
+
+	const msg = document.querySelector('.msg').value.trim();
+	if (msg.length === 0 || msg === '') return;
+
+	const socketMsg = {
+		type: 3,
+		content: msg,
+		clientName,
+		clientId,
+		poolId,
+	};
+
+	sendViaSocket(socketMsg);
+}
+
+/**
+ * Disable player sketching by hiding the paint utils and removing the event listeners
+ */
+function disableSketching() {
+	// get the paint utils, clear canvav btn & undo btn
+	const paintUtilsDiv = document.querySelector('.paint-utils');
+	const clearCanvasBtn = document.querySelector('.pu.clear');
+	const undoBtn = document.querySelector('.pu.undo');
+
+	// get the strokes and brush Stroke Selected divs
+	const strokes = document.querySelector('.strokes');
+	const strokeSelected = document.querySelector('.pu.stroke-selected');
+
+	// get the colors and color selected divs
+	const colors = document.querySelector('.colors');
+	const colorSelected = document.querySelector('.pu.color-selected');
+
+	// hide paint utils div and disable painting access
+	paintUtils.isAllowedToPaint = false;
+	paintUtilsDiv.classList.add('hidden');
+
+	// remove ELs for clear canvas & undo btn
+	clearCanvasBtn.removeEventListener('click', requestCanvasClear);
+	undoBtn.removeEventListener('click', undo);
+
+	// remove ELs for selecting brush stroke
+	strokes.removeEventListener('click', selectStrokeEL);
+	strokeSelected.removeEventListener('click', openStrokeSelectOptions);
+
+	// remove ELs for selecting brush color
+	colors.removeEventListener('click', selectColorEL);
+	colorSelected.removeEventListener('click', openColorSelectOptions);
+
+	// clear the paths
+	paintUtils.points = [];
+	paintUtils.paths = [];
+
+	// undo overflow:hidden
+	document.querySelector('*').style.overflow = '';
+}
+
+/**
+ * EVENT: 86
+ * Begins the player sketching process by starting the timer
+ * @param {Object} socketMessage
+ * @returns Number, the timer id from the setInterval function
+ */
+function beginClientSketchingFlowInit(socketMessage) {
+	// initialise the time at which this word expires
+	const currentWordExpiresAt = new Date(
+		socketMessage.currWordExpiresAt
+	).getTime();
+
+	const timeLeftSpan = document.querySelector('.timer span');
+	setGbTimerStat(timeForEachWordInSeconds);
+	return runTimer(timeLeftSpan, currentWordExpiresAt);
 }
 
 /**
@@ -1644,6 +1668,47 @@ function initSocket() {
 }
 
 /**
+ * Socket onclose handler
+ */
+function socketOnClose() {
+	// on socket conn close, stop all timer or intervals
+	log('Socket connection closed, stopping timers and timeouts!');
+	clearAllIntervals(wordExpiryTimer);
+
+	// display connection lost on the modal
+	document.getElementById('modal').style.display = 'flex';
+}
+
+function closeSocketConn(reason) {
+	socket.close(1000, reason);
+}
+
+/**
+ * Send the socketMsg to the server if connected, else show disconnected prompt
+ * @param {Object} socketMsg message to be sent to the server
+ */
+function sendViaSocket(socketMsg) {
+	/*  socket.readyState: int
+			0 - connecting
+			1 - open
+			2 - closing
+			3 - closed
+	*/
+
+	// if socket is in open state then send the message
+	if (socket.readyState === socket.OPEN)
+		socket.send(JSON.stringify(socketMsg));
+	else {
+		// clear any intervals and show connection lost
+		log('socket current state:', socket.readyState);
+		clearAllIntervals(wordExpiryTimer);
+
+		// display connection lost on the modal
+		document.getElementById('modal').style.display = 'flex';
+	}
+}
+
+/**
  * Socket onmessage handler
  * @param {any} message raw message received from server
  */
@@ -1803,47 +1868,6 @@ function socketOnMessage(message) {
 
 		default:
 			break;
-	}
-}
-
-/**
- * Socket onclose handler
- */
-function socketOnClose() {
-	// on socket conn close, stop all timer or intervals
-	log('Socket connection closed, stopping timers and timeouts!');
-	clearAllIntervals(wordExpiryTimer);
-
-	// display connection lost on the modal
-	document.getElementById('modal').style.display = 'flex';
-}
-
-function closeSocketConn(reason) {
-	socket.close(1000, reason);
-}
-
-/**
- * Send the socketMsg to the server if connected, else show disconnected prompt
- * @param {Object} socketMsg message to be sent to the server
- */
-function sendViaSocket(socketMsg) {
-	/*  socket.readyState: int
-			0 - connecting
-			1 - open
-			2 - closing
-			3 - closed
-	*/
-
-	// if socket is in open state then send the message
-	if (socket.readyState === socket.OPEN)
-		socket.send(JSON.stringify(socketMsg));
-	else {
-		// clear any intervals and show connection lost
-		log('socket current state:', socket.readyState);
-		clearAllIntervals(wordExpiryTimer);
-
-		// display connection lost on the modal
-		document.getElementById('modal').style.display = 'flex';
 	}
 }
 
