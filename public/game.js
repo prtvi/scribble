@@ -637,11 +637,11 @@ function removeEventListenersOnGameStart() {
 		startGameBtn && startGameBtn.removeEventListener('click', startGameEl);
 	}
 
-	document
-		.querySelector('.joining-link-btn')
-		.removeEventListener('click', copyJoiningLinkEL);
+	// document
+	// 	.querySelector('.joining-link-btn')
+	// 	.removeEventListener('click', copyJoiningLinkEL);
 
-	document.querySelector('.joining-link-div').classList.add('hidden');
+	// document.querySelector('.joining-link-div').classList.add('hidden');
 }
 
 /**
