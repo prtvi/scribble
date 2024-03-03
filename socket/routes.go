@@ -29,7 +29,8 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 // GET /
 func Index(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"RenderTemplateName": "home",
+		"RenderPage":         "home",
+		"CanCustomiseAvatar": false,
 		"CreateRoomRoute":    createRoomRoute,
 	})
 }
@@ -38,10 +39,10 @@ func Index(c echo.Context) error {
 func CreateRoomForm(c echo.Context) error {
 	// render a form to create a new pool
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"RenderTemplateName": "createRoom",
-		"FormParams":         utils.FormParams,
-		"RoomCreated":        false,
-		"CreateRoomRoute":    createRoomRoute,
+		"RenderPage":      "createRoom",
+		"FormParams":      utils.FormParams,
+		"RoomCreated":     false,
+		"CreateRoomRoute": createRoomRoute,
 	})
 }
 
@@ -71,11 +72,11 @@ func CreateRoom(c echo.Context) error {
 
 	// send the link for the same
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"RenderTemplateName": "createRoom",
-		"FormParams":         utils.FormParams,
-		"RoomCreated":        true,
-		"RoomJoiningLink":    pool.JoiningLink + "&isOwner=true",
-		"CreateRoomRoute":    createRoomRoute,
+		"RenderPage":      "createRoom",
+		"FormParams":      utils.FormParams,
+		"RoomCreated":     true,
+		"RoomJoiningLink": pool.JoiningLink + "&isOwner=true",
+		"CreateRoomRoute": createRoomRoute,
 
 		// show on submit value submitted on form
 		"Players":            pool.Capacity,
@@ -91,7 +92,7 @@ func CreateRoom(c echo.Context) error {
 
 // GET /app
 func JoinPool(c echo.Context) error {
-	// if /app?join=poolId, then render the playing areax
+	// if /app?join=poolId, then render the playing area
 	// if /app          , then render message
 
 	poolId := c.QueryParam("join")
@@ -99,9 +100,9 @@ func JoinPool(c echo.Context) error {
 	// if poolId is empty then do not render any forms, just display message
 	if poolId == "" || len(poolId) == 0 {
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"RenderTemplateName": "error",
-			"Message":            "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
-			"HomeRoute":          slashRoute,
+			"RenderPage": "error",
+			"Message":    "Hi there, are you lost?! The link seems to be broken. Make sure you copied the link properly! 😃",
+			"HomeRoute":  slashRoute,
 		})
 	}
 
@@ -110,9 +111,9 @@ func JoinPool(c echo.Context) error {
 	if !ok {
 		// if not then do not render both forms and display message
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"RenderTemplateName": "error",
-			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
-			"HomeRoute":          slashRoute,
+			"RenderPage": "error",
+			"Message":    "Pool expired or non-existent! Make sure you have the correct link! 😃",
+			"HomeRoute":  slashRoute,
 		})
 	}
 
@@ -120,15 +121,16 @@ func JoinPool(c echo.Context) error {
 	if len(pool.Clients)+1 > pool.Capacity {
 		// if poolCurrSizePlus1 is greater than capacity then do not render both forms and display message
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"RenderTemplateName": "error",
-			"Message":            "Your party is full! Maximum room capacity reached! 😃",
-			"HomeRoute":          slashRoute,
+			"RenderPage": "error",
+			"Message":    "Your party is full! Maximum room capacity reached! 😃",
+			"HomeRoute":  slashRoute,
 		})
 	}
 
 	// else if every check, checks out then render "RegisterToPool" form
 	return c.Render(http.StatusOK, "index", map[string]any{
-		"RenderTemplateName": "join",
+		"RenderPage":         "join",
+		"CanCustomiseAvatar": true,
 		"AppRoute":           appRoute,
 
 		// hidden in form, added as hidden in "RegisterToPool" form to submit later when POST request is made to join the pool
@@ -149,9 +151,9 @@ func EnterPool(c echo.Context) error {
 	pool, ok := hub[poolId]
 	if !ok {
 		return c.Render(http.StatusOK, "index", map[string]any{
-			"RenderTemplateName": "error",
-			"Message":            "Pool expired or non-existent! Make sure you have the correct link! 😃",
-			"HomeRoute":          slashRoute,
+			"RenderPage": "error",
+			"Message":    "Pool expired or non-existent! Make sure you have the correct link! 😃",
+			"HomeRoute":  slashRoute,
 		})
 	}
 

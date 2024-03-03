@@ -1,11 +1,15 @@
 {{ define "customiseAvatar" }}
 
 <div class="avatar-customisable">
+	{{ if .CanCustomiseAvatar }}
+
 	<div class="avc-lb-container">
 		<div class="avc-btn eyes-left"></div>
 		<div class="avc-btn mouth-left"></div>
 		<div class="avc-btn color-left"></div>
 	</div>
+
+	{{ end }}
 
 	<div class="avatar custom-avatar">
 		<div class="color"></div>
@@ -15,6 +19,8 @@
 		<div class="owner"></div>
 	</div>
 
+	{{ if .CanCustomiseAvatar }}
+
 	<div class="avc-rb-container">
 		<div class="avc-btn eyes-right"></div>
 		<div class="avc-btn mouth-right"></div>
@@ -22,6 +28,8 @@
 	</div>
 
 	<div class="randomize"></div>
+
+	{{ end }}
 </div>
 
 {{ end }}

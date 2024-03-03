@@ -11,7 +11,7 @@
 				<div class="avatar-row"></div>
 			</div>
 
-			{{ if eq .RenderTemplateName "home" }}
+			{{ if eq .RenderPage "home" }}
 
 			<div class="container start">
 				<div class="subtext">
@@ -32,7 +32,7 @@
 				</div>
 			</div>
 
-			{{ else if eq .RenderTemplateName "createRoom" }}
+			{{ else if eq .RenderPage "createRoom" }}
 
 			<div class="container form-container">
 				<form action="{{ .CreateRoomRoute }}" method="post">
@@ -171,7 +171,7 @@
 				{{ end }}
 			</div>
 
-			{{ else if eq .RenderTemplateName "join" }}
+			{{ else if eq .RenderPage "join" }}
 
 			<div class="container form-container join-room-form">
 				<form action="{{ .AppRoute }}" method="post">
@@ -225,7 +225,7 @@
 		</main>
 
 		<script>
-			const renderTemplateName = '{{ .RenderTemplateName }}';
+			const renderPage = '{{ .RenderPage }}';
 		</script>
 		<script src="public/game.js"></script>
 	</body>

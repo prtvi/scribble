@@ -171,6 +171,8 @@ function renderRowAvatars() {
 function renderCustomisableAvatar() {
 	randomizeCustomisableAvatar();
 
+	if (renderPage != 'join') return;
+
 	const colorLeft = document.querySelector('.avc-btn.color-left');
 	const colorRight = document.querySelector('.avc-btn.color-right');
 	colorLeft.name = 'color';
@@ -433,7 +435,7 @@ function getPlayerCardDom(playerInfo, iteration) {
 	return playerCard;
 }
 
-// -------------------------------- OVERLAY --------------------------------
+// -------------------------------- OVERLAY and ADJUSTMENTS --------------------------------
 
 /**
  * Returns the HTML DOM for the overlay, for text only
@@ -1926,7 +1928,7 @@ const avatarConfig = {
 
 let canvas, ctx, overlay, socket;
 
-switch (renderTemplateName) {
+switch (renderPage) {
 	case 'game':
 		[canvas, ctx, overlay] = initCanvasAndOverlay();
 		socket = initSocket();
