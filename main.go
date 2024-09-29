@@ -8,23 +8,23 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func main() {
-	defer func() {
-		r := recover()
-		if r != nil {
-			utils.Cp("red", "panic occurred! recovering from", r)
-		}
-	}()
+func panicRecover() {
+	if err := recover(); err == nil {
+		return
+	}
 
-	isDebugEnv, port := utils.LoadAndGetEnv()
-	socket.InitDebugEnv(isDebugEnv)
+	utils.Cp("red", "restarting service ...")
+	main()
+}
+
+func main() {
+	defer panicRecover()
 	go socket.Maintainer()
 
 	e := echo.New()
 
 	e.Static("/public", "public")
 	e.Static("/scribble/public", "public")
-
 	e.Renderer = utils.InitTemplates()
 
 	ee := e.Group("/scribble", socket.Logger)
@@ -40,7 +40,5 @@ func main() {
 
 	ee.GET("/ws", socket.WsConnect)
 
-	ee.GET("/api/stats", socket.GetAppStats)
-
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", utils.GetPort())))
 }

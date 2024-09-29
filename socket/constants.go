@@ -28,8 +28,6 @@ var (
 	RemovePoolAfterGameNotStarted        = time.Minute * 10
 
 	ScoreForCorrectGuess = 50
-
-	debug = false
 )
 
 // B=> broadcasting to everyone

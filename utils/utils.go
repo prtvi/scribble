@@ -9,28 +9,32 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 )
 
 func IsProdEnv() bool {
-	return GetEnvVar("ENV") == "PROD" || GetEnvVar("ENV") == ""
+	return GetEnvVar("ENV") == "PROD"
 }
 
 func GetEnvVar(key string) string {
 	return os.Getenv(key)
 }
 
-func LoadAndGetEnv() (isDebugEnv bool, port string) {
-	err := godotenv.Load(".env")
-	if err != nil {
-		Cp("redBg", "Error loading .env file")
+func GetPort() (port string) {
+	if !IsProdEnv() {
+		DEBUG = true
+		port = "1323"
+		Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
+		return
 	}
 
-	if IsProdEnv() {
-		return false, GetEnvVar("PORT")
+	DEBUG = false
+	port = GetEnvVar("PORT")
+	if port == "" {
+		port = "1323"
 	}
 
-	return true, "1323"
+	Cp("redBg", "----------- PROD ENV -----------")
+	return
 }
 
 func logToFile(content string) {

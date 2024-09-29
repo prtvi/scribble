@@ -115,14 +115,3 @@ func Maintainer() {
 		utils.Cp("red", "len hub:", len(hub))
 	}
 }
-
-func InitDebugEnv(isDebugEnv bool) {
-	debug = isDebugEnv
-	utils.Cp("red", "len hub:", len(hub))
-
-	if isDebugEnv {
-		utils.Cp("greenBg", "----------- DEV/DEBUG ENV -----------")
-	} else {
-		utils.Cp("redBg", "----------- PROD ENV -----------")
-	}
-}

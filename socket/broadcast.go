@@ -62,7 +62,7 @@ func (pool *Pool) shareConfigWithClient(c *Client) {
 		MessageTypeMap:                 messageTypeMap,
 		TimeForEachWordInSeconds:       utils.DurationToSeconds(pool.DrawTime),
 		TimeForChoosingWordInSeconds:   utils.DurationToSeconds(TimeoutForChoosingWord),
-		PrintLogs:                      debug,
+		PrintLogs:                      utils.DEBUG,
 		CloseSocketConnectionInSeconds: utils.DurationToSeconds(CloseSocketConnectionIn),
 	}
 

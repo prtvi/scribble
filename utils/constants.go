@@ -37,6 +37,8 @@ var colorMap map[string]string = map[string]string{
 	"whiteBg":  "\033[47m",
 }
 
+var DEBUG = false
+
 var FontFaces = []string{"xb800", "b700", "sb600", "m500", "r400", "l300", "xl200", "t100"}
 
 var COLORS_FOR_DRAWING = []string{"#fff", "#c1c1c1", "#ef100c", "#ff7002", "#ffe300", "#00cc00", "#00ff92", "#00b2fe", "#231fd3", "#a302ba", "#df69a7", "#ffad8e", "#a1512d", "#000", "#505050", "#750b07", "#c23a00", "#e8a200", "#004618", "#06785d", "#00579e", "#0f0665", "#550069", "#886353", "#cc784c", "#64300d"}
